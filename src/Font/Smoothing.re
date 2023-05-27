@@ -10,15 +10,15 @@ type t =
 let default = SubpixelAntialiased;
 
 let setPaint = (~smoothing: t, paint: Skia.Paint.t) => {
-  switch (smoothing) {
-  | None =>
-    Skia.Paint.setAntiAlias(paint, false);
-    Skia.Paint.setSubpixelText(paint, false);
-  | Antialiased =>
-    Skia.Paint.setAntiAlias(paint, true);
-    Skia.Paint.setSubpixelText(paint, false);
-  | SubpixelAntialiased =>
-    Skia.Paint.setAntiAlias(paint, true);
-    Skia.Paint.setSubpixelText(paint, true);
-  };
+  // switch (smoothing) {
+  // | None =>
+  //   Skia.Paint.setAntiAlias(paint, false);
+  //   Skia.Paint.setSubpixelText(paint, false);
+  // | Antialiased =>
+  //   Skia.Paint.setAntiAlias(paint, true);
+  //   Skia.Paint.setSubpixelText(paint, false);
+  // | SubpixelAntialiased =>
+  //   Skia.Paint.setAntiAlias(paint, true);
+  //   Skia.Paint.setSubpixelText(paint, true);
+  // };
 };

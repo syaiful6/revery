@@ -279,7 +279,6 @@ let makeShadowImageFilter = boxShadow => {
     sigma,
     sigma,
     Color.toSkia(color),
-    DrawShadowOnly,
     None,
     None,
   );

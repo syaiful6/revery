@@ -30,25 +30,7 @@ module M = (T: TYPE) => {
         ],
       );
   };
-  module Hinting = {
-    type t =
-      | NoHinting
-      | SlightHinting
-      | NormalHinting
-      | FullHinting;
-
-    let t =
-      skiaCEnum(
-        "sk_paint_hinting_t",
-        [
-          (NoHinting, "NO_HINTING_SK_PAINT_HINTING"),
-          (SlightHinting, "SLIGHT_HINTING_SK_PAINT_HINTING"),
-          (NormalHinting, "NORMAL_HINTING_SK_PAINT_HINTING"),
-          (FullHinting, "FULL_HINTING_SK_PAINT_HINTING"),
-        ],
-      );
-  };
-
+  
   module TextEncoding = {
     type t =
       | Utf8
@@ -107,6 +89,12 @@ module M = (T: TYPE) => {
     let t = typedef(t, "sk_string_t");
   };
 
+  module Font = {
+    type t;
+    let t: typ(structure(t)) = structure("sk_font_t");
+    let t = typedef(t, "sk_font_t");
+  };
+
   module Typeface = {
     type t;
     let t: typ(structure(t)) = structure("sk_typeface_t");
@@ -154,26 +142,6 @@ module M = (T: TYPE) => {
       type t;
       let t: typ(structure(t)) = structure("sk_imagefilter_croprect_t");
       let t = typedef(t, "sk_imagefilter_croprect_t");
-    };
-
-    module DropShadow = {
-      type shadowMode =
-        | DrawShadowAndForeground
-        | DrawShadowOnly;
-      let shadowMode =
-        skiaCEnum(
-          "sk_drop_shadow_image_filter_shadow_mode_t",
-          [
-            (
-              DrawShadowAndForeground,
-              "DRAW_SHADOW_AND_FOREGROUND_SK_DROP_SHADOW_IMAGE_FILTER_SHADOW_MODE",
-            ),
-            (
-              DrawShadowOnly,
-              "DRAW_SHADOW_ONLY_SK_DROP_SHADOW_IMAGE_FILTER_SHADOW_MODE",
-            ),
-          ],
-        );
     };
   };
 
@@ -249,7 +217,15 @@ module M = (T: TYPE) => {
   module Matrix = {
     type t;
     let t: typ(structure(t)) = structure("sk_matrix_t");
-    let mat = field(t, "mat", array(9, float));
+    let scaleX = field(t, "scaleX", float);
+    let skewX = field(t, "skewX", float);
+    let transX = field(t, "transX", float);
+    let skewY = field(t, "skewY", float);
+    let scaleY = field(t, "scaleY", float);
+    let transY = field(t, "transY", float);
+    let persp0 = field(t, "persp0", float);
+    let persp1 = field(t, "persp1", float);
+    let persp2 = field(t, "persp2", float);
     seal(t);
     let t = typedef(t, "sk_matrix_t");
   };
@@ -365,9 +341,19 @@ module M = (T: TYPE) => {
     | Rgb888x
     | Bgra8888
     | Rgba1010102
+    | Bgra1010102
     | Rgb101010x
     | Gray8
-    | RgbaF16;
+    | RgbaF16Norm
+    | RgbaF16
+    | RgbaF32
+    | R8g8Unorm
+    | A16Float
+    | R16g16Float
+    | A16Unorm
+    | R16g16Unorm
+    | R16g16b16a16Unorm;
+
   let colorType =
     skiaCEnum(
       "sk_colortype_t",
@@ -380,9 +366,18 @@ module M = (T: TYPE) => {
         (Rgb888x, "RGB_888X_SK_COLORTYPE"),
         (Bgra8888, "BGRA_8888_SK_COLORTYPE"),
         (Rgba1010102, "RGBA_1010102_SK_COLORTYPE"),
+        (Bgra1010102, "BGRA_1010102_SK_COLORTYPE"),
         (Rgb101010x, "RGB_101010X_SK_COLORTYPE"),
         (Gray8, "GRAY_8_SK_COLORTYPE"),
+        (RgbaF16Norm, "RGBA_F16_NORM_SK_COLORTYPE"),
         (RgbaF16, "RGBA_F16_SK_COLORTYPE"),
+        (RgbaF32, "RGBA_F32_SK_COLORTYPE"),
+        (R8g8Unorm, "R8G8_UNORM_SK_COLORTYPE"),
+        (A16Float, "A16_FLOAT_SK_COLORTYPE"),
+        (R16g16Float, "R16G16_FLOAT_SK_COLORTYPE"),
+        (A16Unorm, "A16_UNORM_SK_COLORTYPE"),
+        (R16g16Unorm, "R16G16_UNORM_SK_COLORTYPE"),
+        (R16g16b16a16Unorm, "R16G16B16A16_UNORM_SK_COLORTYPE"),
       ],
     );
 

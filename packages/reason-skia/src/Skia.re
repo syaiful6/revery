@@ -75,10 +75,6 @@ module FilterQuality = {
   type t = SkiaWrapped.FilterQuality.t;
 };
 
-module Hinting = {
-  type t = SkiaWrapped.Hinting.t;
-};
-
 module TextEncoding = {
   type t = SkiaWrapped.TextEncoding.t;
 };
@@ -91,8 +87,6 @@ module ImageFilter = {
   };
 
   module DropShadow = {
-    type shadowMode = SkiaWrapped.ImageFilter.DropShadow.shadowMode;
-
     let make =
         (
           dx,
@@ -100,7 +94,6 @@ module ImageFilter = {
           sigmaX,
           sigmaY,
           color,
-          shadowMode,
           inputOption,
           cropRectOption,
         ) => {
@@ -112,7 +105,6 @@ module ImageFilter = {
           sigmaY,
           // TODO: Make fast
           Unsigned.UInt32.of_int32(color),
-          shadowMode,
           inputOption,
           cropRectOption,
         );
@@ -136,10 +128,6 @@ module Paint = {
     paint;
   };
 
-  let measureText = (paint, text, rectOpt) => {
-    SkiaWrapped.Paint.measureText(paint, text, String.length(text), rectOpt);
-  };
-
   [@noalloc]
   external _setColor: (CI.fatptr(_), [@unboxed] int32) => unit =
     "reason_skia_paint_set_color_byte" "reason_skia_paint_set_color";
@@ -154,20 +142,9 @@ module Paint = {
   let getFilterQuality = SkiaWrapped.Paint.getFilterQuality;
   let setFilterQuality = SkiaWrapped.Paint.setFilterQuality;
 
-  let setHinting = SkiaWrapped.Paint.setHinting;
-  let getHinting = SkiaWrapped.Paint.getHinting;
-
-  let isAutohinted = SkiaWrapped.Paint.isAutohinted;
-  let setAutohinted = SkiaWrapped.Paint.setAutohinted;
-
   let setAntiAlias = SkiaWrapped.Paint.setAntiAlias;
   let setStyle = SkiaWrapped.Paint.setStyle;
   let setStrokeWidth = SkiaWrapped.Paint.setStrokeWidth;
-  let setLcdRenderText = SkiaWrapped.Paint.setLcdRenderText;
-  let setSubpixelText = SkiaWrapped.Paint.setSubpixelText;
-  let setTextSize = SkiaWrapped.Paint.setTextSize;
-  let setTypeface = SkiaWrapped.Paint.setTypeface;
-  let getFontMetrics = SkiaWrapped.Paint.getFontMetrics;
   let setImageFilter = SkiaWrapped.Paint.setImageFilter;
   let setPathEffect = SkiaWrapped.Paint.setPathEffect;
   let getPathEffect = SkiaWrapped.Paint.getPathEffect;
@@ -176,6 +153,26 @@ module Paint = {
   let getTextEncoding = SkiaWrapped.Paint.getTextEncoding;
 
   let setShader = SkiaWrapped.Paint.setShader;
+};
+
+module Font = {
+  type t = SkiaWrapped.Font.t;
+
+  let make = () => {
+    let font = SkiaWrapped.Font.allocate();
+    Gc.finalise(SkiaWrapped.Font.delete, font); 
+    font;
+  };
+  let getTypeface = SkiaWrapped.Font.getTypeface;
+  let setTypeface = SkiaWrapped.Font.setTypeface;
+  let getSize = SkiaWrapped.Font.getSize;
+  let setSize = SkiaWrapped.Font.setSize;
+  let getFontMetrics = SkiaWrapped.Font.getFontMetrics;
+
+  let measureText = (~bounds, ~paint, t, text, encoding) => {
+    //SkiaWrapped.Font.measureText(t, text, Unsigned.Size_t.of_int(String.length(text)), encoding, bounds, paint);
+    0.
+  };
 };
 
 module Point = {
@@ -962,21 +959,23 @@ module Surface = {
   let getWidth = SkiaWrapped.Surface.getWidth;
   let getHeight = SkiaWrapped.Surface.getHeight;
   let getProps = SkiaWrapped.Surface.getProps;
+  let flush = SkiaWrapped.Surface.flush;
+  let flushAndSubmit = SkiaWrapped.Surface.flushAndSubmit;
 };
 
-module SVG = {
-  type t = {
-    svg: SkiaWrapped.SVG.t,
-    stream: SkiaWrapped.Stream.t,
-  };
-  let makeFromStream = stream =>
-    SkiaWrapped.SVG.makeFromStream(stream)
-    |> Option.map(svg => {
-         svg |> Gc.finalise(SkiaWrapped.SVG.delete);
-         {svg, stream};
-       });
-  let render = t => SkiaWrapped.SVG.render(t.svg);
-  let setContainerSize = t => SkiaWrapped.SVG.setContainerSize(t.svg);
-  let getContainerWidth = t => SkiaWrapped.SVG.getContainerWidth(t.svg);
-  let getContainerHeight = t => SkiaWrapped.SVG.getContainerHeight(t.svg);
-};
+// module SVG = {
+//   type t = {
+//     svg: SkiaWrapped.SVG.t,
+//     stream: SkiaWrapped.Stream.t,
+//   };
+//   let makeFromStream = stream =>
+//     SkiaWrapped.SVG.makeFromStream(stream)
+//     |> Option.map(svg => {
+//          svg |> Gc.finalise(SkiaWrapped.SVG.delete);
+//          {svg, stream};
+//        });
+//   let render = t => SkiaWrapped.SVG.render(t.svg);
+//   let setContainerSize = t => SkiaWrapped.SVG.setContainerSize(t.svg);
+//   let getContainerWidth = t => SkiaWrapped.SVG.getContainerWidth(t.svg);
+//   let getContainerHeight = t => SkiaWrapped.SVG.getContainerHeight(t.svg);
+// };

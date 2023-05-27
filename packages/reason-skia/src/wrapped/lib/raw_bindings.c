@@ -5,13 +5,13 @@
  */
 
 #include "c_stubs.h"
-#include "sk_canvas.h"
-#include "sk_matrix.h"
-#include "sk_paint.h"
-#include "sk_types.h"
-#include "sk_typeface.h"
-#include "sk_data.h"
-#include "sk_stream.h"
+#include "include/c/sk_canvas.h"
+#include "include/c/sk_matrix.h"
+#include "include/c/sk_paint.h"
+#include "include/c/sk_types.h"
+#include "include/c/sk_typeface.h"
+#include "include/c/sk_data.h"
+#include "include/c/sk_stream.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -201,16 +201,15 @@ CAMLprim value reason_skia_rect_set_byte(value vRect, value vLeft, value vTop,
 CAMLprim value reason_skia_matrix_set_scale(value vMatrix, double scaleX,
         double scaleY, double pivotX,
         double pivotY) {
-    float *pMatrix = CTYPES_ADDR_OF_FATPTR(vMatrix);
-    pMatrix[0] = scaleX;
-    pMatrix[1] = 0.0;
-    pMatrix[2] = pivotX - (scaleX * pivotX);
-    pMatrix[3] = 0.0;
-    pMatrix[4] = scaleY;
-    pMatrix[5] = pivotY - (scaleY * pivotY);
-    pMatrix[6] = 0.0;
-    pMatrix[7] = 0.0;
-    pMatrix[8] = 1.0;
+    sk_matrix_t *matrix = CTYPES_ADDR_OF_FATPTR(vMatrix);
+    matrix->skewX = 0.0;
+    matrix->transX = pivotX - (scaleX * pivotX);
+    matrix->skewY = 0.0;
+    matrix->scaleY = scaleY;
+    matrix->transY = pivotY - (scaleY * pivotY);
+    matrix->persp0 = 0.0;
+    matrix->persp1 = 0.0;
+    matrix->persp2 = 1.0;
     return Val_unit;
 }
 
@@ -225,16 +224,16 @@ CAMLprim value reason_skia_matrix_set_scale_byte(value vMatrix, value vScaleX,
 CAMLprim value reason_skia_matrix_set_translate(value vMatrix,
         double translateX,
         double translateY) {
-    float *pMatrix = CTYPES_ADDR_OF_FATPTR(vMatrix);
-    pMatrix[0] = 1.0;
-    pMatrix[1] = 0.0;
-    pMatrix[2] = translateX;
-    pMatrix[3] = 0.0;
-    pMatrix[4] = 1.0;
-    pMatrix[5] = translateY;
-    pMatrix[6] = 0.0;
-    pMatrix[7] = 0.0;
-    pMatrix[8] = 1.0;
+    sk_matrix_t *matrix = CTYPES_ADDR_OF_FATPTR(vMatrix);
+    matrix->scaleX = 1.0;
+    matrix->skewX = 0.0;
+    matrix->transX = translateX;
+    matrix->skewY = 0.0;
+    matrix->scaleY = 1.0;
+    matrix->transY = translateY;
+    matrix->persp0 = 0.0;
+    matrix->persp1 = 0.0;
+    matrix->persp2 = 1.0;
     return Val_unit;
 }
 

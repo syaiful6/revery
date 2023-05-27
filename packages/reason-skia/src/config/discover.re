@@ -113,10 +113,11 @@ let flags = os =>
 
 let skiaIncludeFlags = {
   let skiaIncludePath = getenv("SKIA_INCLUDE_PATH");
-  Sys.readdir(skiaIncludePath)
-  |> Array.map(path => "-I" ++ skiaIncludePath ++ "/" ++ path)
-  |> Array.append([|"-I" ++ skiaIncludePath|])
-  |> Array.to_list;
+  ["-I" ++ skiaIncludePath]
+  // Sys.readdir(skiaIncludePath)
+  // |> Array.map(path => "-I" ++ skiaIncludePath ++ "/" ++ path)
+  // |> Array.append([|"-I" ++ skiaIncludePath|])
+  // |> Array.to_list;
 };
 let cflags = os => {
   switch (os) {
@@ -129,6 +130,7 @@ let cflags = os => {
     @ ["-llog"]
     @ ["-landroid"]
     @ ["-lskia"]
+    @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
     @ ["-I" ++ getenv("SDL2_INCLUDE_PATH")]
     @ skiaIncludeFlags
     @ ["-L" ++ getenv("SKIA_LIB_PATH")]
@@ -140,6 +142,7 @@ let cflags = os => {
     []
     @ [sdl2FilePath]
     @ ["-lskia"]
+    @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
     @ ["-I" ++ getenv("SDL2_INCLUDE_PATH")]
     @ skiaIncludeFlags
     @ ["-L" ++ getenv("SKIA_LIB_PATH")]
@@ -149,7 +152,7 @@ let cflags = os => {
     @ ["-ljpeg"]
     @ ["-fPIC"]
   | IOS
-  | Mac => [] @ ["-I" ++ getenv("SDL2_INCLUDE_PATH")] @ skiaIncludeFlags
+  | Mac => [] @ ["-I" ++ getenv("SDL2_INCLUDE_PATH"),] @ skiaIncludeFlags
   | Windows =>
     []
     @ ["-std=c++1y"]

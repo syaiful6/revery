@@ -158,12 +158,12 @@ let getMetrics: (t, float) => FontMetrics.t =
       MetricsCache.promote(size, metricsCache);
       v;
     | None =>
-      let paint = Skia.Paint.make();
-      Skia.Paint.setTypeface(paint, skiaFace);
-      Skia.Paint.setTextSize(paint, size);
+      let font = Skia.Font.make();
+      Skia.Font.setTypeface(font, skiaFace);
+      Skia.Font.setSize(font, size);
 
       let metrics = Skia.FontMetrics.make();
-      let lineHeight = Skia.Paint.getFontMetrics(paint, metrics, 1.0);
+      let lineHeight = Skia.Font.getFontMetrics(font, metrics);
 
       let ret = FontMetrics.ofSkia(size, lineHeight, metrics);
       MetricsCache.add(size, ret, metricsCache);

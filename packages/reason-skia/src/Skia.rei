@@ -32,7 +32,6 @@ module FontStyle: {
 };
 
 module FilterQuality: {type t = SkiaWrapped.FilterQuality.t;};
-module Hinting: {type t = SkiaWrapped.Hinting.t;};
 module TextEncoding: {type t = SkiaWrapped.TextEncoding.t;};
 
 module Stream: {
@@ -94,8 +93,6 @@ module ImageFilter: {
   module CropRect: {type t;};
 
   module DropShadow: {
-    type shadowMode = SkiaWrapped.ImageFilter.DropShadow.shadowMode;
-
     let make:
       (
         float,
@@ -103,7 +100,6 @@ module ImageFilter: {
         float,
         float,
         Color.t,
-        shadowMode,
         option(t),
         option(CropRect.t)
       ) =>
@@ -117,7 +113,6 @@ module ImageFilter: {
       float,
       float,
       Color.t,
-      DropShadow.shadowMode,
       option(t),
       option(CropRect.t)
     ) =>
@@ -325,12 +320,6 @@ module Paint: {
   let setColor: (t, Color.t) => unit;
   let setAntiAlias: (t, bool) => unit;
 
-  let setAutohinted: (t, bool) => unit;
-  let isAutohinted: t => bool;
-
-  let setHinting: (t, Hinting.t) => unit;
-  let getHinting: t => Hinting.t;
-
   let setFilterQuality: (t, FilterQuality.t) => unit;
   let getFilterQuality: t => FilterQuality.t;
 
@@ -340,18 +329,24 @@ module Paint: {
   let setStyle: (t, style) => unit;
   let setStrokeWidth: (t, float) => unit;
   let setImageFilter: (t, option(ImageFilter.t)) => unit;
-  let setTypeface: (t, Typeface.t) => unit;
-  let setLcdRenderText: (t, bool) => unit;
-  let setSubpixelText: (t, bool) => unit;
-  let setTextSize: (t, float) => unit;
   let setAlpha: (t, float) => unit;
-  let getFontMetrics: (t, FontMetrics.t, float) => float;
-  let measureText: (t, string, option(Rect.t)) => float;
 
   let setTextEncoding: (t, TextEncoding.t) => unit;
   let getTextEncoding: t => TextEncoding.t;
 
   let setShader: (t, Shader.t) => unit;
+};
+
+module Font: {
+  type t;
+
+  let make: unit => t;
+  let setTypeface: (t, Typeface.t) => unit;
+  let getTypeface: (t) => Typeface.t;
+  let getSize: (t) => float;
+  let setSize: (t, float) => unit;
+  let measureText: (~bounds: option(Rect.t), ~paint: option(Paint.t), t, string, TextEncoding.t) => float;
+  let getFontMetrics: (t, FontMetrics.t) => float;
 };
 
 module IRect: {
@@ -545,14 +540,16 @@ module Surface: {
   let getWidth: t => int;
   let getHeight: t => int;
   let getProps: t => SurfaceProps.t;
+  let flush: t => unit;
+  let flushAndSubmit: (t, bool) => unit;
 };
 
-module SVG: {
-  type t;
+// module SVG: {
+//   type t;
 
-  let makeFromStream: Stream.t => option(t);
-  let render: (t, Canvas.t) => unit;
-  let setContainerSize: (t, float, float) => unit;
-  let getContainerWidth: t => float;
-  let getContainerHeight: t => float;
-};
+//   let makeFromStream: Stream.t => option(t);
+//   let render: (t, Canvas.t) => unit;
+//   let setContainerSize: (t, float, float) => unit;
+//   let getContainerWidth: t => float;
+//   let getContainerHeight: t => float;
+// };

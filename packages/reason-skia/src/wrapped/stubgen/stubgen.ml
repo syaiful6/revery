@@ -2,23 +2,21 @@ let prefix = "skia_wrapped_stub"
 
 let prologue = {|
 #include "c_stubs.h"
-#include "gr_context.h"
-#include "sk_canvas.h"
-#include "sk_data.h"
-#include "sk_image.h"
-#include "sk_imagefilter.h"
-#include "sk_paint.h"
-#include "sk_path.h"
-#include "sk_surface.h"
-#include "sk_rrect.h"
-#include "sk_matrix.h"
-#include "sk_typeface.h"
-#include "sk_stream.h"
-#include "sk_string.h"
-
-// Enable the SVG functions
-#define ESY_SKIA_SVG
-#include "sk_svg.h"
+#include "include/c/sk_types.h"
+#include "include/c/gr_context.h"
+#include "include/c/sk_canvas.h"
+#include "include/c/sk_data.h"
+#include "include/c/sk_image.h"
+#include "include/c/sk_imagefilter.h"
+#include "include/c/sk_paint.h"
+#include "include/c/sk_path.h"
+#include "include/c/sk_surface.h"
+#include "include/c/sk_rrect.h"
+#include "include/c/sk_matrix.h"
+#include "include/c/sk_typeface.h"
+#include "include/c/sk_stream.h"
+#include "include/c/sk_string.h"
+#include "include/c/sk_svg.h"
 |}
 
 let () =

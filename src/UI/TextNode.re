@@ -28,9 +28,13 @@ class textNode (text: string) = {
   val _textPaint = {
     let paint = Skia.Paint.make();
     Skia.Paint.setTextEncoding(paint, GlyphId);
-    Skia.Paint.setLcdRenderText(paint, true);
-    Skia.Paint.setAntiAlias(paint, true);
+    // Skia.Paint.setLcdRenderText(paint, true);
+    // Skia.Paint.setAntiAlias(paint, true);
     paint;
+  };
+  val _font = {
+    let font = Skia.Font.make();
+    font;
   };
   inherit (class viewNode)() as _super;
   pub! draw = (parentContext: NodeDrawContext.t) => {
@@ -46,7 +50,7 @@ class textNode (text: string) = {
     | Ok(font) =>
       Revery_Font.Smoothing.setPaint(~smoothing=_smoothing, _textPaint);
       Skia.Paint.setColor(_textPaint, Color.toSkia(colorWithAppliedOpacity));
-      Skia.Paint.setTextSize(_textPaint, _fontSize);
+      Skia.Font.setSize(_font, _fontSize);
 
       let ascentPx =
         Text.ascent(~italic=_italicized, _fontFamily, _fontSize, _fontWeight);
@@ -83,7 +87,7 @@ class textNode (text: string) = {
 
           glyphStrings
           |> List.iter(((skiaFace, str)) => {
-               Skia.Paint.setTypeface(_textPaint, skiaFace);
+               Skia.Font.setTypeface(_font, skiaFace);
 
                CanvasContext.drawText(
                  ~paint=_textPaint,
@@ -94,7 +98,7 @@ class textNode (text: string) = {
                );
 
                offset :=
-                 offset^ +. Skia.Paint.measureText(_textPaint, str, None);
+                 offset^ +. Skia.Font.measureText(~bounds=None, ~paint=Some(_textPaint), _font, str, GlyphId);
              });
 
           if (_underlined) {
