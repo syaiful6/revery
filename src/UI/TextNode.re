@@ -29,7 +29,7 @@ class textNode (text: string) = {
     let paint = Skia.Paint.make();
     // Skia.Paint.setTextEncoding(paint, GlyphId);
     // Skia.Paint.setLcdRenderText(paint, true);
-    // Skia.Paint.setAntiAlias(paint, true);
+    Skia.Paint.setAntiAlias(paint, true);
     paint;
   };
   val _font = {
@@ -48,7 +48,7 @@ class textNode (text: string) = {
     switch (Family.resolve(~italic=_italicized, _fontWeight, _fontFamily)) {
     | Error(_) => ()
     | Ok(font) =>
-      Revery_Font.Smoothing.setPaint(~smoothing=_smoothing, _textPaint);
+      Revery_Font.Smoothing.setPaint(~smoothing=_smoothing, _font, _textPaint);
       Skia.Paint.setColor(_textPaint, Color.toSkia(colorWithAppliedOpacity));
       Skia.Font.setSize(_font, _fontSize);
 

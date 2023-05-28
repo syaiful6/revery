@@ -13,7 +13,7 @@ let measure = {
     let glyphStrings =
       text |> FontCache.shape(~features, font) |> ShapeResult.getGlyphStrings;
 
-    //Smoothing.setPaint(~smoothing, paint);
+    Smoothing.setPaint(~smoothing, skiaFont, paint);
     Skia.Font.setSize(skiaFont, size);
     // Skia.Paint.setTextSize(paint, size);
 

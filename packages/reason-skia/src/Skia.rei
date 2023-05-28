@@ -343,6 +343,8 @@ module Font: {
   let getTypeface: (t) => Typeface.t;
   let getSize: (t) => float;
   let setSize: (t, float) => unit;
+  let isSubpixel: (t) => bool;
+  let setSubpixel: (t, bool) => unit;
   let measureText: (~bounds:Rect.t=?, ~paint:Paint.t, ~encoding:TextEncoding.t=?, t, string, unit) => float;
   let getFontMetrics: (t, FontMetrics.t) => float;
 };

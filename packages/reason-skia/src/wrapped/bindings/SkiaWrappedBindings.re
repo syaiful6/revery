@@ -668,6 +668,18 @@ module M = (F: FOREIGN) => {
     let getFontMetrics = foreign("sk_font_get_metrics", t @-> FontMetrics.t @-> returning(float));
     let setHinting = foreign("sk_font_set_hinting", t @-> hinting @-> returning(void));
     let getHinting = foreign("sk_font_get_hinting", t @-> returning(hinting));
+    let isSubpixel = foreign("sk_font_is_subpixel", t @-> returning(bool));
+    let setSubpixel = foreign("sk_font_set_subpixel", t @-> bool @-> returning(void));
+    let isLinearMetrics = foreign("sk_font_is_linear_metrics", t @-> returning(bool));
+    let setLinearMetrics = foreign("sk_font_set_linear_metrics", t @-> bool @-> returning(void));
+    // let textToGlyph = foreign(
+    //   "sk_font_text_to_glyphs",
+    //   t
+    //   @-> string
+    //   @-> size_t
+    //   @-> TextEncoding.t
+    //   @-> 
+    // )
 
     let measureText = foreign(
       "sk_font_measure_text",

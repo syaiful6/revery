@@ -202,6 +202,7 @@ CAMLprim value reason_skia_matrix_set_scale(value vMatrix, double scaleX,
         double scaleY, double pivotX,
         double pivotY) {
     sk_matrix_t *matrix = CTYPES_ADDR_OF_FATPTR(vMatrix);
+    matrix->scaleX = scaleX;
     matrix->skewX = 0.0;
     matrix->transX = pivotX - (scaleX * pivotX);
     matrix->skewY = 0.0;

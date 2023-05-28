@@ -94,20 +94,16 @@ module M = (T: TYPE) => {
     let t: typ(structure(t)) = structure("sk_font_t");
     let t = typedef(t, "sk_font_t");
 
-    type hinting =
-      | Nohint
-      | Slight
-      | Normal
-      | Full;
+    type hinting = [ | `nohint | `slight | `normal | `full];
 
-    let hinting =
+    let hinting : T.typ(hinting) =
       skiaCEnum(
         "sk_font_hinting_t",
         [
-          (Nohint, "NONE_SK_FONT_HINTING"),
-          (Slight, "SLIGHT_SK_FONT_HINTING"),
-          (Normal, "NORMAL_SK_FONT_HINTING"),
-          (Full, "FULL_SK_FONT_HINTING"),
+          (`nohint, "NONE_SK_FONT_HINTING"),
+          (`slight, "SLIGHT_SK_FONT_HINTING"),
+          (`normal, "NORMAL_SK_FONT_HINTING"),
+          (`full, "FULL_SK_FONT_HINTING"),
         ],
       );
   };

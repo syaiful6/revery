@@ -358,6 +358,9 @@ module Font = {
   let setSize = SkiaWrapped.Font.setSize;
   let getFontMetrics = SkiaWrapped.Font.getFontMetrics;
 
+  let isSubpixel = SkiaWrapped.Font.isSubpixel;
+  let setSubpixel = SkiaWrapped.Font.setSubpixel;
+
   let measureText = (~bounds=?, ~paint, ~encoding=?, t, text, ()) => {
     let enc: TextEncoding.t = switch(encoding) {
     | None => Utf8
@@ -838,7 +841,7 @@ module Canvas = {
   let drawPath = SkiaWrapped.Canvas.drawPath;
   let drawCircle = SkiaWrapped.Canvas.drawCircle;
 
-  let drawSimpleText = (~encoding:TextEncoding.t=Utf8, canvas, text, x, y, font, paint, ()) => {
+  let drawSimpleText = (~encoding:TextEncoding.t=GlyphId, canvas, text, x, y, font, paint, ()) => {
     SkiaWrapped.Canvas.drawSimpleText(
       canvas,
       text,
