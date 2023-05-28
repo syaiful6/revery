@@ -643,6 +643,9 @@ module M = (F: FOREIGN) => {
     type t = ptr(structure(SkiaTypes.Font.t));
     let t = ptr(SkiaTypes.Font.t);
 
+    type hinting = SkiaTypes.Font.hinting;
+    let hinting = SkiaTypes.Font.hinting;
+
     let allocate =
       foreign("sk_font_new", void @-> returning(t));
 
@@ -663,6 +666,8 @@ module M = (F: FOREIGN) => {
     let getSize = foreign("sk_font_get_size", t @-> returning(float));
     let setSize = foreign("sk_font_set_size", t @-> float @-> returning(void));
     let getFontMetrics = foreign("sk_font_get_metrics", t @-> FontMetrics.t @-> returning(float));
+    let setHinting = foreign("sk_font_set_hinting", t @-> hinting @-> returning(void));
+    let getHinting = foreign("sk_font_get_hinting", t @-> returning(hinting));
 
     let measureText = foreign(
       "sk_font_measure_text",
@@ -670,8 +675,8 @@ module M = (F: FOREIGN) => {
       @-> string
       @-> size_t
       @-> TextEncoding.t
-      @-> ptr_opt(Rect.t)
-      @-> ptr_opt(Paint.t)
+      @-> ptr_opt(SkiaTypes.Rect.t)
+      @-> Paint.t
       @-> returning(float)
     );
   };
@@ -862,7 +867,6 @@ module M = (F: FOREIGN) => {
       foreign(
         "sk_image_new_from_encoded",
         Data.t
-        @-> ptr_opt(SkiaTypes.IRect.t)
         @-> returning(ptr_opt(SkiaTypes.Image.t)),
       );
     let delete = foreign("sk_image_unref", t @-> returning(void));
@@ -932,7 +936,7 @@ module M = (F: FOREIGN) => {
 
       let makeGl =
         foreign(
-          "gr_context_make_gl",
+          "gr_direct_context_make_gl",
           ptr_opt(SkiaTypes.Gr.Gl.Interface.t)
           @-> returning(ptr_opt(SkiaTypes.Gr.Context.t)),
         );
@@ -1009,14 +1013,16 @@ module M = (F: FOREIGN) => {
         t @-> Path.t @-> Paint.t @-> returning(void),
       );
 
-    let drawText =
+    let drawSimpleText =
       foreign(
-        "sk_canvas_draw_text",
+        "sk_canvas_draw_simple_text",
         t
         @-> string
         @-> int
+        @-> TextEncoding.t
         @-> float
         @-> float
+        @-> Font.t
         @-> Paint.t
         @-> returning(void),
       );

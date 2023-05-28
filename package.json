@@ -55,7 +55,7 @@
     "esy-freetype2": "^2.9.1008",
     "@onivim/reason-native-crash-utils": "^1.0.2",
     "@revery/esy-harfbuzz": "^2.6.8002",
-    "esy-mono-skia": "*",
+    "esy-mono-skia": "syaiful6/esy-mono-skia#a5643d70fa",
     "esy-sdl2": "revery-ui/esy-sdl2#5f771c6c12a41e2f4295cc1d796b63741fa3c020",
     "flex": "jordwalke/flex#6ff12fe",
     "reperf": "^1.5.1",
@@ -66,8 +66,7 @@
   },
   "resolutions": {
     "@esy-ocaml/reason": "EduardoRFS/reason:reason.json#35aa4df3de0daa60bdc1133dcf97855decac48f7",
-    "@opam/printbox": "0.5",
-    "esy-mono-skia": "link:../esy-mono-skia"
+    "@opam/printbox": "0.5"
   },
   "devDependencies": {
     "ocaml": "4.12.x",

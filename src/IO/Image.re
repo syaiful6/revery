@@ -108,7 +108,7 @@ let fromAssetPath = (imagePath: string) => {
     Log.info("Got data.");
 
     let maybeImage =
-      Option.bind(maybeData, data => Skia.Image.makeFromEncoded(data, None));
+      Option.bind(maybeData, data => Skia.Image.makeFromEncoded(data));
 
     Hashtbl.replace(contextCache, imagePath, maybeImage);
 

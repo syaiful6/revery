@@ -331,21 +331,19 @@ module Paint: {
   let setImageFilter: (t, option(ImageFilter.t)) => unit;
   let setAlpha: (t, float) => unit;
 
-  let setTextEncoding: (t, TextEncoding.t) => unit;
-  let getTextEncoding: t => TextEncoding.t;
-
   let setShader: (t, Shader.t) => unit;
 };
 
 module Font: {
   type t;
+  type hinting = SkiaWrapped.Font.hinting;
 
   let make: unit => t;
   let setTypeface: (t, Typeface.t) => unit;
   let getTypeface: (t) => Typeface.t;
   let getSize: (t) => float;
   let setSize: (t, float) => unit;
-  let measureText: (~bounds: option(Rect.t), ~paint: option(Paint.t), t, string, TextEncoding.t) => float;
+  let measureText: (~bounds:Rect.t=?, ~paint:Paint.t, ~encoding:TextEncoding.t=?, t, string, unit) => float;
   let getFontMetrics: (t, FontMetrics.t) => float;
 };
 
@@ -422,7 +420,7 @@ module ImageInfo: {
 module Image: {
   type t;
 
-  let makeFromEncoded: (Data.t, option(IRect.t)) => option(t);
+  let makeFromEncoded: (Data.t) => option(t);
   let encodeToData: t => Data.t;
 
   let width: t => int;
@@ -477,7 +475,8 @@ module Canvas: {
   let drawCircle: (t, float, float, float, Paint.t) => unit;
   let drawRRect: (t, RRect.t, Paint.t) => unit;
   let drawPath: (t, Path.t, Paint.t) => unit;
-  let drawText: (t, string, float, float, Paint.t) => unit;
+  let drawSimpleText: (~encoding:TextEncoding.t=?, t, string, float, float, Font.t, Paint.t, unit) => unit;
+  let drawText: (t, string, float, float, Font.t, Paint.t) => unit;
   let drawImage: (t, Image.t, float, float, option(Paint.t)) => unit;
   let drawImageRect:
     (t, Image.t, option(Rect.t), Rect.t, option(Paint.t)) => unit;

@@ -20,17 +20,18 @@ let draw = canvas => {
   let maybeTypeface =
     FontManager.matchFamilyStyle(fontManager, "Arial", style);
   let fill = Paint.make();
+  let font = Font.make();
 
-  Paint.setColor(fill, Color.makeArgb(0xFFl, 0xFFl, 0xFFl, 0xFFl));
-  Paint.setTextSize(fill, 16.);
-  Paint.setSubpixelText(fill, true);
+  // Paint.setColor(fill, Color.makeArgb(0xFFl, 0xFFl, 0xFFl, 0xFFl));
+  // Paint.setTextSize(fill, 16.);
+  // Paint.setSubpixelText(fill, true);
 
   switch (maybeTypeface) {
   | None =>
     print_endline("Normal Arial not found. Ensure you have it available.")
   | Some(typeface) =>
-    Paint.setTypeface(fill, typeface);
-    Canvas.drawText(canvas, "Arial (System)", 10., 20., fill);
+    Font.setTypeface(font, typeface);
+    Canvas.drawText(canvas, "Arial (System)", 10., 20., font, fill);
     let stream = Typeface.toStream(typeface);
     let length = Stream.getLength(stream);
     Printf.printf("Stream length: %d\n", length);
@@ -50,8 +51,8 @@ let draw = canvas => {
       "Normal Times New Roman not found. Ensure you have it available.",
     )
   | Some(typeface) =>
-    Paint.setTypeface(fill, typeface);
-    Canvas.drawText(canvas, "Times New Roman (System)", 10., 40., fill);
+    Font.setTypeface(font, typeface);
+    Canvas.drawText(canvas, "Times New Roman (System)", 10., 40., font, fill);
   };
 
   let maybeTypeface =
@@ -62,9 +63,9 @@ let draw = canvas => {
       "Normal Consolas not found. Ensure your system has it available.",
     )
   | Some(typeface) =>
-    Paint.setTypeface(fill, typeface);
+    Font.setTypeface(font, typeface);
     let metrics = FontMetrics.make();
-    let _ret: float = Paint.getFontMetrics(fill, metrics, 1.0);
+    let _ret: float = Font.getFontMetrics(font, metrics);
     print_endline("__Consolas__");
     print_endline(
       "-- Average character width: "
@@ -84,9 +85,9 @@ let draw = canvas => {
   switch (maybeTypeface) {
   | None => failwith("Unable to load font: " ++ filePath)
   | Some(typeface) =>
-    Paint.setTypeface(fill, typeface);
+    Font.setTypeface(font, typeface);
     let metrics = FontMetrics.make();
-    let _ret: float = Paint.getFontMetrics(fill, metrics, 1.0);
+    let _ret: float = Font.getFontMetrics(font, metrics);
     print_endline("__Fira Code__");
     print_endline(
       "-- Average character width: "
@@ -113,8 +114,8 @@ let draw = canvas => {
     print_endline(
       "Found font for emoji: " ++ Typeface.getFamilyName(typeface),
     );
-    Paint.setTypeface(fill, typeface);
-    Canvas.drawText(canvas, emoji, 10., 60., fill);
+    Font.setTypeface(font, typeface);
+    Canvas.drawText(canvas, emoji, 10., 60., font, fill);
   | None => print_endline("No emoji font found")
   };
 
@@ -133,8 +134,8 @@ let draw = canvas => {
     print_endline(
       "Found font for Japanese: " ++ Typeface.getFamilyName(typeface),
     );
-    Paint.setTypeface(fill, typeface);
-    Canvas.drawText(canvas, japanese, 10., 80., fill);
+    Font.setTypeface(font, typeface);
+    Canvas.drawText(canvas, japanese, 10., 80., font, fill);
   | None => print_endline("No Japanese font found")
   };
 };

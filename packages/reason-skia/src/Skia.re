@@ -149,30 +149,7 @@ module Paint = {
   let setPathEffect = SkiaWrapped.Paint.setPathEffect;
   let getPathEffect = SkiaWrapped.Paint.getPathEffect;
 
-  let setTextEncoding = SkiaWrapped.Paint.setTextEncoding;
-  let getTextEncoding = SkiaWrapped.Paint.getTextEncoding;
-
   let setShader = SkiaWrapped.Paint.setShader;
-};
-
-module Font = {
-  type t = SkiaWrapped.Font.t;
-
-  let make = () => {
-    let font = SkiaWrapped.Font.allocate();
-    Gc.finalise(SkiaWrapped.Font.delete, font); 
-    font;
-  };
-  let getTypeface = SkiaWrapped.Font.getTypeface;
-  let setTypeface = SkiaWrapped.Font.setTypeface;
-  let getSize = SkiaWrapped.Font.getSize;
-  let setSize = SkiaWrapped.Font.setSize;
-  let getFontMetrics = SkiaWrapped.Font.getFontMetrics;
-
-  let measureText = (~bounds, ~paint, t, text, encoding) => {
-    //SkiaWrapped.Font.measureText(t, text, Unsigned.Size_t.of_int(String.length(text)), encoding, bounds, paint);
-    0.
-  };
 };
 
 module Point = {
@@ -359,6 +336,34 @@ module Rect = {
       right,
       bottom,
     );
+  };
+};
+
+module Font = {
+  type t = SkiaWrapped.Font.t;
+  type hinting = SkiaWrapped.Font.hinting;
+
+  let make = () => {
+    let font = SkiaWrapped.Font.allocate();
+    Gc.finalise(SkiaWrapped.Font.delete, font); 
+    font;
+  };
+  let getTypeface = (t) => {
+    let face = SkiaWrapped.Font.getTypeface(t);
+    Gc.finalise(SkiaWrapped.Typeface.delete, face);
+    face;
+  };
+  let setTypeface = SkiaWrapped.Font.setTypeface;
+  let getSize = SkiaWrapped.Font.getSize;
+  let setSize = SkiaWrapped.Font.setSize;
+  let getFontMetrics = SkiaWrapped.Font.getFontMetrics;
+
+  let measureText = (~bounds=?, ~paint, ~encoding=?, t, text, ()) => {
+    let enc: TextEncoding.t = switch(encoding) {
+    | None => Utf8
+    | Some(e) => e
+    };
+    SkiaWrapped.Font.measureText(t, text, Unsigned.Size_t.of_int(String.length(text)), enc, bounds, paint);
   };
 };
 
@@ -759,8 +764,8 @@ module Image = {
       Ctypes.structure(SkiaWrappedBindings.SkiaTypes.Image.t),
     );
 
-  let makeFromEncoded = (encodedData, subset) => {
-    switch (SkiaWrapped.Image.allocateFromEncoded(encodedData, subset)) {
+  let makeFromEncoded = (encodedData) => {
+    switch (SkiaWrapped.Image.allocateFromEncoded(encodedData)) {
     | Some(image) =>
       Gc.finalise(SkiaWrapped.Image.delete, image);
       Some(image);
@@ -833,16 +838,21 @@ module Canvas = {
   let drawPath = SkiaWrapped.Canvas.drawPath;
   let drawCircle = SkiaWrapped.Canvas.drawCircle;
 
-  let drawText = (canvas, text, x, y, paint) => {
-    SkiaWrapped.Canvas.drawText(
+  let drawSimpleText = (~encoding:TextEncoding.t=Utf8, canvas, text, x, y, font, paint, ()) => {
+    SkiaWrapped.Canvas.drawSimpleText(
       canvas,
       text,
       String.length(text),
+      encoding,
       x,
       y,
+      font,
       paint,
     );
   };
+  let drawText = (canvas, text, x, y, font, paint) =>
+    drawSimpleText(canvas, text, x, y, font, paint, ());
+
   let drawImage = SkiaWrapped.Canvas.drawImage;
   let drawImageRect = SkiaWrapped.Canvas.drawImageRect;
 

@@ -6,6 +6,7 @@ let prologue = {|
 #include "include/c/gr_context.h"
 #include "include/c/sk_canvas.h"
 #include "include/c/sk_data.h"
+#include "include/c/sk_font.h"
 #include "include/c/sk_image.h"
 #include "include/c/sk_imagefilter.h"
 #include "include/c/sk_paint.h"

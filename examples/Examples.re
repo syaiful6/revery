@@ -145,11 +145,11 @@ let examples = [
     render: _ => CanvasExample.render(),
     source: "CanvasExample.re",
   },
-  {
-    name: "SVG Example",
-    render: _ => SVGExample.render(),
-    source: "SVGExample.re",
-  },
+  // {
+  //   name: "SVG Example",
+  //   render: _ => SVGExample.render(),
+  //   source: "SVGExample.re",
+  // },
   {
     name: "Zoom Example",
     render: _ => ZoomExample.render(),

@@ -16,6 +16,7 @@ let prologue = {|
 #include "include/c/sk_stream.h"
 #include "include/c/sk_string.h"
 #include "include/c/sk_svg.h"
+#include "include/c/sk_font.h"
 |}
 
 let () =

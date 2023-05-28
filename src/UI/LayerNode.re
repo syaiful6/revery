@@ -90,9 +90,11 @@ class layerNode (condition: RenderCondition.t) = {
       };
 
       let textPaint = Skia.Paint.make();
+      let textFont = Skia.Font.make();
       Skia.Paint.setColor(textPaint, Colors.white |> Color.toSkia);
       CanvasContext.drawText(
         ~paint=textPaint,
+        ~font=textFont,
         ~x=0.,
         ~y=0.,
         ~text="Unique ID: " ++ string_of_int(_super#getInternalId()),
@@ -100,6 +102,7 @@ class layerNode (condition: RenderCondition.t) = {
       );
       CanvasContext.drawText(
         ~paint=textPaint,
+        ~font=textFont,
         ~x=0.,
         ~y=20.,
         ~text=
@@ -112,6 +115,7 @@ class layerNode (condition: RenderCondition.t) = {
       );
       CanvasContext.drawText(
         ~paint=textPaint,
+        ~font=textFont,
         ~x=0.,
         ~y=40.,
         ~text=Printf.sprintf("Element Dimensions: %dx%d", width, height),

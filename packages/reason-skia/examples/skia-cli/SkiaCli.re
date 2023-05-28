@@ -16,6 +16,7 @@ let emitPng = (path, surface) => {
 
 let draw = canvas => {
   let fill = Paint.make();
+  let font = Font.make();
   Paint.setColor(fill, Color.makeArgb(0xFFl, 0x00l, 0x00l, 0xFFl));
   Canvas.drawPaint(canvas, fill);
 
@@ -43,21 +44,21 @@ let draw = canvas => {
   Canvas.drawPath(canvas, path, stroke);
 
   Paint.setColor(fill, Color.makeArgb(0xCCl, 0x00l, 0xFFl, 0x00l));
-  Paint.setImageFilter(
-    fill,
-    Some(
-      ImageFilter.makeDropShadow(
-        10.,
-        10.,
-        3.,
-        3.,
-        Color.makeArgb(0xAAl, 0x00l, 0x00l, 0x00l),
-        DrawShadowAndForeground,
-        None,
-        None,
-      ),
-    ),
-  );
+  // Paint.setImageFilter(
+  //   fill,
+  //   Some(
+  //     ImageFilter.makeDropShadow(
+  //       10.,
+  //       10.,
+  //       3.,
+  //       3.,
+  //       Color.makeArgb(0xAAl, 0x00l, 0x00l, 0x00l),
+  //       DrawShadowAndForeground,
+  //       None,
+  //       None,
+  //     ),
+  //   ),
+  // );
   let rect2 = Rect.makeLtrb(120., 120., 520., 360.);
 
   let ovalPaint = Skia.Paint.make();
@@ -80,7 +81,8 @@ let draw = canvas => {
 
   let fill3 = Paint.make();
   Paint.setColor(fill3, Color.makeArgb(0xFFl, 0xFFl, 0xFFl, 0xFFl));
-  Paint.setTextSize(fill3, 30.);
+  Font.setSize(font, 30.)
+  // Paint.setTextSize(fill3, 30.);
 
   let nonExistentTypeface = Typeface.makeFromFile("non-existent-font.ttf", 0);
   assert(nonExistentTypeface == None);
@@ -95,11 +97,11 @@ let draw = canvas => {
   | None => failwith("Unable to load font: " ++ filePath)
   | Some(typeFace) =>
     print_endline(__LOC__ ++ ": we will set.");
-    Paint.setTypeface(fill3, typeFace);
+    Font.setTypeface(font, typeFace);
     print_endline(__LOC__ ++ ": setTypeface is OK.");
-    Canvas.drawText(canvas, "Hello, world!", 30., 30., fill3);
+    Canvas.drawText(canvas, "Hello, world!", 30., 30., font, fill3);
     let metrics = FontMetrics.make();
-    let _ret: float = Paint.getFontMetrics(fill3, metrics, 1.0);
+    let _ret: float = Font.getFontMetrics(font, metrics);
 
     print_endline(
       "-- Top: " ++ string_of_float(FontMetrics.getTop(metrics)),
@@ -120,10 +122,10 @@ let draw = canvas => {
     print_endline(__LOC__ ++ ": We return.");
 
     // Measure
-    let measurement = Paint.measureText(fill3, "Hello, world!", None);
+    let measurement = Font.measureText(~paint=fill3, font, "Hello, world!", ());
     print_endline("Measured text: " ++ string_of_float(measurement));
-    Paint.setTextSize(fill3, 50.);
-    let largeMeasurement = Paint.measureText(fill3, "Hello, world!", None);
+    Font.setSize(font, 50.);
+    let largeMeasurement = Font.measureText(~paint=fill3, font, "Hello, world!", ());
     print_endline(
       "Large measured text: " ++ string_of_float(largeMeasurement),
     );
@@ -148,7 +150,7 @@ let draw = canvas => {
     | Some(imgData) =>
       let strLen = String.length(Data.makeString(imgData));
       print_endline("Bytes loaded: " ++ string_of_int(strLen));
-      let ret = Image.makeFromEncoded(imgData, None);
+      let ret = Image.makeFromEncoded(imgData);
       print_endline("Got image!");
       ret;
     | None => failwith("Unable to load img: " ++ imgPath)
@@ -191,10 +193,10 @@ let draw = canvas => {
   | Some(typeFace) =>
     let fill = Paint.make();
     Paint.setColor(fill, Color.makeArgb(0xFFl, 0xFFl, 0xFFl, 0xFFl));
-    Paint.setTextSize(fill, 30.);
-    Paint.setTypeface(fill, typeFace);
-    Paint.setSubpixelText(fill, true);
-    Paint.setTextEncoding(fill, GlyphId);
+    Font.setSize(font, 30.);
+    Font.setTypeface(font, typeFace);
+    // Paint.setSubpixelText(fill, true);
+    // Paint.setTextEncoding(fill, GlyphId);
 
     let glyphsToString = glyphs => {
       let len = List.length(glyphs);
@@ -219,7 +221,7 @@ let draw = canvas => {
 
     // For FiraCode, this is a==>b
     let str = glyphsToString([136, 1624, 1624, 1495, 148]);
-    Canvas.drawText(canvas, str, 50., 100., fill);
+    Canvas.drawText(canvas, str, 50., 100., font, fill);
   };
 
   let fill = Paint.make();
@@ -270,58 +272,58 @@ let draw = canvas => {
   Canvas.drawRectLtwh(canvas, 100., 100., 100., 100., fill);
 };
 
-let drawSvg = canvas => {
-  let drawFromFile = dX => {
-    let stream = Stream.makeFileStream("./assets/revery.svg") |> Option.get;
+// let drawSvg = canvas => {
+//   let drawFromFile = dX => {
+//     let stream = Stream.makeFileStream("./assets/revery.svg") |> Option.get;
 
-    let svg = SVG.makeFromStream(stream) |> Option.get;
+//     let svg = SVG.makeFromStream(stream) |> Option.get;
 
-    Printf.printf(
-      "SVG: file container size: w=%f h=%f\n",
-      SVG.getContainerWidth(svg),
-      SVG.getContainerHeight(svg),
-    );
+//     Printf.printf(
+//       "SVG: file container size: w=%f h=%f\n",
+//       SVG.getContainerWidth(svg),
+//       SVG.getContainerHeight(svg),
+//     );
 
-    Canvas.translate(canvas, dX, 0.);
+//     Canvas.translate(canvas, dX, 0.);
 
-    SVG.render(svg, canvas);
-    SVG.getContainerWidth(svg);
-  };
+//     SVG.render(svg, canvas);
+//     SVG.getContainerWidth(svg);
+//   };
 
-  let drawFromString = dX => {
-    let svgStr = {|
-      <svg width="100%" height="10%">
-        <path id="lineAB" d="M 100 350 l 150 -300" stroke="red" stroke-width="3" fill="none" />
-        <path id="lineBC" d="M 250 50 l 150 300" stroke="red" stroke-width="3" fill="none" />
-        <path d="M 175 200 l 150 0" stroke="green" stroke-width="3" fill="none" />
-        <path d="M 100 350 q 150 -300 300 0" stroke="blue" stroke-width="5" fill="none" />
-        <g stroke="black" stroke-width="3" fill="black">
-          <circle id="pointA" cx="100" cy="350" r="3" />
-          <circle id="pointB" cx="250" cy="50" r="3" />
-          <circle id="pointC" cx="400" cy="350" r="3" />
-        </g>
-      </svg>
-    |};
+//   let drawFromString = dX => {
+//     let svgStr = {|
+//       <svg width="100%" height="10%">
+//         <path id="lineAB" d="M 100 350 l 150 -300" stroke="red" stroke-width="3" fill="none" />
+//         <path id="lineBC" d="M 250 50 l 150 300" stroke="red" stroke-width="3" fill="none" />
+//         <path d="M 175 200 l 150 0" stroke="green" stroke-width="3" fill="none" />
+//         <path d="M 100 350 q 150 -300 300 0" stroke="blue" stroke-width="5" fill="none" />
+//         <g stroke="black" stroke-width="3" fill="black">
+//           <circle id="pointA" cx="100" cy="350" r="3" />
+//           <circle id="pointB" cx="250" cy="50" r="3" />
+//           <circle id="pointC" cx="400" cy="350" r="3" />
+//         </g>
+//       </svg>
+//     |};
 
-    let stream =
-      Stream.makeMemoryStreamFromString(svgStr, String.length(svgStr));
+//     let stream =
+//       Stream.makeMemoryStreamFromString(svgStr, String.length(svgStr));
 
-    let svg = SVG.makeFromStream(stream) |> Option.get;
+//     let svg = SVG.makeFromStream(stream) |> Option.get;
 
-    Printf.printf(
-      "SVG: string container size: w=%f h=%f\n",
-      SVG.getContainerWidth(svg),
-      SVG.getContainerHeight(svg),
-    );
+//     Printf.printf(
+//       "SVG: string container size: w=%f h=%f\n",
+//       SVG.getContainerWidth(svg),
+//       SVG.getContainerHeight(svg),
+//     );
 
-    Canvas.translate(canvas, dX, 0.);
+//     Canvas.translate(canvas, dX, 0.);
 
-    SVG.render(svg, canvas);
-    SVG.getContainerWidth(svg);
-  };
+//     SVG.render(svg, canvas);
+//     SVG.getContainerWidth(svg);
+//   };
 
-  drawFromFile(0.) |> drawFromString |> ignore;
-};
+//   drawFromFile(0.) |> drawFromString |> ignore;
+// };
 
 let surface = makeSurface(640l, 480l) |> Option.get;
 let svgSurface = makeSurface(1280l, 1280l) |> Option.get;
@@ -330,7 +332,7 @@ let canvas = Surface.getCanvas(surface);
 let svgCanvas = Surface.getCanvas(svgSurface);
 
 draw(canvas);
-drawSvg(svgCanvas);
+// drawSvg(svgCanvas);
 
 emitPng("skia-c-example.png", surface);
 emitPng("skia-svg-example.png", svgSurface);

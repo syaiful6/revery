@@ -93,6 +93,23 @@ module M = (T: TYPE) => {
     type t;
     let t: typ(structure(t)) = structure("sk_font_t");
     let t = typedef(t, "sk_font_t");
+
+    type hinting =
+      | Nohint
+      | Slight
+      | Normal
+      | Full;
+
+    let hinting =
+      skiaCEnum(
+        "sk_font_hinting_t",
+        [
+          (Nohint, "NONE_SK_FONT_HINTING"),
+          (Slight, "SLIGHT_SK_FONT_HINTING"),
+          (Normal, "NORMAL_SK_FONT_HINTING"),
+          (Full, "FULL_SK_FONT_HINTING"),
+        ],
+      );
   };
 
   module Typeface = {
@@ -471,8 +488,8 @@ module M = (T: TYPE) => {
 
     module Context = {
       type t;
-      let t: typ(structure(t)) = structure("gr_context_t");
-      let t = typedef(t, "gr_context_t");
+      let t: typ(structure(t)) = structure("gr_direct_context_t");
+      let t = typedef(t, "gr_direct_context_t");
     };
 
     module BackendRenderTarget = {

@@ -286,8 +286,8 @@ let drawImage = (~x, ~y, ~width, ~height, ~paint=?, data: Skia.Image.t, v: t) =>
   );
 };
 
-let drawText = (~paint, ~x=0., ~y=0., ~text, v: t) => {
-  Canvas.drawText(v.canvas, text, x, y, paint);
+let drawText = (~paint, ~font, ~x=0., ~y=0., ~text, v: t) => {
+  Canvas.drawText(v.canvas, text, x, y, font, paint);
 };
 
 let _topMatrix = Skia.Matrix.make();

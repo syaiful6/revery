@@ -115,12 +115,14 @@ let render =
         let w = float_of_int(adjustedWidth);
         let (x, y) = (w -. 64., 32.);
         let paint = Skia.Paint.make();
+        let font = Skia.Font.make();
         Skia.Paint.setColor(
           paint,
           Skia.Color.makeArgb(255l, 50l, 200l, 50l),
         );
         CanvasContext.drawText(
           ~paint,
+          ~font,
           ~x,
           ~y,
           ~text=Printf.sprintf("FPS: %d", Window.getFPS(window)),

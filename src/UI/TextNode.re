@@ -27,7 +27,7 @@ class textNode (text: string) = {
   val mutable _features: list(Feature.t) = [];
   val _textPaint = {
     let paint = Skia.Paint.make();
-    Skia.Paint.setTextEncoding(paint, GlyphId);
+    // Skia.Paint.setTextEncoding(paint, GlyphId);
     // Skia.Paint.setLcdRenderText(paint, true);
     // Skia.Paint.setAntiAlias(paint, true);
     paint;
@@ -90,6 +90,7 @@ class textNode (text: string) = {
                Skia.Font.setTypeface(_font, skiaFace);
 
                CanvasContext.drawText(
+                 ~font=_font,
                  ~paint=_textPaint,
                  ~x=offset^,
                  ~y=baselineY,
@@ -98,7 +99,7 @@ class textNode (text: string) = {
                );
 
                offset :=
-                 offset^ +. Skia.Font.measureText(~bounds=None, ~paint=Some(_textPaint), _font, str, GlyphId);
+                 offset^ +. Skia.Font.measureText(~paint=_textPaint, _font, str, ());
              });
 
           if (_underlined) {
