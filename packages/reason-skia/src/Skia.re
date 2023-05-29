@@ -976,19 +976,19 @@ module Surface = {
   let flushAndSubmit = SkiaWrapped.Surface.flushAndSubmit;
 };
 
-// module SVG = {
-//   type t = {
-//     svg: SkiaWrapped.SVG.t,
-//     stream: SkiaWrapped.Stream.t,
-//   };
-//   let makeFromStream = stream =>
-//     SkiaWrapped.SVG.makeFromStream(stream)
-//     |> Option.map(svg => {
-//          svg |> Gc.finalise(SkiaWrapped.SVG.delete);
-//          {svg, stream};
-//        });
-//   let render = t => SkiaWrapped.SVG.render(t.svg);
-//   let setContainerSize = t => SkiaWrapped.SVG.setContainerSize(t.svg);
-//   let getContainerWidth = t => SkiaWrapped.SVG.getContainerWidth(t.svg);
-//   let getContainerHeight = t => SkiaWrapped.SVG.getContainerHeight(t.svg);
-// };
+module SVG = {
+  type t = {
+    svg: SkiaWrapped.SVG.t,
+    stream: SkiaWrapped.Stream.t,
+  };
+  let makeFromStream = stream =>
+    SkiaWrapped.SVG.makeFromStream(stream)
+    |> Option.map(svg => {
+         svg |> Gc.finalise(SkiaWrapped.SVG.delete);
+         {svg, stream};
+       });
+  let render = t => SkiaWrapped.SVG.render(t.svg);
+  let setContainerSize = t => SkiaWrapped.SVG.setContainerSize(t.svg);
+  let getContainerWidth = t => SkiaWrapped.SVG.getContainerWidth(t.svg);
+  let getContainerHeight = t => SkiaWrapped.SVG.getContainerHeight(t.svg);
+};

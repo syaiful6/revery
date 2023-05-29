@@ -67,6 +67,7 @@ let flags = os =>
     @ ["-verbose"]
     @ cclib("-lfreetype")
     @ cclib("-lz")
+    @ cclib("-lsvg")
     @ cclib("-lskia")
     @ cclib("-lGLESv2")
     @ cclib("-lGLESv1_CM")
@@ -91,6 +92,7 @@ let flags = os =>
     @ cclib("-lfreetype")
     @ cclib("-lz")
     @ cclib("-lbz2")
+    @ cclib("-lsvg")
     @ cclib("-lskia")
     @ cclib(sdl2FilePath)
     @ ccopt("-L" ++ getenv("FREETYPE2_LIB_PATH"))
@@ -105,6 +107,7 @@ let flags = os =>
     @ ccopt("-fPIC")
   | Windows =>
     []
+    @ cclib("-lsvg")
     @ cclib("-lskia")
     @ cclib("-lSDL2")
     @ ccopt("-L" ++ getenv("SDL2_LIB_PATH"))
@@ -129,6 +132,7 @@ let cflags = os => {
     @ ["-lm"]
     @ ["-llog"]
     @ ["-landroid"]
+    @ ["-lsvg"]
     @ ["-lskia"]
     @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
     @ ["-I" ++ getenv("SDL2_INCLUDE_PATH")]
@@ -141,6 +145,7 @@ let cflags = os => {
   | Linux =>
     []
     @ [sdl2FilePath]
+    @ ["-lsvg"]
     @ ["-lskia"]
     @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
     @ ["-I" ++ getenv("SDL2_INCLUDE_PATH")]
@@ -177,6 +182,7 @@ let libs = os =>
       "-lm",
       "-llog",
       "-landroid",
+      "-lsvg",
       "-lskia",
       "-lfreetype",
       "-lz",
@@ -219,6 +225,7 @@ let libs = os =>
       "-L" ++ getenv("SKIA_LIB_PATH"),
       "-L" ++ getenv("FREETYPE2_LIB_PATH"),
       sdl2FilePath,
+      "-lsvg",
       "-lskia",
       "-lfreetype",
       "-lfontconfig",
@@ -251,12 +258,14 @@ let libs = os =>
     @ framework("Metal")
     @ ["-liconv"]
     @ [sdl2FilePath]
+    @ ["-lsvg"]
     @ ["-lskia"]
     @ ["-lstdc++"]
     @ [getenv("JPEG_LIB_PATH") ++ "/libturbojpeg.a"]
   | Windows =>
     []
     @ ["-luser32"]
+    @ ["-lsvg"]
     @ ["-lskia"]
     @ ["-lSDL2"]
     @ ["-lstdc++"]

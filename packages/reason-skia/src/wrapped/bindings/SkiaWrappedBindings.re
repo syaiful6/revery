@@ -1180,4 +1180,33 @@ module M = (F: FOREIGN) => {
     let flush = foreign("sk_surface_flush", t @-> returning(void));
     let flushAndSubmit = foreign("sk_surface_flush_and_submit", t @-> bool @-> returning(void));
   };
+
+  module SVG = {
+    type t = ptr(structure(SkiaTypes.SVG.t));
+    let t = ptr(SkiaTypes.SVG.t);
+    let maybeT = ptr_opt(SkiaTypes.SVG.t);
+
+    let makeFromStream =
+      foreign(
+        "sk_svgdom_create_from_stream",
+        Stream.t @-> returning(maybeT),
+      );
+
+    let render =
+      foreign("sk_svgdom_render", t @-> Canvas.t @-> returning(void));
+
+    let setContainerSize =
+      foreign(
+        "sk_svgdom_set_container_size",
+        t @-> float @-> float @-> returning(void),
+      );
+
+    let getContainerWidth =
+      foreign("sk_svgdom_get_container_width", t @-> returning(float));
+
+    let getContainerHeight =
+      foreign("sk_svgdom_get_container_height", t @-> returning(float));
+
+    let delete = foreign("sk_svgdom_unref", t @-> returning(void));
+  };
 };
