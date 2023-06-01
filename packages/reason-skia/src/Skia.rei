@@ -339,6 +339,7 @@ module Font: {
   type hinting = SkiaWrapped.Font.hinting;
 
   let make: unit => t;
+  let makeWithValues: (Typeface.t, float, float, float) => t;
   let setTypeface: (t, Typeface.t) => unit;
   let getTypeface: (t) => Typeface.t;
   let getSize: (t) => float;

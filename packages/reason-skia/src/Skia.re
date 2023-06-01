@@ -348,6 +348,13 @@ module Font = {
     Gc.finalise(SkiaWrapped.Font.delete, font); 
     font;
   };
+
+  let makeWithValues = (face, size, scaleX, skewX) => {
+    let font = SkiaWrapped.Font.sk_font_new_with_values(face, size, scaleX, skewX);
+    Gc.finalise(SkiaWrapped.Font.delete, font); 
+    font;
+  };
+
   let getTypeface = (t) => {
     let face = SkiaWrapped.Font.getTypeface(t);
     Gc.finalise(SkiaWrapped.Typeface.delete, face);

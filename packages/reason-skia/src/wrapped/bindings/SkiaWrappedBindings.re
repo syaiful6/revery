@@ -516,6 +516,7 @@ module M = (F: FOREIGN) => {
         | 6 => setf(!@matrix, SkiaTypes.Matrix.persp0, value)
         | 7 => setf(!@matrix, SkiaTypes.Matrix.persp1, value)
         | 8 => setf(!@matrix, SkiaTypes.Matrix.persp2, value)
+        | _ => ()
       };
     };
     let invert =
