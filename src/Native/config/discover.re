@@ -28,6 +28,18 @@ let detect_system_header = {|
   #endif
 |};
 
+let find_xcode_sysroot = sdk => {
+  let ic = Unix.open_process_in("xcrun --sdk " ++ sdk ++ " --show-sdk-path");
+  let path = input_line(ic);
+  close_in(ic);
+  path;
+};
+
+let macos_isysroot = {
+  let sdk_path = find_xcode_sysroot("macosx");
+  "-isysroot" ++ sdk_path
+};
+
 let get_os = t => {
   let header = {
     let file = Filename.temp_file("discover", "os.h");
@@ -96,6 +108,8 @@ type config = {
 
 let ccopt = s => ["-ccopt", s];
 let cclib = s => ["-cclib", s];
+let framework = s => ["-framework", s];
+let ldopt = s => ["-ldopt", s]
 
 let get_ios_config = () => {
   features: [UIKIT],
@@ -105,8 +119,8 @@ let get_ios_config = () => {
 };
 let get_mac_config = () => {
   features: [COCOA],
-  cflags: ["-I", ".", "-x", "objective-c", "-Wno-deprecated-declarations"],
-  libs: [],
+  cflags: [macos_isysroot] @ ["-I", ".", "-x", "objective-c", "-Wno-deprecated-declarations"],
+  libs: [] @ framework("Foundation"),
   flags: [] @ cclib("-ObjC"),
 };
 

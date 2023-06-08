@@ -55,7 +55,7 @@
     "esy-freetype2": "^2.9.1008",
     "@onivim/reason-native-crash-utils": "^1.0.2",
     "esy-harfbuzz": "syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232",
-    "esy-mono-skia": "syaiful6/esy-mono-skia#e9a155ebbae8f99cfeecbac2ab7de5998520a6c5",
+    "esy-mono-skia": "syaiful6/esy-mono-skia#caf5f7d8c92dcc72c2ef4035e688172b249a9344",
     "esy-sdl2": "revery-ui/esy-sdl2#5f771c6c12a41e2f4295cc1d796b63741fa3c020",
     "flex": "jordwalke/flex#6ff12fe",
     "reperf": "^1.5.1",

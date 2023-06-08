@@ -5,6 +5,13 @@ let getenv = name =>
   | Not_found => failwith("Error: Undefined environment variable: " ++ name)
   };
 
+let find_xcode_sysroot = sdk => {
+  let ic = Unix.open_process_in("xcrun --sdk " ++ sdk ++ " --show-sdk-path");
+  let path = input_line(ic);
+  close_in(ic);
+  path;
+};
+
 type os =
   | Android
   | IOS
@@ -84,7 +91,7 @@ let flags = os =>
     @ ccopt("-I/usr/include")
     @ ccopt("-lstdc++")
   | IOS
-  | Mac => []
+  | Mac => [] @ cclib(sdl2FilePath)
   | Linux =>
     []
     @ ["-verbose"]
@@ -157,7 +164,14 @@ let cflags = os => {
     @ ["-ljpeg"]
     @ ["-fPIC"]
   | IOS
-  | Mac => [] @ ["-I" ++ getenv("SDL2_INCLUDE_PATH"),] @ skiaIncludeFlags
+  | Mac => {
+      let sdk_path = find_xcode_sysroot("macosx");
+      []
+      @ ["-isysroot" ++ sdk_path]
+      @ ["-I" ++ getenv("SDL2_INCLUDE_PATH"),]
+      @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
+      @ skiaIncludeFlags
+  }
   | Windows =>
     []
     @ ["-std=c++1y"]
@@ -257,11 +271,11 @@ let libs = os =>
     @ framework("IOKit")
     @ framework("Metal")
     @ ["-liconv"]
-    @ [sdl2FilePath]
+    @ ["-lSDL2"]
     @ ["-lsvg"]
     @ ["-lskia"]
     @ ["-lstdc++"]
-    @ [getenv("JPEG_LIB_PATH") ++ "/libturbojpeg.a"]
+    @ ["-ljpeg"]
   | Windows =>
     []
     @ ["-luser32"]

@@ -7,6 +7,18 @@ type os =
   | Mac
   | Windows;
 
+let find_xcode_sysroot = sdk => {
+  let ic = Unix.open_process_in("xcrun --sdk " ++ sdk ++ " --show-sdk-path");
+  let path = input_line(ic);
+  close_in(ic);
+  path;
+};
+
+let macos_isysroot = {
+  let sdk_path = find_xcode_sysroot("macosx");
+  "-isysroot" ++ sdk_path
+};
+
 let detect_system_header = {|
   #if __APPLE__
     #include <TargetConditionals.h>
@@ -63,7 +75,10 @@ let c_flags = os =>
   switch (os) {
   | Android
   | IOS
-  | Mac => c_flags
+  | Mac => {
+    let sdk_path = find_xcode_sysroot("macosx");
+    ["-isysroot" ++ sdk_path] @ c_flags;
+  }
   | Linux => c_flags @ ["-fPIC"]
   | Windows => c_flags @ ["-mwindows"]
   };
@@ -74,6 +89,7 @@ prerr_endline("SDL2 Library Folder Path: " ++ libFolderPath);
 
 let ccopt = s => ["-ccopt", s];
 let cclib = s => ["-cclib", s];
+let framework = s => ["-framework", s];
 
 let flags = os =>
   switch (os) {
@@ -149,8 +165,8 @@ let flags = os =>
 let c_library_flags = os =>
   switch (os) {
   | Android
-  | IOS
-  | Mac
+  | IOS 
+  | Mac => framework("Foundation")
   | Linux => [libFilePath]
   | Windows => ["-L" ++ libFolderPath, "-lSDL2"]
   };
