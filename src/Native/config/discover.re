@@ -35,7 +35,7 @@ let find_xcode_sysroot = sdk => {
   path;
 };
 
-let macos_isysroot = {
+let macos_isysroot = () => {
   let sdk_path = find_xcode_sysroot("macosx");
   "-isysroot" ++ sdk_path
 };
@@ -119,7 +119,7 @@ let get_ios_config = () => {
 };
 let get_mac_config = () => {
   features: [COCOA],
-  cflags: [macos_isysroot] @ ["-I", ".", "-x", "objective-c", "-Wno-deprecated-declarations"],
+  cflags: [macos_isysroot()] @ ["-I", ".", "-x", "objective-c", "-Wno-deprecated-declarations"],
   libs: [] @ framework("Foundation"),
   flags: [] @ cclib("-ObjC"),
 };

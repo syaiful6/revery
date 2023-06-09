@@ -14,11 +14,6 @@ let find_xcode_sysroot = sdk => {
   path;
 };
 
-let macos_isysroot = {
-  let sdk_path = find_xcode_sysroot("macosx");
-  "-isysroot" ++ sdk_path
-};
-
 let detect_system_header = {|
   #if __APPLE__
     #include <TargetConditionals.h>
