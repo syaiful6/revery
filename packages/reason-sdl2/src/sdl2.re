@@ -572,18 +572,6 @@ module Event = {
     isFlipped: bool,
   };
 
-  type mousePan = {
-    windowID: int,
-    deltaX: int,
-    deltaY: int,
-    containsX: bool,
-    containsY: bool,
-    isFling: bool,
-    isInterrupt: bool,
-    source: WheelType.t,
-    timestamp: int,
-  };
-
   type mouseButtonEvent = {
     windowID: int,
     button: MouseButton.t,
@@ -675,12 +663,10 @@ module Event = {
     | WindowClosed(windowEvent) // 21
     | WindowTakeFocus(windowEvent) // 22
     | WindowHitTest(windowEvent) // 23
-    | MousePan(mousePan) // 24
-    | DropText(dropEvent) // 25
-    | DropFile(dropEvent) // 26
-    | DropBegin(dropNotificationEvent) // 27
-    | DropComplete(dropNotificationEvent) // 28
-    | WindowFullscreen(windowEvent) // 29
+    | DropText(dropEvent) // 24
+    | DropFile(dropEvent) // 25
+    | DropBegin(dropNotificationEvent) // 26
+    | DropComplete(dropNotificationEvent) // 27
     // An event that hasn't been implemented yet
     | Unknown
     | KeymapChanged;
@@ -697,26 +683,6 @@ module Event = {
         deltaX,
         deltaY,
         isFlipped ? 1 : 0,
-      )
-    | MousePan({
-        windowID,
-        deltaX,
-        deltaY,
-        containsX,
-        containsY,
-        isFling,
-        isInterrupt,
-        _,
-      }) =>
-      Printf.sprintf(
-        "Pan event: %d %d %d %d %d %d %d",
-        windowID,
-        deltaX,
-        deltaY,
-        if (containsX) {1} else {0},
-        if (containsY) {1} else {0},
-        if (isFling) {1} else {0},
-        if (isInterrupt) {1} else {0},
       )
     | MouseButtonUp({windowID, button, _}) =>
       Printf.sprintf(
@@ -786,8 +752,6 @@ module Event = {
       Printf.sprintf("WindowMinimized: %d\n", windowID)
     | WindowMaximized({windowID}) =>
       Printf.sprintf("WindowMaximized: %d\n", windowID)
-    | WindowFullscreen({windowID}) =>
-      Printf.sprintf("WindowFullscreen: %d\n", windowID)
     | WindowRestored({windowID}) =>
       Printf.sprintf("WindowRestored: %d\n", windowID)
     | WindowEnter({windowID}) =>

@@ -21,19 +21,19 @@ void reason_skia_stub_sk_canvas_draw_rect_ltwh(sk_canvas_t *canvas, float left,
     sk_canvas_draw_rect(canvas, &rect, paint);
 }
 
-void *reason_skia_sdl2_get(void *ctx, const char name[]) {
+GLProcAddress reason_skia_sdl2_get(void* ctx, const char* name) {
     return SDL_GL_GetProcAddress(name);
 };
 
 gr_glinterface_t *reason_skia_make_sdl2_gl_interface() {
     gr_glinterface_t *interface =
-            gr_glinterface_assemble_gl_interface(0, reason_skia_sdl2_get);
+            gr_glinterface_assemble_gl_interface(0, &reason_skia_sdl2_get);
     return interface;
 }
 
 gr_glinterface_t *reason_skia_make_sdl2_gles_interface() {
     gr_glinterface_t *interface =
-            gr_glinterface_assemble_gles_interface(0, reason_skia_sdl2_get);
+            gr_glinterface_assemble_gles_interface(0, &reason_skia_sdl2_get);
     return interface;
 }
 

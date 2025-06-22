@@ -875,25 +875,8 @@ extern "C" {
 
             Store_field(v, 0, vInner);
             break;
-        case SDL_PANEVENT:
-            v = caml_alloc(1, 24);
-
-            vInner = caml_alloc(9, 0);
-            Store_field(vInner, 0, Val_int(event->window.windowID));
-            Store_field(vInner, 1, Val_int(event->pan.x));
-            Store_field(vInner, 2, Val_int(event->pan.y));
-            Store_field(vInner, 3, Val_bool(event->pan.contains_x));
-            Store_field(vInner, 4, Val_bool(event->pan.contains_y));
-            Store_field(vInner, 5, Val_bool(event->pan.fling));
-            Store_field(vInner, 6, Val_bool(event->pan.interrupt));
-            // verify this is the correct way of representing a ref to some WheelType.t
-            Store_field(vInner, 7, Val_int(event->pan.source_type));
-            Store_field(vInner, 8, Val_int(event->pan.timestamp));
-
-            Store_field(v, 0, vInner);
-            break;
         case SDL_DROPTEXT:
-            v = caml_alloc(1, 25);
+            v = caml_alloc(1, 24);
             vInner = caml_alloc(5, 0);
 
             getNonFocusedMousePosition(SDL_GetWindowFromID(event->drop.windowID), &mousePosX, &mousePosY);
@@ -908,7 +891,7 @@ extern "C" {
             SDL_free(event->drop.file);
             break;
         case SDL_DROPFILE:
-            v = caml_alloc(1, 26);
+            v = caml_alloc(1, 25);
             vInner = caml_alloc(5, 0);
 
             getNonFocusedMousePosition(SDL_GetWindowFromID(event->drop.windowID), &mousePosX, &mousePosY);
@@ -923,7 +906,7 @@ extern "C" {
             SDL_free(event->drop.file);
             break;
         case SDL_DROPBEGIN:
-            v = caml_alloc(1, 27);
+            v = caml_alloc(1, 26);
             vInner = caml_alloc(4, 0);
 
             getNonFocusedMousePosition(SDL_GetWindowFromID(event->drop.windowID), &mousePosX, &mousePosY);
@@ -937,7 +920,7 @@ extern "C" {
             SDL_free(event->drop.file);
             break;
         case SDL_DROPCOMPLETE:
-            v = caml_alloc(1, 28);
+            v = caml_alloc(1, 27);
             vInner = caml_alloc(4, 0);
 
             getNonFocusedMousePosition(SDL_GetWindowFromID(event->drop.windowID), &mousePosX, &mousePosY);
@@ -981,9 +964,6 @@ extern "C" {
                 break;
             case SDL_WINDOWEVENT_MAXIMIZED:
                 v = Val_SDL_WindowEvent(15, event->window.windowID);
-                break;
-            case SDL_WINDOWEVENT_FULLSCREEN:
-                v = Val_SDL_WindowEvent(29, event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_RESTORED:
                 v = Val_SDL_WindowEvent(16, event->window.windowID);
@@ -1578,18 +1558,18 @@ extern "C" {
         CAMLlocal1(vWindow);
 
         int x;
-        if (vX == hash_variant("Centered")) {
+        if (vX == caml_hash_variant("Centered")) {
             x = SDL_WINDOWPOS_CENTERED;
-        } else if (Is_block(vX) && Field(vX, 0) == hash_variant("Absolute")) {
+        } else if (Is_block(vX) && Field(vX, 0) == caml_hash_variant("Absolute")) {
             x = Int_val(Field(vX, 1));
         } else {
             x = SDL_WINDOWPOS_UNDEFINED;
         };
 
         int y;
-        if (vY == hash_variant("Centered")) {
+        if (vY == caml_hash_variant("Centered")) {
             y = SDL_WINDOWPOS_CENTERED;
-        } else if (Is_block(vY) && Field(vY, 0) == hash_variant("Absolute")) {
+        } else if (Is_block(vY) && Field(vY, 0) == caml_hash_variant("Absolute")) {
             y = Int_val(Field(vY, 1));
         } else {
             y = SDL_WINDOWPOS_UNDEFINED;
@@ -1630,9 +1610,9 @@ extern "C" {
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, kStencilBits);
 
         // If vAcceleration is Auto, don't set SDL_GL_ACCELERATED_VISUAL at all.
-        if (vAcceleration == hash_variant("ForceHardware")) {
+        if (vAcceleration == caml_hash_variant("ForceHardware")) {
             SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-        } else if (vAcceleration == hash_variant("ForceSoftware")) {
+        } else if (vAcceleration == caml_hash_variant("ForceSoftware")) {
             SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 0);
         }
 

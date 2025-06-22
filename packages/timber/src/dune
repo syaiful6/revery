@@ -1,0 +1,11 @@
+(library
+    (name Timber)
+    (public_name timber)
+    (foreign_stubs 
+        (language c)
+        (names nativeChannels))
+    (libraries 
+        fmt
+        logs
+        re
+    ))

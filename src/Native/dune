@@ -20,9 +20,6 @@
     ReveryProgressBar)
   (flags
    :standard
-   -Wall
-   -Wextra
-   -Werror
    (:include c_flags.sexp)))
  (c_library_flags
   (:include c_library_flags.sexp))

@@ -22,7 +22,7 @@
         "scope": "global"
       }
     },
-    "build": "dune build -p reason-harfbuzz,reason-skia,reason-sdl2,Revery",
+    "build": "dune build -p reason-harfbuzz,reason-skia,reason-sdl2,timber,rebez,flex,Revery",
     "install": [
       "esy-installer reason-harfbuzz.install",
       "esy-installer reason-skia.install",
@@ -35,17 +35,17 @@
     ]
   },
   "dependencies": {
-    "@opam/bos": "0.2.0",
-    "@opam/ctypes": "0.15.1",
-    "@opam/dune": "^2.5.0",
+    "@opam/bos": "*",
+    "@opam/ctypes": "0.23.0",
+    "@opam/dune": "< 4.0.0",
     "@opam/dune-configurator": "*",
     "@opam/reason": "^3.6.2",
-    "@opam/lru": "bryphe/lru:lru.opam#2708c70",
-    "@opam/lwt": "^5.0.0",
-    "@opam/lwt_ppx": "^1.1.0",
-    "@opam/markup": "0.8.2",
+    "@opam/lru": "*",
+    "@opam/lwt": "^5.9.1",
+    "@opam/lwt_ppx": "^5.9.1",
+    "@opam/markup": "1.0.3",
     "@opam/ppx_deriving": "*",
-    "@opam/ppx_optcomp": "v0.14.0",
+    "@opam/ppx_optcomp": "v0.17.0",
     "@opam/omd": "ocaml/omd:omd.opam#1535e3c",
     "@opam/uucp": "*",
     "@opam/uutf": "*",
@@ -55,21 +55,21 @@
     "esy-freetype2": "^2.9.1008",
     "@onivim/reason-native-crash-utils": "^1.0.2",
     "esy-harfbuzz": "syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232",
-    "esy-mono-skia": "syaiful6/esy-mono-skia#caf5f7d8c92dcc72c2ef4035e688172b249a9344",
-    "esy-sdl2": "revery-ui/esy-sdl2#5f771c6c12a41e2f4295cc1d796b63741fa3c020",
-    "flex": "jordwalke/flex#6ff12fe",
-    "reperf": "^1.5.1",
+    "esy-mono-skia": "syaiful6/esy-mono-skia#ed44f9368b8c9185c2d74a6edbd717a1f8dc0ef2",
+    "esy-sdl2": "syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b",
+    "reperf": "syaiful6/reperf#27f9e34747f1b1c5ff7efdfc28452315f29f26b1",
     "rench": "^1.10.0",
-    "rebez": "jchavarri/rebez#03fa3b7",
-    "@revery/timber": "^2.0.0",
-    "@reason-native/rely": "^3.2.1"
+    "@reason-native/rely": "*",
+    "ocaml": "5.x"
   },
   "resolutions": {
-    "@esy-ocaml/reason": "EduardoRFS/reason:reason.json#35aa4df3de0daa60bdc1133dcf97855decac48f7",
-    "@opam/printbox": "0.5"
+    "@opam/printbox": "0.12",
+    "@reason-native/rely": "git+https://github.com/reasonml/reason-native.git:rely.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8",
+    "@opam/cli": "git+https://github.com/reasonml/reason-native.git:cli.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8",
+    "@opam/pastel": "git+https://github.com/reasonml/reason-native.git:pastel.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8",
+    "@opam/file-context-printer": "git+https://github.com/reasonml/reason-native.git:file-context-printer.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8"
   },
   "devDependencies": {
-    "ocaml": "4.12.x",
     "esy-astyle": "zbaylin/esy-astyle#59bc21a",
     "@opam/merlin": "*",
     "@opam/ocaml-lsp-server": "*"

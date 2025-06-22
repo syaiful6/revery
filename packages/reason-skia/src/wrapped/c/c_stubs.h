@@ -7,6 +7,10 @@
 
 #include <SDL2/SDL.h>
 
+// Define a type for a generic OpenGL function pointer, as expected by the return of gr_gl_get_proc
+// This is typically how OpenGL functions are cast after being retrieved from a loader.
+typedef void (*GLProcAddress)(void);
+
 void reason_skia_stub_sk_canvas_draw_rect_ltwh(sk_canvas_t *canvas, float left,
         float top, float width,
         float height, sk_paint_t *paint);
