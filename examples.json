@@ -6,7 +6,7 @@
       "run-skia-fontmanager": "esy @examples x bash -c run-skia-fontmanager.sh #{os}"
   },
   "override": {
-      "build": ["dune build -p reason-harfbuzz,reason-skia,reason-sdl2,Revery,ReveryExamples -j4"],
+      "build": ["dune build -p reason-harfbuzz,reason-skia,reason-sdl2,timber,rebez,flex,Revery,ReveryExamples -j4"],
       "install": [
           "esy-installer reason-harfbuzz.install",
           "esy-installer reason-skia.install",

@@ -32,3 +32,16 @@ sk_shader_t* reason_skia_stub_linear_gradient(
     float* positions,
     int count,
     sk_shader_tilemode_t tileMode);
+
+void reason_skia_stub_paint_set_alpha(sk_paint_t *pPaint, double alpha);
+
+void reason_skia_stub_matrix_set_translate(sk_matrix_t *matrix,
+        double translateX,
+        double translateY);
+void reason_skia_stub_matrix_set_scale(sk_matrix_t *matrix, double scaleX,
+        double scaleY, double pivotX,
+        double pivotY);
+
+
+void reason_skia_stub_rect_set(sk_rect_t *pRect, double left, double top,
+                                    double right, double bottom);

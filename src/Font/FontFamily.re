@@ -22,7 +22,7 @@ module FontDescriptorWeight = {
 
 module FontFamilyCache = Lru.M.Make(FontFamilyHashable, FontDescriptorWeight);
 
-let cache = FontFamilyCache.create(~initialSize=8, 64);
+let cache = FontFamilyCache.create(64);
 
 let system = (familyName): t =>
   (~italic, weight) => {

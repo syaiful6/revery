@@ -275,7 +275,7 @@ let libs = os =>
     @ ["-lsvg"]
     @ ["-lskia"]
     @ ["-lstdc++"]
-    @ ["-ljpeg"]
+    @ [getenv("JPEG_LIB_PATH") ++ "/libturbojpeg.a"]
   | Windows =>
     []
     @ ["-luser32"]

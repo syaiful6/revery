@@ -87,3 +87,52 @@ sk_shader_t* reason_skia_stub_linear_gradient(
                NULL
            );
 }
+
+
+void reason_skia_stub_matrix_set_translate(sk_matrix_t *matrix,
+        double translateX,
+        double translateY) {
+    matrix->scaleX = 1.0;
+    matrix->skewX = 0.0;
+    matrix->transX = translateX;
+    matrix->skewY = 0.0;
+    matrix->scaleY = 1.0;
+    matrix->transY = translateY;
+    matrix->persp0 = 0.0;
+    matrix->persp1 = 0.0;
+    matrix->persp2 = 1.0;
+}
+
+void reason_skia_stub_paint_set_alpha(sk_paint_t *pPaint, double alpha) {
+    int a = (int)(255.0 * alpha);
+    sk_color_t c = sk_paint_get_color(pPaint);
+
+    sk_paint_set_color(pPaint,
+                       sk_color_set_argb(a, sk_color_get_r(c), sk_color_get_g(c),
+                                         sk_color_get_b(c)));
+
+    sk_color_t newColor = sk_paint_get_color(pPaint);
+}
+
+void reason_skia_stub_rect_set(sk_rect_t *pRect, double left, double top,
+                                    double right, double bottom) {
+    pRect->left = left;
+    pRect->top = top;
+    pRect->right = right;
+    pRect->bottom = bottom;
+}
+
+
+void reason_skia_stub_matrix_set_scale(sk_matrix_t *matrix, double scaleX,
+        double scaleY, double pivotX,
+        double pivotY) {
+    matrix->scaleX = scaleX;
+    matrix->skewX = 0.0;
+    matrix->transX = pivotX - (scaleX * pivotX);
+    matrix->skewY = 0.0;
+    matrix->scaleY = scaleY;
+    matrix->transY = pivotY - (scaleY * pivotY);
+    matrix->persp0 = 0.0;
+    matrix->persp1 = 0.0;
+    matrix->persp2 = 1.0;
+}

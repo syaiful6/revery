@@ -3,6 +3,7 @@ type alphaType = SkiaWrapped.alphaType;
 
 module Color = {
   type t = int32;
+  
   [@noalloc]
   external makeArgb:
     ([@unboxed] int32, [@unboxed] int32, [@unboxed] int32, [@unboxed] int32) =>
@@ -120,22 +121,16 @@ module Paint = {
   type t = SkiaWrapped.Paint.t;
   type style = SkiaWrapped.Paint.style;
 
+  module CI = Cstubs_internals;
+
   let make = () => {
     let paint = SkiaWrapped.Paint.allocate();
     Gc.finalise(SkiaWrapped.Paint.delete, paint);
     paint;
   };
 
-[@noalloc]
-  external _setColor: (t, [@unboxed] int32) => unit =
-    "reason_skia_paint_set_color_byte" "reason_skia_paint_set_color";
-
-  [@noalloc]
-  external _setAlphaf: (t, [@unboxed] float) => unit =
-    "reason_skia_paint_set_alphaf_byte" "reason_skia_paint_set_alphaf";
-
-  let setColor = (paint, color) => _setColor(paint, color);
-  let setAlpha = (paint, alpha) => _setAlphaf(paint, alpha);
+  let setColor = (paint, color: Color.t) => SkiaWrapped.Paint.setColor(paint, Unsigned.UInt32.of_int32(color));
+  let setAlpha = SkiaWrapped.Paint.setAlpha;
 
   let getFilterQuality = SkiaWrapped.Paint.getFilterQuality;
   let setFilterQuality = SkiaWrapped.Paint.setFilterQuality;
@@ -280,42 +275,14 @@ module Rect = {
   type t = SkiaWrapped.Rect.t;
 
   module Mutable = {
-    [@noalloc]
-    external _set:
-      (
-        t,
-        [@unboxed] float,
-        [@unboxed] float,
-        [@unboxed] float,
-        [@unboxed] float
-      ) =>
-      unit =
-      "reason_skia_rect_set_byte" "reason_skia_rect_set";
-
     let setLtrb = (~out, left, top, right, bottom) =>
-      _set(out, left, top, right, bottom);
+      SkiaWrapped.Rect.setLtrb(out, left, top, right, bottom);
   };
 
-  [@noalloc]
-  external _getLeft: t => [@unboxed] float =
-    "reason_skia_rect_get_left_byte" "reason_skia_rect_get_left";
-
-  [@noalloc]
-  external _getTop: t => [@unboxed] float =
-    "reason_skia_rect_get_top_byte" "reason_skia_rect_get_top";
-
-  [@noalloc]
-  external _getRight: t => [@unboxed] float =
-    "reason_skia_rect_get_right_byte" "reason_skia_rect_get_right";
-
-  [@noalloc]
-  external _getBottom: t => [@unboxed] float =
-    "reason_skia_rect_get_bottom_byte" "reason_skia_rect_get_bottom";
-
-  let getLeft = rect => _getLeft(rect);
-  let getTop = rect => _getTop(rect);
-  let getBottom = rect => _getBottom(rect);
-  let getRight = rect => _getRight(rect);
+  let getLeft = SkiaWrapped.Rect.getLeft;
+  let getTop = SkiaWrapped.Rect.getTop;
+  let getBottom = SkiaWrapped.Rect.getBottom;
+  let getRight = SkiaWrapped.Rect.getRight;
 
   let makeEmpty = SkiaWrapped.Rect.makeEmpty;
   let makeLtrb = SkiaWrapped.Rect.makeLtrb;
@@ -519,33 +486,16 @@ module Path = {
 module Matrix = {
   type t = SkiaWrapped.Matrix.t;
 
+  module CI = Cstubs_internals;
+
   let make = SkiaWrapped.Matrix.make;
   let setAll = SkiaWrapped.Matrix.setAll;
   let get = SkiaWrapped.Matrix.get;
   let set = SkiaWrapped.Matrix.set;
 
-  [@noalloc]
-  external _setScale:
-    (
-      t,
-      [@unboxed] float,
-      [@unboxed] float,
-      [@unboxed] float,
-      [@unboxed] float
-    ) =>
-    unit =
-    "reason_skia_matrix_set_scale_byte" "reason_skia_matrix_set_scale";
+  let setScale = SkiaWrapped.Matrix.setScale;
 
-  [@noalloc]
-  external _setTranslate:
-    (t, [@unboxed] float, [@unboxed] float) => unit =
-    "reason_skia_matrix_set_translate_byte" "reason_skia_matrix_set_translate";
-
-  let setScale = (mat, scaleX, scaleY, pivotX, pivotY) =>
-    _setScale(mat, scaleX, scaleY, pivotX, pivotY);
-
-  let setTranslate = (matrix, translateX, translateY) =>
-    _setTranslate(matrix, translateX, translateY);
+  let setTranslate = SkiaWrapped.Matrix.setTranslate;
 
   let makeAll =
       (

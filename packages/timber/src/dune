@@ -5,6 +5,7 @@
         (language c)
         (names nativeChannels))
     (libraries 
+        unix
         fmt
         logs
         re

@@ -21,6 +21,8 @@ module M = (F: FOREIGN) => {
   module Color = {
     type t = Unsigned.uint32;
     let t = uint32_t;
+
+    let setArgb = foreign("sk_color_set_argb", uint32_t @-> uint32_t @-> uint32_t @-> uint32_t @-> returning(t));
   };
 
   type data = ptr(structure(SkiaTypes.Data.t));
@@ -317,6 +319,8 @@ module M = (F: FOREIGN) => {
     let getBottom = rect => {
       getf(!@rect, SkiaTypes.Rect.bottom);
     };
+
+    let setLtrb = foreign("reason_skia_stub_rect_set", t @-> float @-> float @-> float @-> float @-> returning(void));
   };
 
   module Path = {
@@ -554,6 +558,10 @@ module M = (F: FOREIGN) => {
       );
     let mapRadius =
       foreign("sk_matrix_map_radius", t @-> float @-> returning(float));
+
+    let setTranslate = foreign("reason_skia_stub_matrix_set_translate", t @-> float @-> float @-> returning(void));
+
+    let setScale = foreign("reason_skia_stub_matrix_set_scale", t @-> float @-> float @-> float @-> float @-> returning(void));
   };
 
   module PathEffect = {
@@ -599,6 +607,9 @@ module M = (F: FOREIGN) => {
 
     let setColor =
       foreign("sk_paint_set_color", t @-> Color.t @-> returning(void));
+
+    let setAlpha = foreign("reason_skia_stub_paint_set_alpha", t @-> float @-> returning(void));
+
     let setAntiAlias =
       foreign("sk_paint_set_antialias", t @-> bool @-> returning(void));
     let setStyle =

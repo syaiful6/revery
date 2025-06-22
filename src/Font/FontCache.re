@@ -89,7 +89,7 @@ module FontWeight = {
 module FontCache = Lru.M.Make(SkiaTypefaceHashable, FontWeight);
 
 module Internal = {
-  let cache = FontCache.create(~initialSize=8, 64);
+  let cache = FontCache.create(64);
 };
 
 module Constants = {
@@ -113,11 +113,11 @@ let load: option(Skia.Typeface.t) => result(t, string) =
       v;
     | None =>
       let harfbuzzFace = skiaTypeface |> Option.map(skiaFaceToHarfbuzzFace);
-      let metricsCache = MetricsCache.create(~initialSize=8, 64);
-      let shapeCache = ShapeResultCache.create(~initialSize=1024, 128 * 1024);
-      let fallbackCache = FallbackCache.create(~initialSize=1024, 128 * 1024);
+      let metricsCache = MetricsCache.create(64);
+      let shapeCache = ShapeResultCache.create(128 * 1024);
+      let fallbackCache = FallbackCache.create(128 * 1024);
       let fallbackCharacterCache =
-        FallbackCharacterCache.create(~initialSize=1024, 128 * 1024);
+        FallbackCharacterCache.create(128 * 1024);
 
       let ret =
         switch (skiaTypeface, harfbuzzFace) {
