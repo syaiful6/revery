@@ -11,7 +11,10 @@ module Check = {
   let getCheckboxText = checked => checked ? "Checked!" : "Not Checked!";
 
   let%component make = () => {
-    let initialCheckboxState = {first: false, second: true};
+    let initialCheckboxState = {
+      first: false,
+      second: true,
+    };
     let%hook ({first, second}, setCheckboxState) =
       Hooks.state(initialCheckboxState);
 
@@ -24,7 +27,14 @@ module Check = {
       ]>
       <Checkbox
         checked=first
-        onChange={() => setCheckboxState(_ => {first: !first, second})}
+        onChange={() =>
+          setCheckboxState(_ =>
+            {
+              first: !first,
+              second,
+            }
+          )
+        }
         style=Style.[marginBottom(10)]
       />
       <Text
@@ -34,7 +44,14 @@ module Check = {
       />
       <Checkbox
         checkedColor=Colors.green
-        onChange={() => setCheckboxState(_ => {second: !second, first})}
+        onChange={() =>
+          setCheckboxState(_ =>
+            {
+              second: !second,
+              first,
+            }
+          )
+        }
         style=Style.[border(~width=2, ~color=Colors.green)]
         checked=second
       />

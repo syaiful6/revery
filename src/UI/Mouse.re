@@ -14,7 +14,10 @@ module Cursor = {
     mutable y: float,
   };
 
-  let make = () => {x: 0., y: 0.};
+  let make = () => {
+    x: 0.,
+    y: 0.,
+  };
 
   let get = cursor => (cursor.x, cursor.y);
 

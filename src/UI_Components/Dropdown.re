@@ -3,7 +3,9 @@ open Revery_Core;
 open Revery_UI_Primitives;
 
 module Hooks = Revery_UI_Hooks;
-module Make = (Type: {type t;}) => {
+module Make = (Type: {
+                 type t;
+               }) => {
   type item = {
     value: Type.t,
     label: string,
@@ -23,8 +25,15 @@ module Make = (Type: {type t;}) => {
 
   let reducer = (action, state) =>
     switch (action) {
-    | ShowDropdown => {...state, _open: !state._open}
-    | SelectItem(item) => {...state, selected: item, _open: false}
+    | ShowDropdown => {
+        ...state,
+        _open: !state._open,
+      }
+    | SelectItem(item) => {
+        ...state,
+        selected: item,
+        _open: false,
+      }
     };
 
   let textStyles = Style.[color(Colors.black)];
@@ -39,7 +48,11 @@ module Make = (Type: {type t;}) => {
                   ~height as h=50,
                   (),
                 ) => {
-    let initialState = {items, selected: List.nth(items, 0), _open: false};
+    let initialState = {
+      items,
+      selected: List.nth(items, 0),
+      _open: false,
+    };
 
     let%hook (state, dispatch) = Hooks.reducer(~initialState, reducer);
 

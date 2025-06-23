@@ -40,7 +40,12 @@ module Example = {
 
   let%component make = () => {
     let%hook ({first, isPassword, _}, setValue) =
-      Hooks.state({first: "", second: "", third: "", isPassword: false});
+      Hooks.state({
+        first: "",
+        second: "",
+        third: "",
+        isPassword: false,
+      });
 
     <View style=containerStyle>
       <View
@@ -52,7 +57,12 @@ module Example = {
         <Input
           placeholder="Insert text here"
           onChange={(value, _) =>
-            setValue(state => {...state, first: value})
+            setValue(state =>
+              {
+                ...state,
+                first: value,
+              }
+            )
           }
           value=first
         />
@@ -61,14 +71,28 @@ module Example = {
           width=100
           fontSize=15.
           title="Reset"
-          onClick={() => setValue(state => {...state, first: ""})}
+          onClick={() =>
+            setValue(state =>
+              {
+                ...state,
+                first: "",
+              }
+            )
+          }
         />
         <Button
           height=50
           width=100
           fontSize=15.
           title="Set value"
-          onClick={() => setValue(state => {...state, first: "New value"})}
+          onClick={() =>
+            setValue(state =>
+              {
+                ...state,
+                first: "New value",
+              }
+            )
+          }
         />
         <Button
           height=50
@@ -88,7 +112,12 @@ module Example = {
           <Input
             placeholder="Insert text here"
             onChange={(value, _) =>
-              setValue(state => {...state, first: value})
+              setValue(state =>
+                {
+                  ...state,
+                  first: value,
+                }
+              )
             }
             value=first
             isPassword
@@ -98,7 +127,12 @@ module Example = {
             <Checkbox
               checkedColor=Colors.green
               onChange={() =>
-                setValue(state => {...state, isPassword: !state.isPassword})
+                setValue(state =>
+                  {
+                    ...state,
+                    isPassword: !state.isPassword,
+                  }
+                )
               }
               style=Style.[border(~width=2, ~color=Colors.green)]
               checked=isPassword
@@ -124,7 +158,12 @@ module Example = {
             onFocus={() => print_endline("Input example focused")}
             onBlur={() => print_endline("Input example blurred")}
             onChange={(value, _) =>
-              setValue(state => {...state, second: value})
+              setValue(state =>
+                {
+                  ...state,
+                  second: value,
+                }
+              )
             }
             onKeyDown={_ => print_endline("key event")}
             style=Style.[

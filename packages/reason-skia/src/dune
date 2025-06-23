@@ -8,6 +8,8 @@
 (library
  (name skia)
  (public_name reason-skia)
+ (flags
+  (:standard -w -69))
  (library_flags
   (:include flags.sexp))
  (c_library_flags

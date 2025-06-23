@@ -3,7 +3,7 @@ type alphaType = SkiaWrapped.alphaType;
 
 module Color = {
   type t = int32;
-  
+
   [@noalloc]
   external makeArgb:
     ([@unboxed] int32, [@unboxed] int32, [@unboxed] int32, [@unboxed] int32) =>
@@ -88,16 +88,7 @@ module ImageFilter = {
   };
 
   module DropShadow = {
-    let make =
-        (
-          dx,
-          dy,
-          sigmaX,
-          sigmaY,
-          color,
-          inputOption,
-          cropRectOption,
-        ) => {
+    let make = (dx, dy, sigmaX, sigmaY, color, inputOption, cropRectOption) => {
       let imageFilter =
         SkiaWrapped.ImageFilter.DropShadow.allocate(
           dx,
@@ -129,7 +120,8 @@ module Paint = {
     paint;
   };
 
-  let setColor = (paint, color: Color.t) => SkiaWrapped.Paint.setColor(paint, Unsigned.UInt32.of_int32(color));
+  let setColor = (paint, color: Color.t) =>
+    SkiaWrapped.Paint.setColor(paint, Unsigned.UInt32.of_int32(color));
   let setAlpha = SkiaWrapped.Paint.setAlpha;
 
   let getFilterQuality = SkiaWrapped.Paint.getFilterQuality;
@@ -309,17 +301,18 @@ module Font = {
 
   let make = () => {
     let font = SkiaWrapped.Font.allocate();
-    Gc.finalise(SkiaWrapped.Font.delete, font); 
+    Gc.finalise(SkiaWrapped.Font.delete, font);
     font;
   };
 
   let makeWithValues = (face, size, scaleX, skewX) => {
-    let font = SkiaWrapped.Font.sk_font_new_with_values(face, size, scaleX, skewX);
-    Gc.finalise(SkiaWrapped.Font.delete, font); 
+    let font =
+      SkiaWrapped.Font.sk_font_new_with_values(face, size, scaleX, skewX);
+    Gc.finalise(SkiaWrapped.Font.delete, font);
     font;
   };
 
-  let getTypeface = (t) => {
+  let getTypeface = t => {
     let face = SkiaWrapped.Font.getTypeface(t);
     Gc.finalise(SkiaWrapped.Typeface.delete, face);
     face;
@@ -333,11 +326,19 @@ module Font = {
   let setSubpixel = SkiaWrapped.Font.setSubpixel;
 
   let measureText = (~bounds=?, ~paint, ~encoding=?, t, text, ()) => {
-    let enc: TextEncoding.t = switch(encoding) {
-    | None => Utf8
-    | Some(e) => e
-    };
-    SkiaWrapped.Font.measureText(t, text, Unsigned.Size_t.of_int(String.length(text)), enc, bounds, paint);
+    let enc: TextEncoding.t =
+      switch (encoding) {
+      | None => Utf8
+      | Some(e) => e
+      };
+    SkiaWrapped.Font.measureText(
+      t,
+      text,
+      Unsigned.Size_t.of_int(String.length(text)),
+      enc,
+      bounds,
+      paint,
+    );
   };
 };
 
@@ -719,7 +720,7 @@ module Image = {
       Ctypes.structure(SkiaWrappedBindings.SkiaTypes.Image.t),
     );
 
-  let makeFromEncoded = (encodedData) => {
+  let makeFromEncoded = encodedData => {
     switch (SkiaWrapped.Image.allocateFromEncoded(encodedData)) {
     | Some(image) =>
       Gc.finalise(SkiaWrapped.Image.delete, image);
@@ -793,7 +794,8 @@ module Canvas = {
   let drawPath = SkiaWrapped.Canvas.drawPath;
   let drawCircle = SkiaWrapped.Canvas.drawCircle;
 
-  let drawSimpleText = (~encoding:TextEncoding.t=GlyphId, canvas, text, x, y, font, paint, ()) => {
+  let drawSimpleText =
+      (~encoding: TextEncoding.t=GlyphId, canvas, text, x, y, font, paint, ()) => {
     SkiaWrapped.Canvas.drawSimpleText(
       canvas,
       text,
@@ -937,7 +939,10 @@ module SVG = {
     SkiaWrapped.SVG.makeFromStream(stream)
     |> Option.map(svg => {
          svg |> Gc.finalise(SkiaWrapped.SVG.delete);
-         {svg, stream};
+         {
+           svg,
+           stream,
+         };
        });
   let render = t => SkiaWrapped.SVG.render(t.svg);
   let setContainerSize = t => SkiaWrapped.SVG.setContainerSize(t.svg);

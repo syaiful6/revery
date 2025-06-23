@@ -123,7 +123,7 @@ let flags = os =>
 
 let skiaIncludeFlags = {
   let skiaIncludePath = getenv("SKIA_INCLUDE_PATH");
-  ["-I" ++ skiaIncludePath]
+  ["-I" ++ skiaIncludePath];
   // Sys.readdir(skiaIncludePath)
   // |> Array.map(path => "-I" ++ skiaIncludePath ++ "/" ++ path)
   // |> Array.append([|"-I" ++ skiaIncludePath|])
@@ -164,14 +164,13 @@ let cflags = os => {
     @ ["-ljpeg"]
     @ ["-fPIC"]
   | IOS
-  | Mac => {
-      let sdk_path = find_xcode_sysroot("macosx");
-      []
-      @ ["-isysroot" ++ sdk_path]
-      @ ["-I" ++ getenv("SDL2_INCLUDE_PATH"),]
-      @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
-      @ skiaIncludeFlags
-  }
+  | Mac =>
+    let sdk_path = find_xcode_sysroot("macosx");
+    []
+    @ ["-isysroot" ++ sdk_path]
+    @ ["-I" ++ getenv("SDL2_INCLUDE_PATH")]
+    @ ["-I" ++ getenv("SKIA_PREFIX_PATH")]
+    @ skiaIncludeFlags;
   | Windows =>
     []
     @ ["-std=c++1y"]

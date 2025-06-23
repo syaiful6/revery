@@ -1,8 +1,6 @@
-%import
-"config.h";
+[%%import "config.h"];
 
-%if
-defined(USE_COCOA) || defined(USE_UIKIT);
+[%%if defined(USE_COCOA) || defined(USE_UIKIT)];
 
 type t('a) = 'a;
 

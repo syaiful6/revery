@@ -1,4 +1,6 @@
-module type Clock = {let time: unit => Time.t;};
+module type Clock = {
+  let time: unit => Time.t;
+};
 
 module Log = (val Log.withNamespace("Revery.Tick"));
 
@@ -17,8 +19,7 @@ module IntMap =
 
 module Make = (ClockImpl: Clock) => {
   type nonrec callback = callback;
-  module TickId =
-    UniqueId.Make({});
+  module TickId = UniqueId.Make();
 
   type tickType =
     | Timeout
@@ -88,7 +89,11 @@ module Make = (ClockImpl: Clock) => {
         ignore(tf.f(elapsedTime));
         switch (tf.tickType) {
         | Timeout => None
-        | Interval => Some({...tf, lastExecutionTime: currentTime})
+        | Interval =>
+          Some({
+            ...tf,
+            lastExecutionTime: currentTime,
+          })
         };
       } else {
         Some(tf);

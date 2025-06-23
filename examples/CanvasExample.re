@@ -69,7 +69,7 @@ module Sample = {
           | Ok(font) =>
             let textPaint = Skia.Paint.make();
             let textFont = Skia.Font.make();
-            Skia.Font.setSize(textFont, 20.0)
+            Skia.Font.setSize(textFont, 20.0);
             Skia.Paint.setColor(textPaint, Color.toSkia(Colors.white));
             // Skia.Paint.setLcdRenderText(textPaint, true);
             // Skia.Paint.setAntiAlias(textPaint, true);
@@ -84,7 +84,7 @@ module Sample = {
 
             shapedText
             |> List.iter(((typeface, string)) => {
-                 // Skia.Paint.setTypeface(textPaint, typeface);
+                 Skia.Font.setTypeface(textFont, typeface);
                  CanvasContext.drawText(
                    ~paint=textPaint,
                    ~font=textFont,

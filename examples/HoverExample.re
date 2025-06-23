@@ -18,11 +18,26 @@ type action =
 
 let reducer = (action: action, state) => {
   switch (action) {
-  | SetParentBackground(c) => {...state, parentBackground: c}
-  | SetChildOneBackground(c) => {...state, childOneBackground: c}
-  | SetChildTwoBackground(c) => {...state, childTwoBackground: c}
-  | SetChildThreeBackground(c) => {...state, childThreeBackground: c}
-  | SetChildFourBackground(c) => {...state, childFourBackground: c}
+  | SetParentBackground(c) => {
+      ...state,
+      parentBackground: c,
+    }
+  | SetChildOneBackground(c) => {
+      ...state,
+      childOneBackground: c,
+    }
+  | SetChildTwoBackground(c) => {
+      ...state,
+      childTwoBackground: c,
+    }
+  | SetChildThreeBackground(c) => {
+      ...state,
+      childThreeBackground: c,
+    }
+  | SetChildFourBackground(c) => {
+      ...state,
+      childFourBackground: c,
+    }
   };
 };
 module HoverExample = {

@@ -17,7 +17,12 @@ module M = (T: TYPE) => {
     );
 
   module FilterQuality = {
-    type t = [ | `none | `low | `medium | `high];
+    type t = [
+      | `none
+      | `low
+      | `medium
+      | `high
+    ];
 
     let t: T.typ(t) =
       skiaCEnum(
@@ -30,7 +35,7 @@ module M = (T: TYPE) => {
         ],
       );
   };
-  
+
   module TextEncoding = {
     type t =
       | Utf8
@@ -94,9 +99,14 @@ module M = (T: TYPE) => {
     let t: typ(structure(t)) = structure("sk_font_t");
     let t = typedef(t, "sk_font_t");
 
-    type hinting = [ | `nohint | `slight | `normal | `full];
+    type hinting = [
+      | `nohint
+      | `slight
+      | `normal
+      | `full
+    ];
 
-    let hinting : T.typ(hinting) =
+    let hinting: T.typ(hinting) =
       skiaCEnum(
         "sk_font_hinting_t",
         [
@@ -160,7 +170,11 @@ module M = (T: TYPE) => {
 
   module PathEffect = {
     module Style = {
-      type t = [ | `translate | `rotate | `morph];
+      type t = [
+        | `translate
+        | `rotate
+        | `morph
+      ];
 
       let t: T.typ(t) =
         skiaCEnum(
@@ -208,7 +222,11 @@ module M = (T: TYPE) => {
   };
 
   module Shader = {
-    type tileMode = [ | `clamp | `repeat | `mirror];
+    type tileMode = [
+      | `clamp
+      | `repeat
+      | `mirror
+    ];
 
     let tileMode: T.typ(tileMode) =
       skiaCEnum(
@@ -315,7 +333,10 @@ module M = (T: TYPE) => {
   };
 
   module Path = {
-    type arcSize = [ | `small | `large];
+    type arcSize = [
+      | `small
+      | `large
+    ];
 
     let arcSize: T.typ(arcSize) =
       skiaCEnum(
@@ -326,7 +347,10 @@ module M = (T: TYPE) => {
         ],
       );
 
-    type pathDirection = [ | `cw | `ccw];
+    type pathDirection = [
+      | `cw
+      | `ccw
+    ];
 
     let pathDirection: T.typ(pathDirection) =
       skiaCEnum(

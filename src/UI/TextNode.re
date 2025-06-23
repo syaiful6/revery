@@ -10,8 +10,8 @@ open Style;
 open ViewNode;
 
 open {
-       let int_of_float_ceil = f => int_of_float(f +. 1.);
-     };
+  let int_of_float_ceil = f => int_of_float(f +. 1.);
+};
 
 class textNode (text: string) = {
   as _this;
@@ -48,7 +48,11 @@ class textNode (text: string) = {
     switch (Family.resolve(~italic=_italicized, _fontWeight, _fontFamily)) {
     | Error(_) => ()
     | Ok(font) =>
-      Revery_Font.Smoothing.setPaint(~smoothing=_smoothing, _font, _textPaint);
+      Revery_Font.Smoothing.setPaint(
+        ~smoothing=_smoothing,
+        _font,
+        _textPaint,
+      );
       Skia.Paint.setColor(_textPaint, Color.toSkia(colorWithAppliedOpacity));
       Skia.Font.setSize(_font, _fontSize);
 
@@ -99,7 +103,8 @@ class textNode (text: string) = {
                );
 
                offset :=
-                 offset^ +. Skia.Font.measureText(~paint=_textPaint, _font, str, ());
+                 offset^
+                 +. Skia.Font.measureText(~paint=_textPaint, _font, str, ());
              });
 
           if (_underlined) {

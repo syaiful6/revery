@@ -26,7 +26,11 @@ let cache = FontFamilyCache.create(64);
 
 let system = (familyName): t =>
   (~italic, weight) => {
-    let fontDescr: FontFamilyHashable.t = {familyName, weight, italic};
+    let fontDescr: FontFamilyHashable.t = {
+      familyName,
+      weight,
+      italic,
+    };
     switch (FontFamilyCache.find(fontDescr, cache)) {
     | Some(fd) =>
       FontFamilyCache.promote(fontDescr, cache);
@@ -46,7 +50,11 @@ let fromFiles =
       weight,
     ) => {
   let familyName = solver(~italic, ~weight);
-  let fontDescr: FontFamilyHashable.t = {familyName, weight, italic};
+  let fontDescr: FontFamilyHashable.t = {
+    familyName,
+    weight,
+    italic,
+  };
   switch (FontFamilyCache.find(fontDescr, cache)) {
   | Some(tf) =>
     FontFamilyCache.promote(fontDescr, cache);

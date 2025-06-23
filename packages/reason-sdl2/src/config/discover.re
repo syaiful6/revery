@@ -70,10 +70,9 @@ let c_flags = os =>
   switch (os) {
   | Android
   | IOS
-  | Mac => {
+  | Mac =>
     let sdk_path = find_xcode_sysroot("macosx");
     ["-isysroot" ++ sdk_path] @ c_flags;
-  }
   | Linux => c_flags @ ["-fPIC"]
   | Windows => c_flags @ ["-mwindows"]
   };
@@ -160,7 +159,7 @@ let flags = os =>
 let c_library_flags = os =>
   switch (os) {
   | Android
-  | IOS 
+  | IOS
   | Mac => framework("Foundation")
   | Linux => [libFilePath]
   | Windows => ["-L" ++ libFolderPath, "-lSDL2"]

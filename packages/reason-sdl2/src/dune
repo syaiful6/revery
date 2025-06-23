@@ -1,6 +1,8 @@
 (library
  (name sdl2)
  (public_name reason-sdl2)
+ (flags
+  (:standard -w -69))
  (library_flags
   (:include flags.sexp))
  (c_library_flags

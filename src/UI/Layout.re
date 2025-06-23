@@ -44,5 +44,9 @@ let layout = (~force=false, node) =>
 let printCssNode = root =>
   LayoutPrint.printCssNode((
     root,
-    {printLayout: true, printChildren: true, printStyle: true},
+    {
+      printLayout: true,
+      printChildren: true,
+      printStyle: true,
+    },
   ));

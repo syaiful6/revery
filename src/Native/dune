@@ -1,6 +1,8 @@
 (library
  (name Revery_Native)
  (public_name Revery.Native)
+ (flags
+  (:standard -w -69))
  (preprocess
   (pps lwt_ppx ppx_optcomp))
  (preprocessor_deps config.h)
@@ -10,14 +12,45 @@
   (javascript_files dialog.js))
  (foreign_stubs
   (language c)
-  (names Revery_Native dialog dialog_cocoa dialog_win32 dialog_gtk
-    notification notification_cocoa environment environment_mac
-    environment_linux environment_windows icon icon_cocoa icon_win32 shell
-    shell_cocoa shell_gtk shell_win32 locale locale_cocoa locale_win32 menu
-    menu_cocoa input input_cocoa window window_cocoa utilities ReveryGtk
-    ReveryGtk_Widget ReveryAppDelegate ReveryAppDelegate_func ReveryNSObject
-    ReveryNSView ReveryNSViewCoords ReveryMenuItemTarget ReveryButtonTarget
-    ReveryProgressBar)
+  (names
+   Revery_Native
+   dialog
+   dialog_cocoa
+   dialog_win32
+   dialog_gtk
+   notification
+   notification_cocoa
+   environment
+   environment_mac
+   environment_linux
+   environment_windows
+   icon
+   icon_cocoa
+   icon_win32
+   shell
+   shell_cocoa
+   shell_gtk
+   shell_win32
+   locale
+   locale_cocoa
+   locale_win32
+   menu
+   menu_cocoa
+   input
+   input_cocoa
+   window
+   window_cocoa
+   utilities
+   ReveryGtk
+   ReveryGtk_Widget
+   ReveryAppDelegate
+   ReveryAppDelegate_func
+   ReveryNSObject
+   ReveryNSView
+   ReveryNSViewCoords
+   ReveryMenuItemTarget
+   ReveryButtonTarget
+   ReveryProgressBar)
   (flags
    :standard
    (:include c_flags.sexp)))

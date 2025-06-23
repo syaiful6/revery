@@ -1,3 +1,5 @@
 (executable
  (name discover)
+ (flags
+  (:standard -w -69))
  (libraries dune.configurator))

@@ -1,4 +1,4 @@
-let prefix = "skia_wrapped_stub"
+(* let prefix = "skia_wrapped_stub" *)
 
 let prologue = {|
 #include "include/c/sk_types.h"

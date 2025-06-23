@@ -15,10 +15,7 @@ module Data = {
   let testFallbackString = "ABC鬼";
   let paint = {
     let textPaint = Skia.Paint.make();
-    Skia.Paint.setTextEncoding(textPaint, GlyphId);
-    Skia.Paint.setLcdRenderText(textPaint, true);
     Skia.Paint.setAntiAlias(textPaint, true);
-    Skia.Paint.setTextSize(textPaint, 20.);
     textPaint;
   };
 
@@ -41,10 +38,12 @@ let drawText = canvasContext => {
 
     shapedText
     |> List.iter(((typeface, string)) => {
-         Skia.Paint.setTypeface(Data.paint, typeface);
+         let skiaFont = Skia.Font.make();
+         Skia.Font.setTypeface(skiaFont, typeface);
          CanvasContext.drawText(
            ~x=1.,
            ~y=1.,
+           ~font=skiaFont,
            ~paint=Data.paint,
            ~text=string,
            canvasContext,
@@ -68,10 +67,12 @@ let drawFallbackText = canvasContext => {
 
     shapedText
     |> List.iter(((typeface, string)) => {
-         Skia.Paint.setTypeface(Data.paint, typeface);
+         let skiaFont = Skia.Font.make();
+         Skia.Font.setTypeface(skiaFont, typeface);
          CanvasContext.drawText(
            ~x=1.,
            ~y=1.,
+           ~font=skiaFont,
            ~paint=Data.paint,
            ~text=string,
            canvasContext,

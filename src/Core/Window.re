@@ -13,7 +13,10 @@ let scaleSize = (~scale: float, size) => {
   let width = int_of_float(float_of_int(size.width) /. scale);
   let height = int_of_float(float_of_int(size.height) /. scale);
 
-  {width, height};
+  {
+    width,
+    height,
+  };
 };
 
 module Log = (val Log.withNamespace("Revery.Core.Window"));
@@ -149,9 +152,16 @@ module WindowMetrics: {
 
   let setZoom = (zoom, metrics) => {
     Log.tracef(m => m("Setting zoom: %f", zoom));
-    {...metrics, zoom, isDirty: true};
+    {
+      ...metrics,
+      zoom,
+      isDirty: true,
+    };
   };
-  let markDirty = metrics => {...metrics, isDirty: true};
+  let markDirty = metrics => {
+    ...metrics,
+    isDirty: true,
+  };
 };
 
 module FPS = {
@@ -288,7 +298,10 @@ module Internal = {
       if (win.isRendering) {
         Log.trace("setRawSize - queuing for next render");
         win.requestedUnscaledSize =
-          Some({width: adjWidth, height: adjHeight});
+          Some({
+            width: adjWidth,
+            height: adjHeight,
+          });
       } else {
         Log.trace("setRawSize - calling Sdl2.Window.setSize");
         Sdl2.Window.setSize(win.sdlWindow, adjWidth, adjHeight);
@@ -449,11 +462,21 @@ let handleEvent = (sdlEvent: Sdl2.Event.t, v: t) => {
     )
 
   | Sdl2.Event.KeyDown({keycode, keymod, scancode, repeat, _}) =>
-    let keyEvent: Key.KeyEvent.t = {keycode, scancode, keymod, repeat};
+    let keyEvent: Key.KeyEvent.t = {
+      keycode,
+      scancode,
+      keymod,
+      repeat,
+    };
     Event.dispatch(v.onKeyDown, keyEvent);
 
   | Sdl2.Event.KeyUp({keycode, keymod, scancode, repeat, _}) =>
-    let keyEvent: Key.KeyEvent.t = {keycode, scancode, keymod, repeat};
+    let keyEvent: Key.KeyEvent.t = {
+      keycode,
+      scancode,
+      keymod,
+      repeat,
+    };
     Event.dispatch(v.onKeyUp, keyEvent);
 
   | Sdl2.Event.TextEditing(te) =>
@@ -464,7 +487,11 @@ let handleEvent = (sdlEvent: Sdl2.Event.t, v: t) => {
 
     Event.dispatch(
       v.onCompositionEdit,
-      {text: te.text, start: te.start, length: te.length},
+      {
+        text: te.text,
+        start: te.start,
+        length: te.length,
+      },
     );
   | Sdl2.Event.TextInput(ti) =>
     if (v.isComposingText) {
@@ -481,7 +508,10 @@ let handleEvent = (sdlEvent: Sdl2.Event.t, v: t) => {
 
     // Scale the window size changed event, so that is in the same 'scaled-screen-space' as
     // other size functions, like [getSize], [setSize], and [create].
-    let unscaledSize = {width, height};
+    let unscaledSize = {
+      width,
+      height,
+    };
     let scaledSize = scaleSize(~scale=v.metrics.scaleFactor, unscaledSize);
     Event.dispatch(v.onSizeChanged, scaledSize);
 

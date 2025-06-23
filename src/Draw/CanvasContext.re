@@ -290,9 +290,10 @@ let drawText = (~paint, ~font, ~x=0., ~y=0., ~text, v: t) => {
   Canvas.drawText(v.canvas, text, x, y, font, paint);
 };
 
-let drawTextWithEncoding = (~encoding, ~paint, ~font, ~x=0., ~y=0., ~text, v: t) => {
+let drawTextWithEncoding =
+    (~encoding, ~paint, ~font, ~x=0., ~y=0., ~text, v: t) => {
   Canvas.drawSimpleText(~encoding, v.canvas, text, x, y, font, paint, ());
-}
+};
 
 let _topMatrix = Skia.Matrix.make();
 let setMatrix = (v: t, mat: Skia.Matrix.t) => {

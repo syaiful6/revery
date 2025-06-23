@@ -26,7 +26,11 @@ module AnalogClock = {
         numberToPercentage(~number=float_of_int(tm_sec), ~max=60.)
         |> percentageToDegrees;
 
-      {hourDegrees, minuteDegrees, secondDegrees};
+      {
+        hourDegrees,
+        minuteDegrees,
+        secondDegrees,
+      };
     };
   };
 

@@ -15,14 +15,35 @@ module ViewPort = {
     | South
     | West;
 
-  let create = size => {xMin: 0, xMax: size, yMin: 0, yMax: size};
+  let create = size => {
+    xMin: 0,
+    xMax: size,
+    yMin: 0,
+    yMax: size,
+  };
 
   let changeDirection = (viewPort, direction) =>
     switch (direction) {
-    | North => {...viewPort, yMin: viewPort.yMin - 1, yMax: viewPort.yMax - 1}
-    | East => {...viewPort, xMin: viewPort.xMin + 1, xMax: viewPort.xMax + 1}
-    | South => {...viewPort, yMin: viewPort.yMin + 1, yMax: viewPort.yMax + 1}
-    | West => {...viewPort, xMin: viewPort.xMin - 1, xMax: viewPort.xMax - 1}
+    | North => {
+        ...viewPort,
+        yMin: viewPort.yMin - 1,
+        yMax: viewPort.yMax - 1,
+      }
+    | East => {
+        ...viewPort,
+        xMin: viewPort.xMin + 1,
+        xMax: viewPort.xMax + 1,
+      }
+    | South => {
+        ...viewPort,
+        yMin: viewPort.yMin + 1,
+        yMax: viewPort.yMax + 1,
+      }
+    | West => {
+        ...viewPort,
+        xMin: viewPort.xMin - 1,
+        xMax: viewPort.xMax - 1,
+      }
     };
 
   let zoomOut = viewPort => {
@@ -371,11 +392,22 @@ and zoom =
 let noop = () => ();
 let reducer = (action, state) =>
   switch (action) {
-  | TimerTick(_t) => {...state, universe: GameOfLife.evolve(state.universe)}
-  | StartTimer(dispose) => {...state, dispose, isRunning: true}
+  | TimerTick(_t) => {
+      ...state,
+      universe: GameOfLife.evolve(state.universe),
+    }
+  | StartTimer(dispose) => {
+      ...state,
+      dispose,
+      isRunning: true,
+    }
   | StopTimer =>
     state.dispose();
-    {...state, dispose: noop, isRunning: false};
+    {
+      ...state,
+      dispose: noop,
+      isRunning: false,
+    };
   | ToggleAlive(position) => {
       ...state,
       universe:

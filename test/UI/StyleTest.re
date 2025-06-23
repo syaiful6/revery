@@ -58,13 +58,55 @@ describe("Style API tests", ({test, _}) => {
         ],
         (),
       );
-    expect.equal(styles.border, {color: black, width: 2});
-    expect.equal(styles.borderBottom, {color: orange, width: 2});
-    expect.equal(styles.borderTop, {color: red, width: 2});
-    expect.equal(styles.borderRight, {color: blue, width: 2});
-    expect.equal(styles.borderLeft, {color: rebeccaPurple, width: 2});
-    expect.equal(styles.borderHorizontal, {color: paleVioletRed, width: 12});
-    expect.equal(styles.borderVertical, {color: paleTurquoise, width: 18});
+    expect.equal(
+      styles.border,
+      {
+        color: black,
+        width: 2,
+      },
+    );
+    expect.equal(
+      styles.borderBottom,
+      {
+        color: orange,
+        width: 2,
+      },
+    );
+    expect.equal(
+      styles.borderTop,
+      {
+        color: red,
+        width: 2,
+      },
+    );
+    expect.equal(
+      styles.borderRight,
+      {
+        color: blue,
+        width: 2,
+      },
+    );
+    expect.equal(
+      styles.borderLeft,
+      {
+        color: rebeccaPurple,
+        width: 2,
+      },
+    );
+    expect.equal(
+      styles.borderHorizontal,
+      {
+        color: paleVioletRed,
+        width: 12,
+      },
+    );
+    expect.equal(
+      styles.borderVertical,
+      {
+        color: paleTurquoise,
+        width: 18,
+      },
+    );
   });
 
   test(

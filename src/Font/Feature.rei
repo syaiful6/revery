@@ -1,6 +1,10 @@
 type t = Harfbuzz.feature;
 
-type position = [ | `Start | `End | `Position(int)];
+type position = [
+  | `Start
+  | `End
+  | `Position(int)
+];
 type tag;
 
 let customTag: string => tag;

@@ -1,5 +1,4 @@
-%import
-"config.h";
+[%%import "config.h"];
 
 type t;
 
@@ -32,17 +31,25 @@ module KeyEquivalent = {
     ctrl: false,
   };
 
-  let enableAlt = (t, truth) => {...t, alt: truth};
-  let enableShift = (t, truth) => {...t, shift: truth};
-  let enableCtrl = (t, truth) => {...t, ctrl: truth};
+  let enableAlt = (t, truth) => {
+    ...t,
+    alt: truth,
+  };
+  let enableShift = (t, truth) => {
+    ...t,
+    shift: truth,
+  };
+  let enableCtrl = (t, truth) => {
+    ...t,
+    ctrl: truth,
+  };
 };
 
 module Item = {
   type menu = t;
   type t;
 
-  %if
-  defined(USE_COCOA);
+  [%%if defined(USE_COCOA)];
 
   let hash = NSObject.hash;
   let equal = NSObject.equal;
@@ -57,11 +64,10 @@ module Item = {
   [%%endif];
 
   open {
-         external c_create: (string, option(KeyEquivalent.t)) => t =
-           "revery_menuItemCreate";
-         external c_getSubmenu: t => option(menu) =
-           "revery_menuItemGetSubmenu";
-       };
+    external c_create: (string, option(KeyEquivalent.t)) => t =
+      "revery_menuItemCreate";
+    external c_getSubmenu: t => option(menu) = "revery_menuItemGetSubmenu";
+  };
 
   module CallbackTbl =
     Hashtbl.Make({
@@ -86,8 +92,7 @@ module Item = {
   external setEnabled: (t, bool) => unit = "revery_menuItemSetEnabled";
   external setVisible: (t, bool) => unit = "revery_menuItemSetVisible";
 
-  %if
-  defined(USE_COCOA);
+  [%%if defined(USE_COCOA)];
 
   let create = (~title, ~onClick, ~keyEquivalent=?, ()) => {
     let menu = c_create(title, keyEquivalent);
@@ -116,16 +121,16 @@ module Item = {
 };
 
 open {
-       external c_addSubmenu: (t, t) => unit = "revery_menuAddSubmenu";
-       external c_removeSubmenu: (t, t) => unit = "revery_menuRemoveSubmenu";
-       external c_insertSubmenuAt: (t, t, int) => unit =
-         "revery_menuInsertSubmenuAt";
-       external c_getMenuBarHandle: unit => t = "revery_getMenuBarHandle";
-       external c_create: string => t = "revery_menuCreate";
-       external c_nth: (t, int) => option(Item.t) = "revery_menuNth";
-       external c_displayIn: (t, Sdl2.Window.nativeWindow, int, int) => unit =
-         "revery_menuDisplayIn";
-     };
+  external c_addSubmenu: (t, t) => unit = "revery_menuAddSubmenu";
+  external c_removeSubmenu: (t, t) => unit = "revery_menuRemoveSubmenu";
+  external c_insertSubmenuAt: (t, t, int) => unit =
+    "revery_menuInsertSubmenuAt";
+  external c_getMenuBarHandle: unit => t = "revery_getMenuBarHandle";
+  external c_create: string => t = "revery_menuCreate";
+  external c_nth: (t, int) => option(Item.t) = "revery_menuNth";
+  external c_displayIn: (t, Sdl2.Window.nativeWindow, int, int) => unit =
+    "revery_menuDisplayIn";
+};
 
 external addItem: (t, Item.t) => unit = "revery_menuAddItem";
 external insertItemAt: (t, Item.t, int) => unit = "revery_menuInsertItemAt";
@@ -139,8 +144,7 @@ let insertSubmenuAt = (~parent, ~child, ~idx) =>
 let displayIn = (~x, ~y, menu, window) =>
   c_displayIn(menu, window |> Sdl2.Window.getNativeWindow, x, y);
 
-%if
-defined(USE_COCOA);
+[%%if defined(USE_COCOA)];
 
 let toString = NSObject.toString;
 

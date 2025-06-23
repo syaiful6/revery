@@ -9,8 +9,14 @@ module Defaults = {
 };
 let make =
     (
-      ~src: [ | `Str(string) | `File(string)],
-      ~scaleMode: [ | `Fit | `Fill]=`Fit,
+      ~src: [
+         | `Str(string)
+         | `File(string)
+       ],
+      ~scaleMode: [
+         | `Fit
+         | `Fill
+       ]=`Fit,
       ~width as maybeWidth: option(float)=?,
       ~height as maybeHeight: option(float)=?,
       (),

@@ -16,11 +16,26 @@ let textStyle = Style.[marginBottom(20)];
 
 module DropdownExample = {
   let items: DropdownInt.items = [
-    {value: 1, label: "First option"},
-    {value: 2, label: "Second option"},
-    {value: 3, label: "Third option"},
-    {value: 4, label: "Fourth option"},
-    {value: 5, label: "A really, really, really long option"},
+    {
+      value: 1,
+      label: "First option",
+    },
+    {
+      value: 2,
+      label: "Second option",
+    },
+    {
+      value: 3,
+      label: "Third option",
+    },
+    {
+      value: 4,
+      label: "Fourth option",
+    },
+    {
+      value: 5,
+      label: "A really, really, really long option",
+    },
   ];
 
   let%component make = () => {

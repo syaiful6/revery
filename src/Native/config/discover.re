@@ -37,7 +37,7 @@ let find_xcode_sysroot = sdk => {
 
 let macos_isysroot = () => {
   let sdk_path = find_xcode_sysroot("macosx");
-  "-isysroot" ++ sdk_path
+  "-isysroot" ++ sdk_path;
 };
 
 let get_os = t => {
@@ -106,10 +106,10 @@ type config = {
   flags: list(string),
 };
 
-let ccopt = s => ["-ccopt", s];
+// let ccopt = s => ["-ccopt", s];
 let cclib = s => ["-cclib", s];
 let framework = s => ["-framework", s];
-let ldopt = s => ["-ldopt", s]
+// let ldopt = s => ["-ldopt", s]
 
 let get_ios_config = () => {
   features: [UIKIT],
@@ -119,13 +119,20 @@ let get_ios_config = () => {
 };
 let get_mac_config = () => {
   features: [COCOA],
-  cflags: [macos_isysroot()] @ ["-I", ".", "-x", "objective-c", "-Wno-deprecated-declarations"],
+  cflags:
+    [macos_isysroot()]
+    @ ["-I", ".", "-x", "objective-c", "-Wno-deprecated-declarations"],
   libs: [] @ framework("Foundation"),
   flags: [] @ cclib("-ObjC"),
 };
 
 let get_linux_config = c => {
-  let default = {features: [], libs: [], cflags: [], flags: []};
+  let default = {
+    features: [],
+    libs: [],
+    cflags: [],
+    flags: [],
+  };
   switch (Pkg_config.get(c)) {
   | None => default
   | Some(pc) =>

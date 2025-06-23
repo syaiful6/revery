@@ -9,7 +9,11 @@ module FontComponent = {
     italic: bool,
   };
 
-  let initialState: state = {family: "Arial", bold: false, italic: false};
+  let initialState: state = {
+    family: "Arial",
+    bold: false,
+    italic: false,
+  };
 
   type actions =
     | SetBold(bool)
@@ -19,9 +23,18 @@ module FontComponent = {
   let reducer = (action: actions, state: state) => {
     let state =
       switch (action) {
-      | SetBold(v) => {...state, bold: v}
-      | SetItalic(v) => {...state, italic: v}
-      | SetFamily(v) => {...state, family: v}
+      | SetBold(v) => {
+          ...state,
+          bold: v,
+        }
+      | SetItalic(v) => {
+          ...state,
+          italic: v,
+        }
+      | SetFamily(v) => {
+          ...state,
+          family: v,
+        }
       };
 
     state;

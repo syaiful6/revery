@@ -1,12 +1,7 @@
 (library
-    (name Timber)
-    (public_name timber)
-    (foreign_stubs 
-        (language c)
-        (names nativeChannels))
-    (libraries 
-        unix
-        fmt
-        logs
-        re
-    ))
+ (name Timber)
+ (public_name timber)
+ (foreign_stubs
+  (language c)
+  (names nativeChannels))
+ (libraries unix fmt logs re))

@@ -8,7 +8,11 @@ type t = {
   state: option(state),
 };
 
-let create: React.reveryNode => t = n => {node: n, state: None};
+let create: React.reveryNode => t =
+  n => {
+    node: n,
+    state: None,
+  };
 
 let update: (t, React.element(React.reveryNode)) => t =
   ({node, state}, element) => {
@@ -44,7 +48,11 @@ let update: (t, React.element(React.reveryNode)) => t =
 
     let ret: t = {
       node,
-      state: Some({rendered: newRendered, previousElement: element}),
+      state:
+        Some({
+          rendered: newRendered,
+          previousElement: element,
+        }),
     };
     ret;
   };

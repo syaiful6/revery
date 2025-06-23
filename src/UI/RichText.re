@@ -65,41 +65,127 @@ module DSL = {
         ~color=Colors.black,
         text: string,
       ) =>
-    Leaf({fontFamily, fontWeight, italic, fontSize, text, color});
+    Leaf({
+      fontFamily,
+      fontWeight,
+      italic,
+      fontSize,
+      text,
+      color,
+    });
 
   let fontWeight = (fontWeight: Weight.t, richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontWeight}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight,
+         })
+       );
   let thin = (richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.Thin}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.Thin,
+         })
+       );
   let ultralight = (richtext: t) =>
     richtext
-    |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.UltraLight}));
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.UltraLight,
+         })
+       );
   let light = (richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.Light}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.Light,
+         })
+       );
   let normal = (richtext: t) =>
     richtext
-    |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.Normal}));
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.Normal,
+         })
+       );
   let medium = (richtext: t) =>
     richtext
-    |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.Medium}));
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.Medium,
+         })
+       );
   let semibold = (richtext: t) =>
     richtext
-    |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.SemiBold}));
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.SemiBold,
+         })
+       );
   let bold = (richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.Bold}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.Bold,
+         })
+       );
   let ultrabold = (richtext: t) =>
     richtext
-    |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.UltraBold}));
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.UltraBold,
+         })
+       );
   let heavy = (richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontWeight: Weight.Heavy}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontWeight: Weight.Heavy,
+         })
+       );
 
   let fontFamily = (fontFamily: Family.t, richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontFamily}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontFamily,
+         })
+       );
   let italic = (richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, italic: true}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           italic: true,
+         })
+       );
   let fontSize = (fontSize: float, richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, fontSize}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           fontSize,
+         })
+       );
   let color = (color: Color.t, richtext: t) =>
-    richtext |> map(textInfo => Leaf({...textInfo, color}));
+    richtext
+    |> map(textInfo =>
+         Leaf({
+           ...textInfo,
+           color,
+         })
+       );
 };
 include DSL;

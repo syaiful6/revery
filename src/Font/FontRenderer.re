@@ -22,10 +22,20 @@ let measure = {
       |> List.fold_left(
            (acc, (skiaFace, str)) => {
              Skia.Font.setTypeface(skiaFont, skiaFace);
-             acc +. Skia.Font.measureText(~encoding=GlyphId, ~paint=paint, skiaFont, str, ());
+             acc
+             +. Skia.Font.measureText(
+                  ~encoding=GlyphId,
+                  ~paint,
+                  skiaFont,
+                  str,
+                  (),
+                );
            },
            0.,
          );
-    {height, width};
+    {
+      height,
+      width,
+    };
   };
 };

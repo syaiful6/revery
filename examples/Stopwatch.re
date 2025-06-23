@@ -20,10 +20,18 @@ module Clock = {
 
   let reducer = (a, s) =>
     switch (a) {
-    | Start(f) => {dispose: f, isRunning: true, elapsedTime: Time.zero}
+    | Start(f) => {
+        dispose: f,
+        isRunning: true,
+        elapsedTime: Time.zero,
+      }
     | Stop =>
       s.dispose();
-      let ret = {dispose: noop, isRunning: false, elapsedTime: Time.zero};
+      let ret = {
+        dispose: noop,
+        isRunning: false,
+        elapsedTime: Time.zero,
+      };
       ret;
     | TimerTick(t) => {
         ...s,

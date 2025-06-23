@@ -1,5 +1,4 @@
-%import
-"../Native/config.h";
+[%%import "../Native/config.h"];
 
 module AppLog = (val Log.withNamespace("Revery.App"));
 module SdlLog = (val Log.withNamespace("Revery.SDL2"));
@@ -176,8 +175,7 @@ let handleKeymapChanged = () => {
   };
 };
 
-%ifdef
-USE_GTK;
+[%%ifdef USE_GTK];
 
 let runGtkIteration = () =>
   if (Revery_Native.Gtk.eventsPending()) {

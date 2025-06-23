@@ -12,7 +12,11 @@ let make = (shouldRender: ('a, 'a) => bool) => {
   let pipe: ref(option('a)) = ref(None);
 
   v => {
-    Condition({shouldRender, v, pipe});
+    Condition({
+      shouldRender,
+      v,
+      pipe,
+    });
   };
 };
 

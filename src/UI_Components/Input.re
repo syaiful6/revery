@@ -19,16 +19,29 @@ module Cursor = {
   let use = (~interval, ~isFocused) => {
     let%hook (state, dispatch) =
       Hooks.reducer(
-        ~initialState={time: Time.zero, isOn: false}, (action, state) => {
+        ~initialState={
+          time: Time.zero,
+          isOn: false,
+        },
+        (action, state) => {
         switch (action) {
-        | Reset => {isOn: true, time: Time.zero}
+        | Reset => {
+            isOn: true,
+            time: Time.zero,
+          }
         | Tick(increasedTime) =>
           let newTime = Time.(state.time + increasedTime);
 
           /* if newTime is above the interval a `Tick` has passed */
           newTime >= interval
-            ? {isOn: !state.isOn, time: Time.zero}
-            : {...state, time: newTime};
+            ? {
+              isOn: !state.isOn,
+              time: Time.zero,
+            }
+            : {
+              ...state,
+              time: newTime,
+            };
         }
       });
 
@@ -62,7 +75,10 @@ type action =
 
 let reducer = (action, _state) =>
   switch (action) {
-  | TextInput(value, cursorPosition) => {value, cursorPosition}
+  | TextInput(value, cursorPosition) => {
+      value,
+      cursorPosition,
+    }
   };
 
 let getStringParts = (index, str) => {
