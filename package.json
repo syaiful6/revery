@@ -45,7 +45,7 @@
     "@opam/lwt_ppx": "^5.9.1",
     "@opam/markup": "1.0.3",
     "@opam/ppx_deriving": "*",
-    "@opam/ppx_optcomp": "v0.17.0",
+    "@opam/ppx_optcomp": "v0.16.0",
     "@opam/omd": "ocaml/omd:omd.opam#1535e3c",
     "@opam/uucp": "*",
     "@opam/uutf": "*",
@@ -60,10 +60,11 @@
     "reperf": "syaiful6/reperf#27f9e34747f1b1c5ff7efdfc28452315f29f26b1",
     "rench": "^1.10.0",
     "@reason-native/rely": "*",
-    "ocaml": "5.x"
+    "ocaml": "4.14.x"
   },
   "resolutions": {
     "@opam/printbox": "0.12",
+    "@opam/stdio": "v0.16.0",
     "@reason-native/rely": "git+https://github.com/reasonml/reason-native.git:rely.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8",
     "@opam/cli": "git+https://github.com/reasonml/reason-native.git:cli.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8",
     "@opam/pastel": "git+https://github.com/reasonml/reason-native.git:pastel.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8",
