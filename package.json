@@ -60,7 +60,7 @@
     "reperf": "syaiful6/reperf#27f9e34747f1b1c5ff7efdfc28452315f29f26b1",
     "rench": "^1.10.0",
     "@reason-native/rely": "*",
-    "ocaml": "5.x"
+    "ocaml": "^5.2"
   },
   "resolutions": {
     "@opam/printbox": "0.12",
