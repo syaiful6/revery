@@ -2,5 +2,10 @@
  (name TestRunner)
  (public_name ReveryTestRunner)
  (package ReveryTest)
- (libraries Revery_Core_Test Revery_Math_Test Revery_UI_Test Revery_Font_Test
-   Skia_Test Harfbuzz_Test))
+ (libraries
+  Revery_Core_Test
+  Revery_Math_Test
+  Revery_UI_Test
+  Revery_Font_Test
+  Skia_Test
+  Harfbuzz_Test))

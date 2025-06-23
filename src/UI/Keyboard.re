@@ -5,7 +5,11 @@ let internalToExternalEvent =
     (event: Revery_Core.Events.internalKeyboardEvent) =>
   switch (event) {
   | InternalTextEditEvent({text, start, length}) =>
-    TextEdit({text, start, length})
+    TextEdit({
+      text,
+      start,
+      length,
+    })
   | InternalTextInputEvent(e) => TextInput({text: e.text})
   | InternalKeyUpEvent(e) =>
     KeyUp({

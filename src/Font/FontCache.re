@@ -116,8 +116,7 @@ let load: option(Skia.Typeface.t) => result(t, string) =
       let metricsCache = MetricsCache.create(64);
       let shapeCache = ShapeResultCache.create(128 * 1024);
       let fallbackCache = FallbackCache.create(128 * 1024);
-      let fallbackCharacterCache =
-        FallbackCharacterCache.create(128 * 1024);
+      let fallbackCharacterCache = FallbackCharacterCache.create(128 * 1024);
 
       let ret =
         switch (skiaTypeface, harfbuzzFace) {
@@ -363,7 +362,12 @@ let generateShapes:
           // current glyph to the list.
           let acc = resolvePossibleHole(~stop=cluster);
           let acc = [
-            ShapeResult.{hbFace, skiaFace, glyphId, cluster},
+            ShapeResult.{
+              hbFace,
+              skiaFace,
+              glyphId,
+              cluster,
+            },
             ...acc,
           ];
           loopShapes(

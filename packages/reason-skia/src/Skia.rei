@@ -31,8 +31,12 @@ module FontStyle: {
   let getWidth: t => int;
 };
 
-module FilterQuality: {type t = SkiaWrapped.FilterQuality.t;};
-module TextEncoding: {type t = SkiaWrapped.TextEncoding.t;};
+module FilterQuality: {
+  type t = SkiaWrapped.FilterQuality.t;
+};
+module TextEncoding: {
+  type t = SkiaWrapped.TextEncoding.t;
+};
 
 module Stream: {
   type t;
@@ -90,39 +94,25 @@ module FontMetrics: {
 module ImageFilter: {
   type t;
 
-  module CropRect: {type t;};
+  module CropRect: {
+    type t;
+  };
 
   module DropShadow: {
     let make:
-      (
-        float,
-        float,
-        float,
-        float,
-        Color.t,
-        option(t),
-        option(CropRect.t)
-      ) =>
+      (float, float, float, float, Color.t, option(t), option(CropRect.t)) =>
       t;
   };
 
   let makeDropShadow:
-    (
-      float,
-      float,
-      float,
-      float,
-      Color.t,
-      option(t),
-      option(CropRect.t)
-    ) =>
-    t;
+    (float, float, float, float, Color.t, option(t), option(CropRect.t)) => t;
 };
 
 module Rect: {
   type t;
 
-  module Mutable: {let setLtrb: (~out: t, float, float, float, float) => unit;
+  module Mutable: {
+    let setLtrb: (~out: t, float, float, float, float) => unit;
   };
 
   let makeEmpty: unit => t;
@@ -301,7 +291,13 @@ module Matrix: {
 };
 
 module PathEffect: {
-  module Style: {type t = [ | `translate | `rotate | `morph];};
+  module Style: {
+    type t = [
+      | `translate
+      | `rotate
+      | `morph
+    ];
+  };
 
   type t;
 
@@ -341,12 +337,21 @@ module Font: {
   let make: unit => t;
   let makeWithValues: (Typeface.t, float, float, float) => t;
   let setTypeface: (t, Typeface.t) => unit;
-  let getTypeface: (t) => Typeface.t;
-  let getSize: (t) => float;
+  let getTypeface: t => Typeface.t;
+  let getSize: t => float;
   let setSize: (t, float) => unit;
-  let isSubpixel: (t) => bool;
+  let isSubpixel: t => bool;
   let setSubpixel: (t, bool) => unit;
-  let measureText: (~bounds:Rect.t=?, ~paint:Paint.t, ~encoding:TextEncoding.t=?, t, string, unit) => float;
+  let measureText:
+    (
+      ~bounds: Rect.t=?,
+      ~paint: Paint.t,
+      ~encoding: TextEncoding.t=?,
+      t,
+      string,
+      unit
+    ) =>
+    float;
   let getFontMetrics: (t, FontMetrics.t) => float;
 };
 
@@ -412,7 +417,9 @@ module RRect: {
   let transform: (t, Matrix.t, t) => bool;
 };
 
-module ColorSpace: {type t;};
+module ColorSpace: {
+  type t;
+};
 
 module ImageInfo: {
   type t;
@@ -423,7 +430,7 @@ module ImageInfo: {
 module Image: {
   type t;
 
-  let makeFromEncoded: (Data.t) => option(t);
+  let makeFromEncoded: Data.t => option(t);
   let encodeToData: t => Data.t;
 
   let width: t => int;
@@ -478,7 +485,18 @@ module Canvas: {
   let drawCircle: (t, float, float, float, Paint.t) => unit;
   let drawRRect: (t, RRect.t, Paint.t) => unit;
   let drawPath: (t, Path.t, Paint.t) => unit;
-  let drawSimpleText: (~encoding:TextEncoding.t=?, t, string, float, float, Font.t, Paint.t, unit) => unit;
+  let drawSimpleText:
+    (
+      ~encoding: TextEncoding.t=?,
+      t,
+      string,
+      float,
+      float,
+      Font.t,
+      Paint.t,
+      unit
+    ) =>
+    unit;
   let drawText: (t, string, float, float, Font.t, Paint.t) => unit;
   let drawImage: (t, Image.t, float, float, option(Paint.t)) => unit;
   let drawImageRect:

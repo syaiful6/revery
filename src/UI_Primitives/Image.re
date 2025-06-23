@@ -6,13 +6,19 @@ let getStyles: (option(int), option(int), Style.t) => Style.t =
   (w, h, style) => {
     let style =
       switch (w) {
-      | Some(v) => {...style, width: v}
+      | Some(v) => {
+          ...style,
+          width: v,
+        }
       | None => style
       };
 
     let style =
       switch (h) {
-      | Some(v) => {...style, height: v}
+      | Some(v) => {
+          ...style,
+          height: v,
+        }
       | None => style
       };
     style;

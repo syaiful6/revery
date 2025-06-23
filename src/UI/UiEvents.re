@@ -23,7 +23,11 @@ module BubbleEvent: {
 
   let preventDefault = event => event.defaultPrevented = true;
 
-  let make = event => {event, shouldPropagate: true, defaultPrevented: false};
+  let make = event => {
+    event,
+    shouldPropagate: true,
+    defaultPrevented: false,
+  };
 };
 
 let isNodeImpacted = (n, x, y) => n#hitTest(x, y);

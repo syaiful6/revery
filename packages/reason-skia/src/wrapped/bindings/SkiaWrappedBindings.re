@@ -22,7 +22,11 @@ module M = (F: FOREIGN) => {
     type t = Unsigned.uint32;
     let t = uint32_t;
 
-    let setArgb = foreign("sk_color_set_argb", uint32_t @-> uint32_t @-> uint32_t @-> uint32_t @-> returning(t));
+    let setArgb =
+      foreign(
+        "sk_color_set_argb",
+        uint32_t @-> uint32_t @-> uint32_t @-> uint32_t @-> returning(t),
+      );
   };
 
   type data = ptr(structure(SkiaTypes.Data.t));
@@ -320,7 +324,11 @@ module M = (F: FOREIGN) => {
       getf(!@rect, SkiaTypes.Rect.bottom);
     };
 
-    let setLtrb = foreign("reason_skia_stub_rect_set", t @-> float @-> float @-> float @-> float @-> returning(void));
+    let setLtrb =
+      foreign(
+        "reason_skia_stub_rect_set",
+        t @-> float @-> float @-> float @-> float @-> returning(void),
+      );
   };
 
   module Path = {
@@ -466,32 +474,32 @@ module M = (F: FOREIGN) => {
       setf(!@matrix, SkiaTypes.Matrix.persp0, perspective0);
       setf(!@matrix, SkiaTypes.Matrix.persp1, perspective1);
       setf(!@matrix, SkiaTypes.Matrix.persp2, perspective2);
-    };    
-    let getScaleX = (matrix) => {
+    };
+    let getScaleX = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.scaleX);
     };
-    let getSkewX = (matrix) => {
+    let getSkewX = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.skewX);
     };
-    let getTransX = (matrix) => {
+    let getTransX = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.transX);
     };
-    let getSkewY = (matrix) => {
+    let getSkewY = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.skewY);
     };
-    let getScaleY = (matrix) => {
+    let getScaleY = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.scaleY);
     };
-    let getTransY = (matrix) => {
+    let getTransY = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.transY);
     };
-    let getPersp0 = (matrix) => {
+    let getPersp0 = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.persp0);
     };
-    let getPersp1 = (matrix) => {
+    let getPersp1 = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.persp1);
     };
-    let getPersp2 = (matrix) => {
+    let getPersp2 = matrix => {
       getf(!@matrix, SkiaTypes.Matrix.persp2);
     };
     let get = (matrix, index) => {
@@ -505,22 +513,22 @@ module M = (F: FOREIGN) => {
       | 6 => getPersp0(matrix)
       | 7 => getPersp1(matrix)
       | 8 => getPersp2(matrix)
-      | _ => -1.
+      | _ => (-1.)
       };
     };
 
     let set = (matrix, index, value) => {
-      switch(index) {
-        | 0 => setf(!@matrix, SkiaTypes.Matrix.scaleX, value)
-        | 1 => setf(!@matrix, SkiaTypes.Matrix.skewX, value)
-        | 2 => setf(!@matrix, SkiaTypes.Matrix.transX, value)
-        | 3 => setf(!@matrix, SkiaTypes.Matrix.skewY, value)
-        | 4 => setf(!@matrix, SkiaTypes.Matrix.scaleY, value)
-        | 5 => setf(!@matrix, SkiaTypes.Matrix.transY, value)
-        | 6 => setf(!@matrix, SkiaTypes.Matrix.persp0, value)
-        | 7 => setf(!@matrix, SkiaTypes.Matrix.persp1, value)
-        | 8 => setf(!@matrix, SkiaTypes.Matrix.persp2, value)
-        | _ => ()
+      switch (index) {
+      | 0 => setf(!@matrix, SkiaTypes.Matrix.scaleX, value)
+      | 1 => setf(!@matrix, SkiaTypes.Matrix.skewX, value)
+      | 2 => setf(!@matrix, SkiaTypes.Matrix.transX, value)
+      | 3 => setf(!@matrix, SkiaTypes.Matrix.skewY, value)
+      | 4 => setf(!@matrix, SkiaTypes.Matrix.scaleY, value)
+      | 5 => setf(!@matrix, SkiaTypes.Matrix.transY, value)
+      | 6 => setf(!@matrix, SkiaTypes.Matrix.persp0, value)
+      | 7 => setf(!@matrix, SkiaTypes.Matrix.persp1, value)
+      | 8 => setf(!@matrix, SkiaTypes.Matrix.persp2, value)
+      | _ => ()
       };
     };
     let invert =
@@ -559,9 +567,17 @@ module M = (F: FOREIGN) => {
     let mapRadius =
       foreign("sk_matrix_map_radius", t @-> float @-> returning(float));
 
-    let setTranslate = foreign("reason_skia_stub_matrix_set_translate", t @-> float @-> float @-> returning(void));
+    let setTranslate =
+      foreign(
+        "reason_skia_stub_matrix_set_translate",
+        t @-> float @-> float @-> returning(void),
+      );
 
-    let setScale = foreign("reason_skia_stub_matrix_set_scale", t @-> float @-> float @-> float @-> float @-> returning(void));
+    let setScale =
+      foreign(
+        "reason_skia_stub_matrix_set_scale",
+        t @-> float @-> float @-> float @-> float @-> returning(void),
+      );
   };
 
   module PathEffect = {
@@ -608,7 +624,11 @@ module M = (F: FOREIGN) => {
     let setColor =
       foreign("sk_paint_set_color", t @-> Color.t @-> returning(void));
 
-    let setAlpha = foreign("reason_skia_stub_paint_set_alpha", t @-> float @-> returning(void));
+    let setAlpha =
+      foreign(
+        "reason_skia_stub_paint_set_alpha",
+        t @-> float @-> returning(void),
+      );
 
     let setAntiAlias =
       foreign("sk_paint_set_antialias", t @-> bool @-> returning(void));
@@ -658,51 +678,59 @@ module M = (F: FOREIGN) => {
     type hinting = SkiaTypes.Font.hinting;
     let hinting = SkiaTypes.Font.hinting;
 
-    let allocate =
-      foreign("sk_font_new", void @-> returning(t));
+    let allocate = foreign("sk_font_new", void @-> returning(t));
 
     let sk_font_new_with_values =
       foreign(
         "sk_font_new_with_values",
-        Typeface.t
-        @-> float
-        @-> float
-        @-> float
-        @-> returning(t)
+        Typeface.t @-> float @-> float @-> float @-> returning(t),
       );
-    
+
     let delete = foreign("sk_font_delete", t @-> returning(void));
 
-    let setTypeface = foreign("sk_font_set_typeface", t @-> Typeface.t @-> returning(void));
-    let getTypeface = foreign("sk_font_get_typeface", t @-> returning(Typeface.t));
+    let setTypeface =
+      foreign("sk_font_set_typeface", t @-> Typeface.t @-> returning(void));
+    let getTypeface =
+      foreign("sk_font_get_typeface", t @-> returning(Typeface.t));
     let getSize = foreign("sk_font_get_size", t @-> returning(float));
-    let setSize = foreign("sk_font_set_size", t @-> float @-> returning(void));
-    let getFontMetrics = foreign("sk_font_get_metrics", t @-> FontMetrics.t @-> returning(float));
-    let setHinting = foreign("sk_font_set_hinting", t @-> hinting @-> returning(void));
-    let getHinting = foreign("sk_font_get_hinting", t @-> returning(hinting));
+    let setSize =
+      foreign("sk_font_set_size", t @-> float @-> returning(void));
+    let getFontMetrics =
+      foreign(
+        "sk_font_get_metrics",
+        t @-> FontMetrics.t @-> returning(float),
+      );
+    let setHinting =
+      foreign("sk_font_set_hinting", t @-> hinting @-> returning(void));
+    let getHinting =
+      foreign("sk_font_get_hinting", t @-> returning(hinting));
     let isSubpixel = foreign("sk_font_is_subpixel", t @-> returning(bool));
-    let setSubpixel = foreign("sk_font_set_subpixel", t @-> bool @-> returning(void));
-    let isLinearMetrics = foreign("sk_font_is_linear_metrics", t @-> returning(bool));
-    let setLinearMetrics = foreign("sk_font_set_linear_metrics", t @-> bool @-> returning(void));
+    let setSubpixel =
+      foreign("sk_font_set_subpixel", t @-> bool @-> returning(void));
+    let isLinearMetrics =
+      foreign("sk_font_is_linear_metrics", t @-> returning(bool));
+    let setLinearMetrics =
+      foreign("sk_font_set_linear_metrics", t @-> bool @-> returning(void));
     // let textToGlyph = foreign(
     //   "sk_font_text_to_glyphs",
     //   t
     //   @-> string
     //   @-> size_t
     //   @-> TextEncoding.t
-    //   @-> 
+    //   @->
     // )
 
-    let measureText = foreign(
-      "sk_font_measure_text",
-      t
-      @-> string
-      @-> size_t
-      @-> TextEncoding.t
-      @-> ptr_opt(SkiaTypes.Rect.t)
-      @-> Paint.t
-      @-> returning(float)
-    );
+    let measureText =
+      foreign(
+        "sk_font_measure_text",
+        t
+        @-> string
+        @-> size_t
+        @-> TextEncoding.t
+        @-> ptr_opt(SkiaTypes.Rect.t)
+        @-> Paint.t
+        @-> returning(float),
+      );
   };
 
   module IRect = {
@@ -890,8 +918,7 @@ module M = (F: FOREIGN) => {
     let allocateFromEncoded =
       foreign(
         "sk_image_new_from_encoded",
-        Data.t
-        @-> returning(ptr_opt(SkiaTypes.Image.t)),
+        Data.t @-> returning(ptr_opt(SkiaTypes.Image.t)),
       );
     let delete = foreign("sk_image_unref", t @-> returning(void));
 
@@ -1190,7 +1217,8 @@ module M = (F: FOREIGN) => {
     let getProps =
       foreign("sk_surface_get_props", t @-> returning(SurfaceProps.t));
     let flush = foreign("sk_surface_flush", t @-> returning(void));
-    let flushAndSubmit = foreign("sk_surface_flush_and_submit", t @-> bool @-> returning(void));
+    let flushAndSubmit =
+      foreign("sk_surface_flush_and_submit", t @-> bool @-> returning(void));
   };
 
   module SVG = {

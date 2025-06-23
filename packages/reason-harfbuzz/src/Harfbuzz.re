@@ -27,7 +27,11 @@ module Internal = {
     "rehb_version_string_runtime";
 };
 
-type position = [ | `Start | `End | `Position(int)];
+type position = [
+  | `Start
+  | `End
+  | `Position(int)
+];
 type feature = {
   tag: string,
   value: int,

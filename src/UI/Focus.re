@@ -36,7 +36,11 @@ let focus = (node: Node.node) =>
 
     Log.trace("focus()");
     node#handleEvent(Focus);
-    focused := Some({handler: node#handleEvent, id: node#getInternalId()});
+    focused :=
+      Some({
+        handler: node#handleEvent,
+        id: node#getInternalId(),
+      });
   };
 
 let dispatch = event =>

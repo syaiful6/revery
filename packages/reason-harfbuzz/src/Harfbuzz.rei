@@ -5,7 +5,11 @@ type hb_shape = {
   cluster: int,
 };
 
-type position = [ | `Start | `End | `Position(int)];
+type position = [
+  | `Start
+  | `End
+  | `Position(int)
+];
 type feature = {
   tag: string,
   value: int,

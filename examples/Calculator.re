@@ -81,7 +81,13 @@ module Display = {
   };
 };
 
-type operator = [ | `Nop | `Add | `Sub | `Mul | `Div];
+type operator = [
+  | `Nop
+  | `Add
+  | `Sub
+  | `Mul
+  | `Div
+];
 
 let showFloat = float => {
   let string = string_of_float(float);
@@ -164,15 +170,35 @@ let reducer = (action, state) =>
       }
   | ClearKeyPressed(ac) =>
     ac
-      ? {operator: `Nop, result: 0., display: "", number: ""}
-      : {...state, number: ""}
+      ? {
+        operator: `Nop,
+        result: 0.,
+        display: "",
+        number: "",
+      }
+      : {
+        ...state,
+        number: "",
+      }
   | DotKeyPressed =>
     String.contains(state.number, '.')
-      ? state : {...state, number: state.number ++ "."}
-  | NumberKeyPressed(n) => {...state, number: state.number ++ n}
+      ? state
+      : {
+        ...state,
+        number: state.number ++ ".",
+      }
+  | NumberKeyPressed(n) => {
+      ...state,
+      number: state.number ++ n,
+    }
   | OperationKeyPressed(o) =>
     let (result, display) = eval(state, o);
-    {operator: o, result, display, number: ""};
+    {
+      operator: o,
+      result,
+      display,
+      number: "",
+    };
   | PlusMinusKeyPressed =>
     if (state.number != "" && state.number.[0] == '-') {
       {
@@ -180,11 +206,19 @@ let reducer = (action, state) =>
         number: String.sub(state.number, 1, String.length(state.number) - 1),
       };
     } else {
-      {...state, number: "-" ++ state.number};
+      {
+        ...state,
+        number: "-" ++ state.number,
+      };
     }
   | ResultKeyPressed =>
     let (result, display) = eval(state, `Nop);
-    {operator: `Nop, result, display, number: showFloat(result)};
+    {
+      operator: `Nop,
+      result,
+      display,
+      number: showFloat(result),
+    };
   };
 
 module KeyboardInput = {
@@ -199,13 +233,25 @@ module KeyboardInput = {
 
   let reducer = (action, state) =>
     switch (action) {
-    | Focused(v) => {...state, hasFocus: v}
-    | SetRef(v) => {...state, ref: Some(v)}
+    | Focused(v) => {
+        ...state,
+        hasFocus: v,
+      }
+    | SetRef(v) => {
+        ...state,
+        ref: Some(v),
+      }
     };
 
   let%component make = (~dispatch as parentDispatch, ()) => {
     let%hook (v, dispatch) =
-      Hooks.reducer(~initialState={ref: None, hasFocus: false}, reducer);
+      Hooks.reducer(
+        ~initialState={
+          ref: None,
+          hasFocus: false,
+        },
+        reducer,
+      );
 
     let%hook () =
       Hooks.effect(
@@ -281,7 +327,12 @@ module Calculator = {
   let%component make = () => {
     let%hook ({display, number, _}, dispatch) =
       Hooks.reducer(
-        ~initialState={operator: `Nop, result: 0., display: "", number: ""},
+        ~initialState={
+          operator: `Nop,
+          result: 0.,
+          display: "",
+          number: "",
+        },
         reducer,
       );
 

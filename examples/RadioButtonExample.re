@@ -26,10 +26,22 @@ module RadioExample = {
         defaultSelected=0
         iconSize=20.
         buttons=[
-          {text: "Button 1", value: 1},
-          {text: "Button 2", value: 2},
-          {text: "Button 3", value: 3},
-          {text: "Button 4", value: 4},
+          {
+            text: "Button 1",
+            value: 1,
+          },
+          {
+            text: "Button 2",
+            value: 2,
+          },
+          {
+            text: "Button 3",
+            value: 3,
+          },
+          {
+            text: "Button 4",
+            value: 4,
+          },
         ]
       />
       <Text text=radioVal fontSize=20. style=Style.[marginTop(20)] />

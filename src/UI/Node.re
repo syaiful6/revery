@@ -26,8 +26,7 @@ module ListEx = {
   };
 };
 
-module UniqueId =
-  Revery_Core.UniqueId.Make({});
+module UniqueId = Revery_Core.UniqueId.Make();
 
 type callback = unit => unit;
 
@@ -118,8 +117,15 @@ class node (()) = {
     switch (_parent) {
     | Some(parent) =>
       let parentOffsets = parent#getSceneOffsets();
-      Offset.{left: left + parentOffsets.left, top: top + parentOffsets.top};
-    | None => Offset.{left, top}
+      Offset.{
+        left: left + parentOffsets.left,
+        top: top + parentOffsets.top,
+      };
+    | None =>
+      Offset.{
+        left,
+        top,
+      }
     };
   };
   pub getInternalId = () => _internalId;
@@ -254,7 +260,13 @@ class node (()) = {
     let depth = _this#_recalculateDepth();
 
     _cachedNodeState =
-      Some({transform, worldTransform, bbox, bboxClipped, depth});
+      Some({
+        transform,
+        worldTransform,
+        bbox,
+        bboxClipped,
+        depth,
+      });
 
     List.iter(c => c#recalculate(), _children);
 

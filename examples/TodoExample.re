@@ -372,8 +372,16 @@ module TodoMVC = {
   let initialState = {
     todos:
       Todo.[
-        {id: 0, task: "Buy Milk", isDone: false},
-        {id: 1, task: "Wag the Dog", isDone: true},
+        {
+          id: 0,
+          task: "Buy Milk",
+          isDone: false,
+        },
+        {
+          id: 1,
+          task: "Wag the Dog",
+          isDone: true,
+        },
       ],
     filter: All,
     inputValue: "",
@@ -394,43 +402,74 @@ module TodoMVC = {
     | Add => {
         ...state,
         todos: [
-          {id: state.nextId, task: state.inputValue, isDone: false},
+          {
+            id: state.nextId,
+            task: state.inputValue,
+            isDone: false,
+          },
           ...state.todos,
         ],
         inputValue: "",
         nextId: state.nextId + 1,
       }
 
-    | UpdateInput(text) => {...state, inputValue: text}
+    | UpdateInput(text) => {
+        ...state,
+        inputValue: text,
+      }
 
     | Toggle(id) =>
       let todos =
         List.map(
           (item: Todo.t) =>
-            item.id == id ? {...item, isDone: !item.isDone} : item,
+            item.id == id
+              ? {
+                ...item,
+                isDone: !item.isDone,
+              }
+              : item,
           state.todos,
         );
-      {...state, todos};
+      {
+        ...state,
+        todos,
+      };
 
     | Remove(id) =>
       let todos = List.filter((item: Todo.t) => item.id != id, state.todos);
-      {...state, todos};
+      {
+        ...state,
+        todos,
+      };
 
-    | SetFilter(filter) => {...state, filter}
+    | SetFilter(filter) => {
+        ...state,
+        filter,
+      }
 
     | ToggleAll =>
       let areAllCompleted =
         List.for_all((item: Todo.t) => item.isDone, state.todos);
       let todos =
         List.map(
-          (item: Todo.t) => {...item, isDone: !areAllCompleted},
+          (item: Todo.t) =>
+            {
+              ...item,
+              isDone: !areAllCompleted,
+            },
           state.todos,
         );
-      {...state, todos};
+      {
+        ...state,
+        todos,
+      };
 
     | ClearCompleted =>
       let todos = List.filter((item: Todo.t) => !item.isDone, state.todos);
-      {...state, todos};
+      {
+        ...state,
+        todos,
+      };
     };
 
   let%component make = () => {

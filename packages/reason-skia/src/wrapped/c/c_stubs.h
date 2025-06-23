@@ -39,9 +39,9 @@ void reason_skia_stub_matrix_set_translate(sk_matrix_t *matrix,
         double translateX,
         double translateY);
 void reason_skia_stub_matrix_set_scale(sk_matrix_t *matrix, double scaleX,
-        double scaleY, double pivotX,
-        double pivotY);
+                                       double scaleY, double pivotX,
+                                       double pivotY);
 
 
 void reason_skia_stub_rect_set(sk_rect_t *pRect, double left, double top,
-                                    double right, double bottom);
+                               double right, double bottom);

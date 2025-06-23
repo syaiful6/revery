@@ -9,8 +9,15 @@ module Actions = {
   type global = [ | `preventDefault];
   type bubble = [ | `stopPropagation];
   type mouseDown = [ | `capture(unit => unit)];
-  type nonBubble = [ mouseDown | global];
-  type all = [ mouseDown | bubble | global];
+  type nonBubble = [
+    mouseDown
+    | global
+  ];
+  type all = [
+    mouseDown
+    | bubble
+    | global
+  ];
 
   let capture = (~onRelease) => `capture(onRelease);
   let stopPropagation = `stopPropagation;
@@ -82,7 +89,10 @@ module DimensionsChangedEventParams = {
     height: int,
   };
 
-  let create = (~width=0, ~height=0, ()) => {width, height};
+  let create = (~width=0, ~height=0, ()) => {
+    width,
+    height,
+  };
 };
 
 [@deriving show({with_path: false})]

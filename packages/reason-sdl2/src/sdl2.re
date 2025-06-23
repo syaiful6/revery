@@ -82,7 +82,7 @@ module Audio = {
       let format = 0x00000002;
       let channels = 0x00000004;
       let samples = 0x00000008;
-      let (|||) = (lor);
+      let (|||) = (\#lor);
       let any = frequency lor format lor channels lor samples;
       let none = 0;
     };
@@ -155,7 +155,7 @@ module Display = {
 
   external getNumberOfDisplays: unit => int = "resdl_SDL_GetNumVideoDisplays";
   let getDisplays = () =>
-    List.init(getNumberOfDisplays(), (i) => (Obj.magic(i: int): t));
+    List.init(getNumberOfDisplays(), (i): t => Obj.magic(i: int));
 
   external getDPI: t => Dpi.t = "resdl_SDL_GetDisplayDPI";
   external getCurrentMode: t => Mode.t = "resdl_SDL_GetCurrentDisplayMode";
@@ -231,11 +231,23 @@ module Window = {
   external create:
     (
       string,
-      [ | `Undefined | `Centered | `Absolute(int)],
-      [ | `Undefined | `Centered | `Absolute(int)],
+      [
+        | `Undefined
+        | `Centered
+        | `Absolute(int)
+      ],
+      [
+        | `Undefined
+        | `Centered
+        | `Absolute(int)
+      ],
       int,
       int,
-      [ | `Auto | `ForceHardware | `ForceSoftware]
+      [
+        | `Auto
+        | `ForceHardware
+        | `ForceSoftware
+      ]
     ) =>
     t =
     "resdl_SDL_CreateWindow_byte" "resdl_SDL_CreateWindow";

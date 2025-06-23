@@ -19,7 +19,11 @@ type example = {
 };
 
 let examples = [
-  {name: "Animation", render: _w => Hello.render(), source: "Hello.re"},
+  {
+    name: "Animation",
+    render: _w => Hello.render(),
+    source: "Hello.re",
+  },
   {
     name: "Spring",
     render: _w => SpringExample.render(),
@@ -40,8 +44,16 @@ let examples = [
     render: _ => CheckboxExample.render(),
     source: "CheckboxExample.re",
   },
-  {name: "Slider", render: _ => SliderExample.render(), source: "Slider.re"},
-  {name: "Border", render: _ => Border.render(), source: "Border.re"},
+  {
+    name: "Slider",
+    render: _ => SliderExample.render(),
+    source: "Slider.re",
+  },
+  {
+    name: "Border",
+    render: _ => Border.render(),
+    source: "Border.re",
+  },
   {
     name: "ScrollView",
     render: _ => ScrollViewExample.render(),
@@ -52,14 +64,26 @@ let examples = [
     render: w => Calculator.render(w),
     source: "Calculator.re",
   },
-  {name: "Flexbox", render: _ => Flexbox.render(), source: "Flexbox.re"},
+  {
+    name: "Flexbox",
+    render: _ => Flexbox.render(),
+    source: "Flexbox.re",
+  },
   {
     name: "Box Shadow",
     render: _ => Boxshadow.render(),
     source: "Boxshadow.re",
   },
-  {name: "Focus", render: _ => FocusExample.render(), source: "Focus.re"},
-  {name: "Fonts", render: _ => FontsExample.render(), source: "Fonts.re"},
+  {
+    name: "Focus",
+    render: _ => FocusExample.render(),
+    source: "Focus.re",
+  },
+  {
+    name: "Fonts",
+    render: _ => FontsExample.render(),
+    source: "Fonts.re",
+  },
   {
     name: "Stopwatch",
     render: _ => Stopwatch.render(),
@@ -210,8 +234,6 @@ let examples = [
 let getExampleByName = name =>
   List.find(example => example.name == name, examples);
 
-let noop = () => ();
-
 module ExampleButton = {
   let make = (~isActive, ~name, ~onClick, ()) => {
     let highlightColor =
@@ -304,16 +326,15 @@ let init = app => {
   Timber.App.enable(Timber.Reporter.console());
   Timber.App.setLevel(Timber.Level.perf);
 
-  App.onIdle(app, () => prerr_endline("Idle!"))
-  |> (ignore: Revery.App.unsubscribe => unit);
-  App.onBeforeQuit(
-    app,
-    (_code: int) => {
-      prerr_endline("Quitting!");
-      App.AllowQuit;
-    },
-  )
-  |> (ignore: Revery.App.unsubscribe => unit);
+  let _unsubIdle = App.onIdle(app, () => prerr_endline("Idle!"));
+  let _unsubBeforQuit =
+    App.onBeforeQuit(
+      app,
+      (_code: int) => {
+        prerr_endline("Quitting!");
+        App.AllowQuit;
+      },
+    );
 
   let initialExample = ref("Canvas Example");
   let decorated = ref(true);

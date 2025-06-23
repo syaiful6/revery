@@ -134,7 +134,10 @@ let transitionf =
   Internal.transition(
     ~active,
     ~duration=
-      Internal.Function({initial: initialDuration, calculated: duration}),
+      Internal.Function({
+        initial: initialDuration,
+        calculated: duration,
+      }),
     ~delay,
     ~easing,
     ~initialValue?,

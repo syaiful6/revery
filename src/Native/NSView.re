@@ -1,15 +1,13 @@
-%import
-"config.h";
+[%%import "config.h"];
 
-%if
-defined(USE_COCOA);
+[%%if defined(USE_COCOA)];
 
 type t('a) = 'a;
 
 open {
-       external c_displayIn: (t('a), Sdl2.Window.nativeWindow) => unit =
-         "revery_NSView_displayIn";
-     };
+  external c_displayIn: (t('a), Sdl2.Window.nativeWindow) => unit =
+    "revery_NSView_displayIn";
+};
 
 let displayIn = (nsView, sdlWindow) =>
   c_displayIn(nsView, Sdl2.Window.getNativeWindow(sdlWindow));

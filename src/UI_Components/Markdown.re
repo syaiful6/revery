@@ -69,7 +69,14 @@ module SyntaxHighlight = {
   let default: t =
     (~language as _, lines) => {
       List.init(List.length(lines), _ =>
-        [{byteIndex: 0, color: Colors.white, bold: false, italic: false}]
+        [
+          {
+            byteIndex: 0,
+            color: Colors.white,
+            bold: false,
+            italic: false,
+          },
+        ]
       );
     };
 };
@@ -143,7 +150,12 @@ type inlineAttrs =
   | Bolded
   | Monospaced;
 
-type kind = [ | `Paragraph | `Heading(int) | `Link(string) | `InlineCode];
+type kind = [
+  | `Paragraph
+  | `Heading(int)
+  | `Link(string)
+  | `InlineCode
+];
 
 let selectStyleFromKind = (kind: kind, styles) =>
   switch (kind) {
@@ -249,8 +261,14 @@ let rec generateInline' = (inline, styles, attrs, dispatch, state) => {
       e.content,
       styles,
       switch (e.style) {
-      | Star => {...attrs, inline: [Bolded, ...attrs.inline]}
-      | Underscore => {...attrs, inline: [Italicized, ...attrs.inline]}
+      | Star => {
+          ...attrs,
+          inline: [Bolded, ...attrs.inline],
+        }
+      | Underscore => {
+          ...attrs,
+          inline: [Italicized, ...attrs.inline],
+        }
       },
       dispatch,
       state,
@@ -261,7 +279,10 @@ let rec generateInline' = (inline, styles, attrs, dispatch, state) => {
     generateInline'(
       r.label,
       styles,
-      {...attrs, kind: `Link(r.def.destination)},
+      {
+        ...attrs,
+        kind: `Link(r.def.destination),
+      },
       dispatch,
       state,
     )
@@ -269,7 +290,10 @@ let rec generateInline' = (inline, styles, attrs, dispatch, state) => {
     generateInline'(
       l.def.label,
       styles,
-      {...attrs, kind: `Link(l.def.destination)},
+      {
+        ...attrs,
+        kind: `Link(l.def.destination),
+      },
       dispatch,
       state,
     )
@@ -277,7 +301,10 @@ let rec generateInline' = (inline, styles, attrs, dispatch, state) => {
     generateText(
       c.content,
       styles,
-      {kind: `InlineCode, inline: [Monospaced, ...attrs.inline]},
+      {
+        kind: `InlineCode,
+        inline: [Monospaced, ...attrs.inline],
+      },
       dispatch,
       state,
     )
@@ -309,7 +336,10 @@ let rec generateMarkdown' = (element, styles, highlighter, dispatch, state) =>
     generateInline(
       p,
       styles,
-      {inline: [], kind: `Paragraph},
+      {
+        inline: [],
+        kind: `Paragraph,
+      },
       dispatch,
       state,
     )
@@ -319,7 +349,10 @@ let rec generateMarkdown' = (element, styles, highlighter, dispatch, state) =>
     generateInline(
       Text(html),
       styles,
-      {inline: [], kind: `Paragraph},
+      {
+        inline: [],
+        kind: `Paragraph,
+      },
       dispatch,
       state,
     )
@@ -329,7 +362,10 @@ let rec generateMarkdown' = (element, styles, highlighter, dispatch, state) =>
     generateInline(
       h.text,
       styles,
-      {inline: [Bolded], kind: `Heading(h.level)},
+      {
+        inline: [Bolded],
+        kind: `Heading(h.level),
+      },
       dispatch,
       state,
     )

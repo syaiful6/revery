@@ -7,7 +7,10 @@ module Options = {
     damping: float,
   };
 
-  let create = (~stiffness=180., ~damping=12., ()) => {damping, stiffness};
+  let create = (~stiffness=180., ~damping=12., ()) => {
+    damping,
+    stiffness,
+  };
 
   // Presets from react-spring: https://www.react-spring.io/docs/hooks/api
   let default = create(~stiffness=170., ~damping=26., ());
@@ -45,9 +48,17 @@ let tick = (target: float, spring: t, options: Options.t, time: Time.t) => {
     let velocity = spring.velocity +. acceleration *. deltaT;
     let value = spring.value +. velocity *. deltaT;
 
-    {acceleration, velocity, value, time};
+    {
+      acceleration,
+      velocity,
+      value,
+      time,
+    };
   } else {
-    {...spring, time};
+    {
+      ...spring,
+      time,
+    };
   };
 };
 

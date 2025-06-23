@@ -19,7 +19,14 @@ let make:
     ~opacity: float=?,
     ~width: int=?,
     ~height: int=?,
-    ~quality: [ | `none | `low | `medium | `high]=?,
+    ~quality:
+      [
+        | `none
+        | `low
+        | `medium
+        | `high
+      ]
+        =?,
     ~src: [ | `File(string)],
     ~style: list(Revery_UI.Style.imageStyleProps)=?,
     ~children: Revery_UI.React.React.element(Revery_UI.React.node)=?,

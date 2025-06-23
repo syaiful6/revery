@@ -5,5 +5,9 @@
  (modules (:standard))
  (preprocess
   (pps brisk-reconciler.ppx))
- (libraries Revery_UI Revery_UI_Primitives Revery_UI_Hooks Revery_Math
-   rely.lib))
+ (libraries
+  Revery_UI
+  Revery_UI_Primitives
+  Revery_UI_Hooks
+  Revery_Math
+  rely.lib))

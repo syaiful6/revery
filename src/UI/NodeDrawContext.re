@@ -34,5 +34,9 @@ let createFromParent = (parentContext: t, localOpacity: float) => {
   let zIndex = parentContext.zIndex + 1;
   let opacity = parentContext.opacity *. localOpacity;
 
-  {...parentContext, zIndex, opacity};
+  {
+    ...parentContext,
+    zIndex,
+    opacity,
+  };
 };

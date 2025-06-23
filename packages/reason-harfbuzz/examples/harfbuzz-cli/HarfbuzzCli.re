@@ -2,15 +2,15 @@ open Harfbuzz;
 
 Printexc.record_backtrace(true);
 
-let isNative =
-  switch (Sys.backend_type) {
-  | Native => true
-  | Bytecode => true
-  | _ => false
-  };
+// let isNative =
+//   switch (Sys.backend_type) {
+//   | Native => true
+//   | Bytecode => true
+//   | _ => false
+//   };
 
-let getExecutingDirectory = () =>
-  isNative ? Filename.dirname(Sys.argv[0]) ++ Filename.dir_sep : "";
+// let getExecutingDirectory = () =>
+//   isNative ? Filename.dirname(Sys.argv[0]) ++ Filename.dir_sep : "";
 
 let run = () => {
   let show = ({glyphId, cluster}: hb_shape) =>
@@ -36,7 +36,12 @@ let run = () => {
   print_endline("__ Font Path: Roboto Regular __");
   let result = hb_face_from_path("test/collateral/FiraCode-Regular.ttf");
   let features = [
-    Harfbuzz.{tag: "dlig", value: 1, start: `Start, stop: `End},
+    Harfbuzz.{
+      tag: "dlig",
+      value: 1,
+      start: `Start,
+      stop: `End,
+    },
   ];
   switch (result) {
   | Error(msg) => failwith(msg)

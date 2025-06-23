@@ -20,8 +20,12 @@
  (flags
   (-w -40 -w +26))
  (public_name reason-skia.wrapped)
- (libraries reason-skia.wrapped.types reason-skia.wrapped.bindings
-   reason-skia.wrapped.c ctypes integers)
+ (libraries
+  reason-skia.wrapped.types
+  reason-skia.wrapped.bindings
+  reason-skia.wrapped.c
+  ctypes
+  integers)
  (foreign_stubs
   (language c)
   (names skia_generated_stubs raw_bindings)

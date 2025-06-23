@@ -35,13 +35,21 @@ type t = {
     or [`Absolute(x)], where [x] is the horizontal pixel coordinate of the left
     edge of the [Window]
     */
-  x: [ | `Undefined | `Centered | `Absolute(int)],
+  x: [
+    | `Undefined
+    | `Centered
+    | `Absolute(int)
+  ],
   /**
     [y] is the initial horizontal position of the [Window], either [`Centered]
     or [`Absolute(x)], where [y] is the vertical pixel coordinate of the top
     edge of the [Window]
     */
-  y: [ | `Undefined | `Centered | `Absolute(int)],
+  y: [
+    | `Undefined
+    | `Centered
+    | `Absolute(int)
+  ],
   /**
     [width] is the initial horizontal size of the [Window], with display scaling applied.
     */
@@ -84,7 +92,11 @@ type t = {
        - [`ForceSoftware] - forces selection of a software renderer
        This is a proxy for the [SDL_GL_ACCELERATED_VISUAL](https://wiki.libsdl.org/SDL_GL_SetAttribute) setting.
    */
-  acceleration: [ | `Auto | `ForceHardware | `ForceSoftware],
+  acceleration: [
+    | `Auto
+    | `ForceHardware
+    | `ForceSoftware
+  ],
 };
 
 let create =

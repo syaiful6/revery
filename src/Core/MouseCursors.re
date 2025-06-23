@@ -5,7 +5,14 @@ open Sdl2;
    [glfwInit]. Since these are global variables, they WILL be initialized first.
    We could also return a new cursor every time, but this would cause a memory
    leak. */
-type t = [ | `Arrow | `Text | `Pointer | `Crosshair | `HResize | `VResize];
+type t = [
+  | `Arrow
+  | `Text
+  | `Pointer
+  | `Crosshair
+  | `HResize
+  | `VResize
+];
 
 let arrow_lazy = lazy(Cursor.createSystem(Cursor.Arrow));
 let text_lazy = lazy(Cursor.createSystem(Cursor.IBeam));

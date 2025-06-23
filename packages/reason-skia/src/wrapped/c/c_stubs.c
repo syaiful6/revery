@@ -115,7 +115,7 @@ void reason_skia_stub_paint_set_alpha(sk_paint_t *pPaint, double alpha) {
 }
 
 void reason_skia_stub_rect_set(sk_rect_t *pRect, double left, double top,
-                                    double right, double bottom) {
+                               double right, double bottom) {
     pRect->left = left;
     pRect->top = top;
     pRect->right = right;
@@ -124,8 +124,8 @@ void reason_skia_stub_rect_set(sk_rect_t *pRect, double left, double top,
 
 
 void reason_skia_stub_matrix_set_scale(sk_matrix_t *matrix, double scaleX,
-        double scaleY, double pivotX,
-        double pivotY) {
+                                       double scaleY, double pivotX,
+                                       double pivotY) {
     matrix->scaleX = scaleX;
     matrix->skewX = 0.0;
     matrix->transX = pivotX - (scaleX * pivotX);

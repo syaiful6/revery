@@ -2,14 +2,14 @@ open Revery_Font;
 
 // INTERNAL
 open {
-       let fontMetrics = (size, skiaFace) => {
-         switch (FontCache.load(skiaFace)) {
-         // TODO: Actually get metrics
-         | Ok(font) => FontCache.getMetrics(font, size)
-         | Error(_) => FontMetrics.empty(0.)
-         };
-       };
-     };
+  let fontMetrics = (size, skiaFace) => {
+    switch (FontCache.load(skiaFace)) {
+    // TODO: Actually get metrics
+    | Ok(font) => FontCache.getMetrics(font, size)
+    | Error(_) => FontMetrics.empty(0.)
+    };
+  };
+};
 
 let lineHeight = (~italic=?, family, size, weight) => {
   let maybeSkia = Family.toSkia(~italic?, weight, family);
@@ -67,7 +67,10 @@ let dimensions =
   // TODO: Properly implement
   | Ok(font) => FontRenderer.measure(~smoothing, font, fontSize, text)
 
-  | Error(_) => {width: 0., height: 0.}
+  | Error(_) => {
+      width: 0.,
+      height: 0.,
+    }
   };
 };
 

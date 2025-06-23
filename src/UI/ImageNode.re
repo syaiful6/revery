@@ -61,21 +61,19 @@ class imageNode (data: option(Skia.Image.t)) = {
 
     let adjustedStyle =
       Layout.Encoding.(
-        {
-          let noDimensionsSet =
-            style.width == cssUndefined && style.height == cssUndefined;
+        let noDimensionsSet =
+          style.width == cssUndefined && style.height == cssUndefined;
 
-          Style.{
-            ...style,
-            width:
-              noDimensionsSet
-                ? _maybeWidth |> Option.value(~default=cssUndefined)
-                : style.width,
-            height:
-              noDimensionsSet
-                ? _maybeHeight |> Option.value(~default=cssUndefined)
-                : style.height,
-          };
+        Style.{
+          ...style,
+          width:
+            noDimensionsSet
+              ? _maybeWidth |> Option.value(~default=cssUndefined)
+              : style.width,
+          height:
+            noDimensionsSet
+              ? _maybeHeight |> Option.value(~default=cssUndefined)
+              : style.height,
         }
       );
     _super#setStyle(adjustedStyle);

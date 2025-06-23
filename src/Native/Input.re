@@ -1,17 +1,15 @@
-%import
-"config.h";
+[%%import "config.h"];
 
 module Button = {
   type t;
 
   open {
-         external c_create: string => t = "revery_buttonCreate";
-         external c_setColor: (t, float, float, float, float) => unit =
-           "revery_buttonSetColor";
-       };
+    external c_create: string => t = "revery_buttonCreate";
+    external c_setColor: (t, float, float, float, float) => unit =
+      "revery_buttonSetColor";
+  };
 
-  %if
-  defined(USE_COCOA);
+  [%%if defined(USE_COCOA)];
 
   let hash = NSObject.hash;
   let equal = NSObject.equal;
@@ -47,8 +45,7 @@ module Button = {
   let setColor = (~red, ~green, ~blue, ~alpha, button) =>
     c_setColor(button, red, green, blue, alpha);
 
-  %if
-  defined(USE_COCOA);
+  [%%if defined(USE_COCOA)];
 
   let create = (~title, ~onClick) => {
     let button = c_create(title);

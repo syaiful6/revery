@@ -25,19 +25,17 @@ let reducer = (action, _state) => {
 
 let bounceAnimation = (~origin, ~force) =>
   Animation.(
-    {
-      let bounceAway =
-        animate(Time.ms(100))
-        |> ease(Easing.cubicBezier(0.23, 1., 0.32, 1.))
-        |> tween(float(origin), float(origin + force));
+    let bounceAway =
+      animate(Time.ms(100))
+      |> ease(Easing.cubicBezier(0.23, 1., 0.32, 1.))
+      |> tween(float(origin), float(origin + force));
 
-      let bounceBack =
-        Animation.animate(Time.ms(800))
-        |> ease(Easing.cubicBezier(0.23, 1., 0.32, 1.))
-        |> tween(float(origin + force), float(origin));
+    let bounceBack =
+      Animation.animate(Time.ms(800))
+      |> ease(Easing.cubicBezier(0.23, 1., 0.32, 1.))
+      |> tween(float(origin + force), float(origin));
 
-      bounceAway |> andThen(~next=bounceBack) |> map(int_of_float);
-    }
+    bounceAway |> andThen(~next=bounceBack) |> map(int_of_float)
   );
 
 let bounceAnimationHook = (scrollPosition, bouncingState, setBouncingState) => {

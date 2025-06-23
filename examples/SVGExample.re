@@ -402,7 +402,11 @@ module SVGExample = {
 
     let buttons =
       List.map(
-        ((text, value)) => RadioButtonsString.{text, value},
+        ((text, value)) =>
+          RadioButtonsString.{
+            text,
+            value,
+          },
         examples,
       );
     let onChange = data => setExample(_ => data);
