@@ -1853,7 +1853,7 @@ extern "C" {
     }
 
 #if SDL_VIDEO_DRIVER_UIKIT
-    value resdl_uikit_main_callback;
+    static value resdl_uikit_main_callback = 0;
     int resdl_uikit_SDL_main (int argc, char *argv[]) {
         caml_callback(resdl_uikit_main_callback, Val_unit);
         return 0;
@@ -1864,6 +1864,10 @@ extern "C" {
         CAMLparam3(ml_argc, ml_argv, closure);
         CAMLlocal1(tmp);
 
+        if (closure == 0) {
+            caml_failwith("Null closure in resdl_SDL_main");
+        }
+
 #if SDL_VIDEO_DRIVER_UIKIT
         int argc = Int_val(ml_argc);
         char **argv = (char**)calloc(sizeof(char*), argc + 1);
@@ -1871,10 +1875,15 @@ extern "C" {
             argv[i] = (char*)String_val(Field(ml_argv, i));
         }
 
+        caml_register_global_root(&resdl_uikit_main_callback);
         resdl_uikit_main_callback = closure;
         SDL_UIKitRunApp(argc, argv, resdl_uikit_SDL_main);
+        free(argv); // Clean up
 #else
-        caml_callback(closure, Val_unit);
+        value result = caml_callback(closure, Val_unit);
+        if (result == 0) {
+            caml_failwith("Callback returned null");
+        }
 #endif
 
         CAMLreturn(Val_unit);

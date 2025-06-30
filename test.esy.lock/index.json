@@ -1,5 +1,5 @@
 {
-  "checksum": "c3e7b68b59dc89d54ca4ae8722def101",
+  "checksum": "6bd23c21fd3048619d26f3c7fc41a9f4",
   "root": "revery@link-dev:./package.json",
   "node": {
     "revery@link-dev:./package.json": {
@@ -15,7 +15,7 @@
       "dependencies": [
         "reperf@github:syaiful6/reperf#27f9e34747f1b1c5ff7efdfc28452315f29f26b1@d41d8cd9",
         "rench@1.10.0@d41d8cd9", "ocaml@5.2.0@d41d8cd9",
-        "esy-sdl2@github:syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b@d41d8cd9",
+        "esy-sdl2@github:syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200@d41d8cd9",
         "esy-mono-skia@github:syaiful6/esy-mono-skia#ed44f9368b8c9185c2d74a6edbd717a1f8dc0ef2@d41d8cd9",
         "esy-harfbuzz@github:syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232@d41d8cd9",
         "esy-freetype2@2.9.1008@d41d8cd9",
@@ -93,14 +93,14 @@
       "dependencies": [],
       "devDependencies": []
     },
-    "esy-sdl2@github:syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b@d41d8cd9": {
-      "id": "esy-sdl2@github:syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b@d41d8cd9",
+    "esy-sdl2@github:syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200@d41d8cd9": {
+      "id": "esy-sdl2@github:syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200@d41d8cd9",
       "name": "esy-sdl2",
-      "version": "github:syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b",
+      "version": "github:syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200",
       "source": {
         "type": "install",
         "source": [
-          "github:syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b"
+          "github:syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200"
         ]
       },
       "overrides": [],
@@ -1229,7 +1229,7 @@
         "@opam/ocamlc-loc@opam:3.19.1@b84e5aec",
         "@opam/merlin-lib@opam:5.3-502@45a1163e",
         "@opam/lsp@opam:1.21.0@b3c7ba15",
-        "@opam/jsonrpc@opam:1.21.0@53614e00",
+        "@opam/jsonrpc@opam:1.21.0@06da83d4",
         "@opam/fiber@opam:3.7.0@bf633a34", "@opam/dyn@opam:3.19.1@355f488d",
         "@opam/dune-rpc@opam:3.19.1@8e329192",
         "@opam/dune-build-info@opam:3.19.1@60ed972f",
@@ -1252,7 +1252,7 @@
         "@opam/ocamlc-loc@opam:3.19.1@b84e5aec",
         "@opam/merlin-lib@opam:5.3-502@45a1163e",
         "@opam/lsp@opam:1.21.0@b3c7ba15",
-        "@opam/jsonrpc@opam:1.21.0@53614e00",
+        "@opam/jsonrpc@opam:1.21.0@06da83d4",
         "@opam/fiber@opam:3.7.0@bf633a34", "@opam/dyn@opam:3.19.1@355f488d",
         "@opam/dune-rpc@opam:3.19.1@8e329192",
         "@opam/dune-build-info@opam:3.19.1@60ed972f",
@@ -1593,14 +1593,14 @@
         "ocaml@5.2.0@d41d8cd9", "@opam/yojson@opam:2.2.2@0786d153",
         "@opam/uutf@opam:1.0.4@ba7fbef7",
         "@opam/ppx_yojson_conv_lib@opam:v0.17.0@2b444c0e",
-        "@opam/jsonrpc@opam:1.21.0@53614e00",
+        "@opam/jsonrpc@opam:1.21.0@06da83d4",
         "@opam/dune@opam:3.19.1@c4422bdd", "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
         "ocaml@5.2.0@d41d8cd9", "@opam/yojson@opam:2.2.2@0786d153",
         "@opam/uutf@opam:1.0.4@ba7fbef7",
         "@opam/ppx_yojson_conv_lib@opam:v0.17.0@2b444c0e",
-        "@opam/jsonrpc@opam:1.21.0@53614e00",
+        "@opam/jsonrpc@opam:1.21.0@06da83d4",
         "@opam/dune@opam:3.19.1@c4422bdd"
       ],
       "available": "true"
@@ -1660,8 +1660,8 @@
       "devDependencies": [ "ocaml@5.2.0@d41d8cd9" ],
       "available": "true"
     },
-    "@opam/jsonrpc@opam:1.21.0@53614e00": {
-      "id": "@opam/jsonrpc@opam:1.21.0@53614e00",
+    "@opam/jsonrpc@opam:1.21.0@06da83d4": {
+      "id": "@opam/jsonrpc@opam:1.21.0@06da83d4",
       "name": "@opam/jsonrpc",
       "version": "opam:1.21.0",
       "source": {
