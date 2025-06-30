@@ -56,7 +56,7 @@
     "@onivim/reason-native-crash-utils": "^1.0.2",
     "esy-harfbuzz": "syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232",
     "esy-mono-skia": "syaiful6/esy-mono-skia#ed44f9368b8c9185c2d74a6edbd717a1f8dc0ef2",
-    "esy-sdl2": "syaiful6/esy-sdl2#600ed68d14a985afe78551e6a2f2109d1cf9af0b",
+    "esy-sdl2": "syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200",
     "reperf": "syaiful6/reperf#27f9e34747f1b1c5ff7efdfc28452315f29f26b1",
     "rench": "^1.10.0",
     "@reason-native/rely": "*",

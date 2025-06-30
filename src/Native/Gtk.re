@@ -31,7 +31,7 @@ open {
      bunch of GtkWidgets for one window, so this table maps Sdl windows
      to GtkWidgets.
      */
-  let windowWidgetCache = WindowWidgetCache.create(~initialSize=8, 64);
+  let windowWidgetCache = WindowWidgetCache.create(64);
 };
 
 external eventsPending: unit => bool = "revery_gtkEventsPending";
