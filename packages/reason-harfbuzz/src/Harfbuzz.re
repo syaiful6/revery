@@ -15,7 +15,6 @@ module Internal = {
     "rehb_face_from_path";
   external hb_face_from_data: (string, int) => result(face, string) =
     "rehb_face_from_bytes";
-  external hb_destroy_face: face => unit = "rehb_destroy_face";
   external hb_shape:
     (face, string, array(feature), int, int) => array(hb_shape) =
     "rehb_shape";
@@ -54,9 +53,6 @@ let hb_face_from_path = str => {
   | Ok(face) =>
     let ret = {face: face};
 
-    let finalise = ({face}) => Internal.hb_destroy_face(face);
-
-    Gc.finalise(finalise, ret);
     Ok(ret);
   };
 };
@@ -90,10 +86,6 @@ let hb_face_from_data = bytes => {
   | Error(_) as e => e
   | Ok(face) =>
     let ret = {face: face};
-
-    let finalise = ({face}) => Internal.hb_destroy_face(face);
-
-    Gc.finalise(finalise, ret);
     Ok(ret);
   };
 };
