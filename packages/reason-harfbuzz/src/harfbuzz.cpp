@@ -4,12 +4,12 @@
 #include <caml/alloc.h>
 #include <caml/bigarray.h>
 #include <caml/callback.h>
+#include <caml/custom.h>
 #include <caml/memory.h>
 #include <caml/mlvalues.h>
 
 #include <hb-ot.h>
 #include <hb.h>
-
 
 /* #define TEST_FONT "E:/FiraCode-Regular.ttf" */
 /* #define TEST_FONT "E:/Hasklig-Medium.otf" */
@@ -36,6 +36,27 @@ extern "C" {
         CAMLreturn(error);
     }
 
+    static void custom_finalize_hb_font(value vFontBlock) {
+        hb_font_t *pFont = *((hb_font_t **)Data_custom_val(vFontBlock));
+
+        // fprintf(stderr, "Finalizing hb_font_t* at %p\n", (void *)pFont);
+        if (pFont) {
+            hb_font_destroy(pFont);
+        }
+    }
+
+// Define the custom operations for hb_font_t
+    static struct custom_operations hb_font_custom_ops = {
+        "harfbuzz.font",
+        custom_finalize_hb_font,
+        custom_compare_default,
+        custom_hash_default,
+        custom_serialize_default,
+        custom_deserialize_default,
+        custom_compare_ext_default,
+        custom_fixed_length_default
+    };
+
     /* Use native open type implementation to load font
       https://github.com/harfbuzz/harfbuzz/issues/255 */
     hb_font_t *get_font_ot(char *data, int length, int size) {
@@ -43,25 +64,15 @@ extern "C" {
             hb_blob_create(data, length, HB_MEMORY_MODE_WRITABLE, (void *)data, free);
         hb_face_t *face = hb_face_create(blob, 0);
 
-        hb_blob_destroy(blob); // face will keep a reference to blob
+        // hb_blob_destroy(blob); // face will keep a reference to blob
 
         hb_font_t *font = hb_font_create(face);
-        hb_face_destroy(face); // font will keep a reference to face
+        // hb_face_destroy(face); // font will keep a reference to face
 
         hb_ot_font_set_funcs(font);
         hb_font_set_scale(font, size, size);
 
         return font;
-    }
-    CAMLprim value rehb_destroy_face(value vFont) {
-        CAMLparam1(vFont);
-
-        hb_font_t *pFont = (hb_font_t*)vFont;
-        if (pFont) {
-            hb_font_destroy(pFont);
-        }
-
-        CAMLreturn(Val_unit);
     }
 
     CAMLprim value rehb_face_from_path(value vString) {
@@ -90,7 +101,11 @@ extern "C" {
         if (!hb_font) {
             ret = Val_error("Unable to load font");
         } else {
-            ret = Val_success((value)hb_font);
+            CAMLlocal1(custom_font_block);
+            custom_font_block =
+                caml_alloc_custom(&hb_font_custom_ops, sizeof(hb_font_t *), 0, 1);
+            *((hb_font_t **)Data_custom_val(custom_font_block)) = hb_font;
+            ret = Val_success(custom_font_block);
         }
         CAMLreturn(ret);
     }
@@ -111,7 +126,11 @@ extern "C" {
         if (!hb_font) {
             ret = Val_error("Unable to load font");
         } else {
-            ret = Val_success((value)hb_font);
+            CAMLlocal1(custom_font_block);
+            custom_font_block =
+                caml_alloc_custom(&hb_font_custom_ops, sizeof(hb_font_t *), 0, 1);
+            *((hb_font_t **)Data_custom_val(custom_font_block)) = hb_font;
+            ret = Val_success(custom_font_block);
         }
         CAMLreturn(ret);
     }
@@ -126,7 +145,8 @@ extern "C" {
         CAMLreturn(ret);
     }
 
-    CAMLprim value rehb_shape(value vFace, value vString, value vFeatures, value vStart, value vLen) {
+    CAMLprim value rehb_shape(value vFace, value vString, value vFeatures,
+                              value vStart, value vLen) {
         CAMLparam5(vFace, vString, vFeatures, vStart, vLen);
         CAMLlocal2(ret, feat);
 
@@ -134,7 +154,8 @@ extern "C" {
         int len = Int_val(vLen);
 
         int featuresLen = Wosize_val(vFeatures);
-        hb_feature_t *features = (hb_feature_t *)malloc(featuresLen * sizeof(hb_feature_t));
+        hb_feature_t *features =
+            (hb_feature_t *)malloc(featuresLen * sizeof(hb_feature_t));
         for (int i = 0; i < featuresLen; i++) {
             feat = Field(vFeatures, i);
             const char *tag = String_val(Field(feat, 0));
@@ -144,8 +165,7 @@ extern "C" {
             features[i].end = Int_val(Field(feat, 3));
         }
 
-        hb_font_t *hb_font = (hb_font_t *)vFace;
-
+        hb_font_t *hb_font = *((hb_font_t **)Data_custom_val(vFace));
 
         hb_buffer_t *hb_buffer;
         hb_buffer = hb_buffer_create();

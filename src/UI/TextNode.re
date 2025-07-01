@@ -27,11 +27,10 @@ class textNode (text: string) = {
   val mutable _features: list(Feature.t) = [];
   val _textPaint = {
     let paint = Skia.Paint.make();
-    // Skia.Paint.setTextEncoding(paint, GlyphId);
-    // Skia.Paint.setLcdRenderText(paint, true);
     Skia.Paint.setAntiAlias(paint, true);
     paint;
   };
+  val _font = Skia.Font.make();
   inherit (class viewNode)() as _super;
   pub! draw = (parentContext: NodeDrawContext.t) => {
     let style = _super#getStyle();
@@ -44,7 +43,6 @@ class textNode (text: string) = {
     switch (Family.resolve(~italic=_italicized, _fontWeight, _fontFamily)) {
     | Error(_) => ()
     | Ok(font) =>
-      let _font = Skia.Font.make();
       Revery_Font.Smoothing.setPaint(
         ~smoothing=_smoothing,
         _font,
