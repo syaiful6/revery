@@ -97,12 +97,25 @@ module Constants = {
 };
 
 let skiaFaceToHarfbuzzFace = skiaFace => {
-  let stream = Skia.Typeface.toStream(skiaFace);
-  let length = Skia.Stream.getLength(stream);
-  let data = Skia.Data.makeFromStream(stream, length);
-  let bytes = Skia.Data.makeString(data);
+  switch (Skia.Typeface.toStream(skiaFace)) {
+  | Some(asset) =>
+    let bytes =
+      Fun.protect(
+        ~finally=
+          () => {
+            Log.debugf(m => m("destroying typeface stream asset"));
+            Skia.StreamAsset.delete(asset);
+          },
+        () => {
+          let stream = Skia.StreamAsset.toStream(asset);
+          let length = Skia.Stream.getLength(stream);
+          Skia.Data.makeStringFromStream(stream, length);
+        },
+      );
 
-  Harfbuzz.hb_face_from_data(bytes);
+    Harfbuzz.hb_face_from_data(bytes);
+  | None => Result.Error("failed to convert skia typeface to stream")
+  };
 };
 
 let load: option(Skia.Typeface.t) => result(t, string) =

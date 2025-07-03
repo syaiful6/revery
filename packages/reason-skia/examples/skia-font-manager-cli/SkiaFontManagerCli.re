@@ -32,7 +32,8 @@ let draw = canvas => {
   | Some(typeface) =>
     Font.setTypeface(font, typeface);
     Canvas.drawText(canvas, "Arial (System)", 10., 20., font, fill);
-    let stream = Typeface.toStream(typeface);
+    let stream =
+      Typeface.toStream(typeface) |> Option.get |> StreamAsset.toStream;
     let length = Stream.getLength(stream);
     Printf.printf("Stream length: %d\n", length);
     let data = Data.makeFromStream(stream, length);

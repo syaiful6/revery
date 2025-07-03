@@ -90,16 +90,18 @@ module Internal = {
 //  Lwt.return(Result.value(result, ~default=None));
 //};
 
-type cache = Hashtbl.t(string, option(Skia.Image.t));
-let contextCache: cache = Hashtbl.create(100);
+module ImageCache = Ephemeron.K1.Make(String);
+
+type cache = ImageCache.t(Skia.Image.t);
+let contextCache: cache = ImageCache.create(100);
 
 let fromAssetPath = (imagePath: string) => {
   let imagePath = Environment.getAssetPath(imagePath);
 
-  let cacheResult = Hashtbl.find_opt(contextCache, imagePath);
+  let cacheResult = ImageCache.find_opt(contextCache, imagePath);
 
   switch (cacheResult) {
-  | Some(maybeCachedImage) => maybeCachedImage
+  | Some(image) => Some(image)
   | None =>
     Log.info("Loading from path: " ++ imagePath);
 
@@ -110,8 +112,11 @@ let fromAssetPath = (imagePath: string) => {
     let maybeImage =
       Option.bind(maybeData, data => Skia.Image.makeFromEncoded(data));
 
-    Hashtbl.replace(contextCache, imagePath, maybeImage);
-
-    maybeImage;
+    switch (maybeImage) {
+    | Some(image) =>
+      ImageCache.replace(contextCache, imagePath, image);
+      Some(image);
+    | None => None
+    };
   };
 };
