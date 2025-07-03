@@ -70,7 +70,7 @@ extern "C" {
         hb_face_destroy(face); // font will keep a reference to face
 
         hb_ot_font_set_funcs(font);
-        hb_font_set_scale(font, size, size);
+        // hb_font_set_scale(font, size, size);
 
         return font;
     }

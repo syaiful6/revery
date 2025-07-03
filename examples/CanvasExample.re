@@ -76,7 +76,10 @@ module Sample = {
             // Skia.Paint.setTextSize(textPaint, 20.);
 
             // Skia.Font.setEncoding(textPaint, GlyphId);
-            Skia.Font.setTypeface(textFont, Revery_Font.getSkiaTypeface(font));
+            Skia.Font.setTypeface(
+              textFont,
+              Revery_Font.getSkiaTypeface(font),
+            );
             CanvasContext.drawText(
               ~paint=textPaint,
               ~font=textFont,

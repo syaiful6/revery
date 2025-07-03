@@ -470,17 +470,18 @@ module TextBlobBuillder: {
       ~font: Font.t,
       ~glyphs: list(int),
       ~bounds: Rect.t=?,
-      ~x:float=?,
-      ~y:float=?,
-      t,
-    ) => unit;
+      ~x: float=?,
+      ~y: float=?,
+      t
+    ) =>
+    unit;
   let allocRunPos:
     (
       ~font: Font.t,
-      ~fontSize:float,
+      ~fontSize: float,
       ~shapes: list(shape),
       ~bounds: Rect.t=?,
-      ~baselineY:float=?,
+      ~baselineY: float=?,
       t
     ) =>
     unit;

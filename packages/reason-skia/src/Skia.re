@@ -811,14 +811,19 @@ module TextBlobBuillder = {
     );
 
     // no blits function in Ctypes, so let's just set  glypsh and pos directly here?
-    let glyphsPTr = CArray.from_ptr(
-      coerce(ptr(void), ptr(uint16_t), SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer)),
-      count
-    );
+    let glyphsPTr =
+      CArray.from_ptr(
+        coerce(
+          ptr(void),
+          ptr(uint16_t),
+          SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer),
+        ),
+        count,
+      );
 
     List.iteri(
       (i, glyph) => {
-        CArray.set(glyphsPTr, i, Unsigned.UInt16.of_int(glyph));
+        CArray.set(glyphsPTr, i, Unsigned.UInt16.of_int(glyph))
       },
       glyphs,
     );
@@ -845,13 +850,25 @@ module TextBlobBuillder = {
     );
 
     // no blits function in Ctypes, so let's just set  glypsh and pos directly here?
-    let glyphsPTr = CArray.from_ptr(
-      coerce(ptr(void), ptr(uint16_t), SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer)),
-      count
-    );
+    let glyphsPTr =
+      CArray.from_ptr(
+        coerce(
+          ptr(void),
+          ptr(uint16_t),
+          SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer),
+        ),
+        count,
+      );
 
-    let posCArray = CArray.from_ptr(
-      coerce(ptr(void), ptr(float), SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer)), List.length(shapes) * 2);
+    let posCArray =
+      CArray.from_ptr(
+        coerce(
+          ptr(void),
+          ptr(float),
+          SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer),
+        ),
+        List.length(shapes) * 2,
+      );
 
     let currentXPos = ref(0.0);
 
@@ -868,7 +885,7 @@ module TextBlobBuillder = {
         let glyphOriginY = baselineY +. scaledYOffset;
 
         CArray.set(posCArray, i * 2, glyphOriginX);
-        CArray.set(posCArray, (i * 2) + 1, glyphOriginY);
+        CArray.set(posCArray, i * 2 + 1, glyphOriginY);
 
         currentXPos := currentXPos^ +. scalledXAdvance;
       },

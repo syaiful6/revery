@@ -364,7 +364,15 @@ let generateShapes:
       if (index == Array.length(shapes)) {
         resolvePossibleHole(~stop=stopCluster);
       } else {
-        let Harfbuzz.{glyphId, cluster, xAdvance, yAdvance, xOffset, yOffset, unitsPerEm} = shapes[index];
+        let Harfbuzz.{
+          glyphId,
+          cluster,
+          xAdvance,
+          yAdvance,
+          xOffset,
+          yOffset,
+          unitsPerEm,
+        } = shapes[index];
 
         // If we have an unknown glyph (part of a hole), extend
         // the current hole to encapsulate it. We cannot resolve unresolved
