@@ -646,6 +646,15 @@ module Stream = {
   };
 };
 
+module StreamAsset = {
+  type t = SkiaWrapped.StreamAsset.t;
+
+  let delete = SkiaWrapped.StreamAsset.delete;
+
+  let toStream = (asset: t) =>
+    Ctypes.coerce(SkiaWrapped.StreamAsset.t, SkiaWrapped.Stream.t, asset);
+};
+
 module Data = {
   type t = data;
   let makeString = data => {
@@ -662,6 +671,13 @@ module Data = {
     | None => ()
     };
     maybeData;
+  };
+
+  let makeStringFromStream = (stream, length) => {
+    let data = SkiaWrapped.Data.makeFromStream(stream, length);
+    let str = makeString(data);
+    SkiaWrapped.Data.delete(data);
+    str;
   };
 
   let makeFromStream = (stream, length) => {
@@ -685,7 +701,6 @@ module Typeface = {
 
   let toStream = typeface => {
     let stream = SkiaWrapped.Typeface.openStream(typeface, None);
-    Gc.finalise(SkiaWrapped.Stream.delete, stream);
     stream;
   };
 

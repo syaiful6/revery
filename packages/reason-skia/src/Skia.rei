@@ -48,12 +48,21 @@ module Stream: {
   let makeMemoryStreamFromData: data => t;
 };
 
+module StreamAsset: {
+  type t;
+
+  let delete: t => unit;
+
+  let toStream: t => Stream.t;
+};
+
 module Data: {
   type t = data;
 
   let makeFromFileName: string => option(t);
   let makeString: t => string;
   let makeFromStream: (Stream.t, int) => t;
+  let makeStringFromStream: (Stream.t, int) => string;
 };
 
 module Typeface: {
@@ -62,7 +71,7 @@ module Typeface: {
   let getFamilyName: t => string;
   let makeFromName: (string, FontStyle.t) => option(t);
   let makeFromFile: (string, int) => option(t);
-  let toStream: t => Stream.t;
+  let toStream: t => option(StreamAsset.t);
   let getFontStyle: t => FontStyle.t;
   let getUniqueID: t => int32;
   let equal: (t, t) => bool;

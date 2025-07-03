@@ -62,6 +62,14 @@ module M = (F: FOREIGN) => {
       foreign("sk_memorystream_destroy", t @-> returning(void));
   };
 
+  module StreamAsset = {
+    type t = ptr(structure(SkiaTypes.StreamAsset.t));
+    let t = ptr(SkiaTypes.StreamAsset.t);
+    let maybeT = ptr_opt(SkiaTypes.StreamAsset.t);
+
+    let delete = foreign("sk_stream_asset_destroy", t @-> returning(void));
+  };
+
   module Data = {
     type t = data;
     let t = data;
@@ -73,7 +81,8 @@ module M = (F: FOREIGN) => {
       );
     let delete = foreign("sk_data_unref", t @-> returning(void));
 
-    let getData = foreign("sk_data_get_data", t @-> returning(ptr(void)));
+    let getData =
+      foreign("sk_data_get_data", t @-> returning(ptr(const(void))));
     let getSize = foreign("sk_data_get_size", t @-> returning(size_t));
 
     let makeFromStream =
@@ -145,7 +154,7 @@ module M = (F: FOREIGN) => {
     let openStream =
       foreign(
         "sk_typeface_open_stream",
-        t @-> ptr_opt(int) @-> returning(Stream.t),
+        t @-> ptr_opt(int) @-> returning(StreamAsset.maybeT),
       );
     let delete = foreign("sk_typeface_unref", t @-> returning(void));
   };

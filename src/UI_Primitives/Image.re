@@ -88,7 +88,6 @@ let%nativeComponent make =
         | `File(path) =>
           let maybeSkiaImage = Revery_IO.Image.fromAssetPath(path);
           imgNode#setData(maybeSkiaImage);
-          Lwt.return();
         },
       );
 

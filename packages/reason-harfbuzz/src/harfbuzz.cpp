@@ -39,7 +39,7 @@ extern "C" {
     static void custom_finalize_hb_font(value vFontBlock) {
         hb_font_t *pFont = *((hb_font_t **)Data_custom_val(vFontBlock));
 
-        // fprintf(stderr, "Finalizing hb_font_t* at %p\n", (void *)pFont);
+        fprintf(stderr, "Finalizing hb_font_t* at %p\n", (void *)pFont);
         if (pFont) {
             hb_font_destroy(pFont);
         }
@@ -64,10 +64,10 @@ extern "C" {
             hb_blob_create(data, length, HB_MEMORY_MODE_WRITABLE, (void *)data, free);
         hb_face_t *face = hb_face_create(blob, 0);
 
-        // hb_blob_destroy(blob); // face will keep a reference to blob
+        hb_blob_destroy(blob); // face will keep a reference to blob
 
         hb_font_t *font = hb_font_create(face);
-        // hb_face_destroy(face); // font will keep a reference to face
+        hb_face_destroy(face); // font will keep a reference to face
 
         hb_ot_font_set_funcs(font);
         hb_font_set_scale(font, size, size);
