@@ -290,6 +290,10 @@ let drawText = (~paint, ~font, ~x=0., ~y=0., ~text, v: t) => {
   Canvas.drawText(v.canvas, text, x, y, font, paint);
 };
 
+let drawTextBlob = (~paint, ~x=0., ~y=0., ~textblob, v: t) => {
+  Canvas.drawTextBlob(v.canvas, textblob, x, y, paint);
+};
+
 let drawTextWithEncoding =
     (~encoding, ~paint, ~font, ~x=0., ~y=0., ~text, v: t) => {
   Canvas.drawSimpleText(~encoding, v.canvas, text, x, y, font, paint, ());

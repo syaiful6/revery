@@ -77,44 +77,65 @@ class textNode (text: string) = {
           let baselineY =
             ascentPx *. (-1.0) +. lineHeightPx *. float_of_int(lineIndex);
 
-          let glyphStrings =
+          let shapedNodes =
             line
-            |> Revery_Font.shape(~features=_features, font)
-            |> Revery_Font.ShapeResult.getGlyphStrings;
+            |> Revery_Font.shape(~features=_features, font);
 
-          let offset = ref(0.);
+          if (List.length(shapedNodes) > 0) {
+            Skia.TextBlobBuillder.withBuilder(builder => {
+              let offset = ref(0.0);
 
-          glyphStrings
-          |> List.iter(((skiaFace, str)) => {
-               Skia.Font.setTypeface(_font, skiaFace);
+              let rec processShapesNodes = (nodes: ShapeResult.t) => {
+                switch (nodes) {
+                | [] => ()
+                | [head, ...tail] =>
+                  let currentSkiaFace = head.skiaFace;
+                  let (runNodes, remaingingNodes) = List.partition((ShapeResult.{skiaFace}) => Skia.Typeface.equal(currentSkiaFace, skiaFace), nodes);
+                  if (List.length(runNodes) > 0) {
+                    Skia.Font.setTypeface(_font, currentSkiaFace);
+                    let glyphs = runNodes |> List.map((node: ShapeResult.shapeNode) => node.glyphId);
+                    Skia.TextBlobBuillder.allocRun(
+                      ~font=_font,
+                      ~glyphs=glyphs,
+                      ~x=offset^,
+                      ~y=baselineY,
+                      builder,
+                    );
 
-               CanvasContext.drawText(
-                 ~font=_font,
-                 ~paint=_textPaint,
-                 ~x=offset^,
-                 ~y=baselineY,
-                 ~text=str,
-                 canvas,
-               );
+                    let runTotalWidth =
+                      List.fold_left(
+                        (acc: float, node: ShapeResult.shapeNode) => acc +. (node.xAdvance *. _fontSize /. node.unitsPerEm),
+                        0.,
+                        runNodes
+                      );
+                    offset := offset^ +. runTotalWidth;
+                    processShapesNodes(remaingingNodes);
+                  }
+                }
+              };
+              processShapesNodes(shapedNodes);
 
-               offset :=
-                 offset^
-                 +. Skia.Font.measureText(~paint=_textPaint, _font, str, ());
-             });
+              switch(Skia.TextBlobBuillder.build(builder)) {
+              | Some(textblob) =>
+                  CanvasContext.drawTextBlob(~paint=_textPaint, ~textblob, canvas);
+              | None => ()
+              };
+            });
+          }
 
           if (_underlined) {
             let {underlinePosition, underlineThickness, _}: FontMetrics.t =
               FontCache.getMetrics(font, _fontSize);
 
             let width =
-              FontRenderer.measure(
-                ~smoothing=_smoothing,
-                ~features=_features,
-                font,
-                _fontSize,
-                line,
-              ).
-                width;
+              shapedNodes
+              |> List.fold_left(
+                   (acc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
+                     let scaled_x_advance = (xAdvance *. _fontSize) /. unitsPerEm;
+                     acc +. scaled_x_advance;
+                   },
+                   0.,
+                 );
 
             let rect =
               Skia.Rect.makeLtrb(

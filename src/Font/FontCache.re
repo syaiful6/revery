@@ -51,7 +51,7 @@ module MetricsWeighted = {
 module ShapeResultWeighted = {
   type t = ShapeResult.t;
 
-  let weight = ShapeResult.size;
+  let weight = _ => 1;
 };
 
 module FallbackWeighted = {
@@ -94,6 +94,9 @@ module Internal = {
 
 module Constants = {
   let unresolvedGlyphID = 0;
+  let defaultUnresolvedAdvance = 0.0;
+  let defaultUnresolvedOffset = 0.0;
+  let defaultUnresolvedUnitsPerEm = 1.0;
 };
 
 let skiaFaceToHarfbuzzFace = skiaFace => {
@@ -285,9 +288,13 @@ let generateShapes:
           resolveHole(
             ~acc=[
               ShapeResult.{
-                hbFace: font.hbFace,
                 skiaFace: font.skiaFace,
                 glyphId: Constants.unresolvedGlyphID,
+                xAdvance: Constants.defaultUnresolvedAdvance,
+                yAdvance: Constants.defaultUnresolvedAdvance,
+                xOffset: Constants.defaultUnresolvedOffset,
+                yOffset: Constants.defaultUnresolvedOffset,
+                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
                 cluster: start,
               },
               ...acc,
@@ -303,9 +310,13 @@ let generateShapes:
           resolveHole(
             ~acc=[
               ShapeResult.{
-                hbFace: font.hbFace,
                 skiaFace: font.skiaFace,
                 glyphId: Constants.unresolvedGlyphID,
+                xAdvance: Constants.defaultUnresolvedAdvance,
+                yAdvance: Constants.defaultUnresolvedAdvance,
+                xOffset: Constants.defaultUnresolvedOffset,
+                yOffset: Constants.defaultUnresolvedOffset,
+                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
                 cluster: start,
               },
               ...acc,
@@ -353,7 +364,7 @@ let generateShapes:
       if (index == Array.length(shapes)) {
         resolvePossibleHole(~stop=stopCluster);
       } else {
-        let Harfbuzz.{glyphId, cluster} = shapes[index];
+        let Harfbuzz.{glyphId, cluster, xAdvance, yAdvance, xOffset, yOffset, unitsPerEm} = shapes[index];
 
         // If we have an unknown glyph (part of a hole), extend
         // the current hole to encapsulate it. We cannot resolve unresolved
@@ -376,15 +387,18 @@ let generateShapes:
           let acc = resolvePossibleHole(~stop=cluster);
           let acc = [
             ShapeResult.{
-              hbFace,
               skiaFace,
               glyphId,
+              xAdvance,
+              yAdvance,
+              xOffset,
+              yOffset,
+              unitsPerEm,
               cluster,
             },
             ...acc,
           ];
           loopShapes(
-            // TODO: Bring back fix! Just see if we can repro
             ~attempts,
             ~stopCluster,
             ~acc,
@@ -405,9 +419,13 @@ let generateShapes:
           ~attempts=0,
           ~acc=[
             ShapeResult.{
-              hbFace: font.hbFace,
               skiaFace: font.skiaFace,
               glyphId: Constants.unresolvedGlyphID,
+              xAdvance: Constants.defaultUnresolvedAdvance,
+              yAdvance: Constants.defaultUnresolvedAdvance,
+              xOffset: Constants.defaultUnresolvedOffset,
+              yOffset: Constants.defaultUnresolvedOffset,
+              unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
               cluster: start,
             },
             ...acc,
@@ -427,7 +445,8 @@ let generateShapes:
         |> loopShapes(~attempts, ~stopCluster=stop, ~acc, ~index=0, font);
       };
 
-    loop(~attempts=0, ~start=0, ~stop=String.length(str), ~acc=[], font);
+    loop(~attempts=0, ~start=0, ~stop=String.length(str), ~acc=[], font)
+    |> List.rev;
   };
 
 let shape:
@@ -447,8 +466,7 @@ let shape:
       result;
     | None =>
       let result =
-        generateShapes(~fallback=fallbackToUse, ~features, font, str)
-        |> ShapeResult.ofHarfbuzz;
+        generateShapes(~fallback=fallbackToUse, ~features, font, str);
       ShapeResultCache.add((str, features), result, shapeCache);
       ShapeResultCache.trim(shapeCache);
       result;

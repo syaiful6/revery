@@ -4,34 +4,19 @@ type measureResult = {
 };
 
 let measure =
-    (~smoothing: Smoothing.t, ~features=[], font, size, text: string) => {
+    ( ~features=[], font, size, text: string) => {
   let {height, _}: FontMetrics.t = FontCache.getMetrics(font, size);
-  let glyphStrings =
-    text |> FontCache.shape(~features, font) |> ShapeResult.getGlyphStrings;
-
-  let paint = Skia.Paint.make();
-  let skiaFont = Skia.Font.make();
-
-  Smoothing.setPaint(~smoothing, skiaFont, paint);
-  Skia.Font.setSize(skiaFont, size);
-  // Skia.Paint.setTextSize(paint, size);
+  let shapeNodes =
+    text |> FontCache.shape(~features, font);
 
   let width =
-    glyphStrings
-    |> List.fold_left(
-         (acc, (skiaFace, str)) => {
-           Skia.Font.setTypeface(skiaFont, skiaFace);
-           acc
-           +. Skia.Font.measureText(
-                ~encoding=GlyphId,
-                ~paint,
-                skiaFont,
-                str,
-                (),
-              );
-         },
-         0.,
-       );
+    shapeNodes |> List.fold_left(
+      (acc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
+        let scaled_x_advance = xAdvance *. size /. unitsPerEm;
+        acc +. scaled_x_advance;
+      },
+      0.
+    );
   {
     height,
     width,
