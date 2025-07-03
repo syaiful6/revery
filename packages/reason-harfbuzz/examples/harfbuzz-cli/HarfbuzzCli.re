@@ -13,8 +13,20 @@ Printexc.record_backtrace(true);
 //   isNative ? Filename.dirname(Sys.argv[0]) ++ Filename.dir_sep : "";
 
 let run = () => {
-  let show = ({glyphId, cluster}: hb_shape) =>
-    Printf.sprintf("GlyphID: %d Cluster: %d", glyphId, cluster);
+  let show =
+      (
+        {glyphId, cluster, xAdvance, yAdvance, xOffset, yOffset, unitsPerEm}: hb_shape,
+      ) =>
+    Printf.sprintf(
+      "GlyphID: %d Cluster: %d, xAdvance: %f, yAdvance: %f, xOffset: %f, yOffset: %f, unitsPerEm: %f",
+      glyphId,
+      cluster,
+      xAdvance,
+      yAdvance,
+      xOffset,
+      yOffset,
+      unitsPerEm,
+    );
 
   let renderString = (~features=[], font, str) => {
     let shapes = Harfbuzz.hb_shape(~features, font, str);

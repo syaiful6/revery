@@ -3,6 +3,11 @@ type hb_face;
 type hb_shape = {
   glyphId: int,
   cluster: int,
+  xAdvance: float,
+  yAdvance: float,
+  xOffset: float,
+  yOffset: float,
+  unitsPerEm: float,
 };
 
 type position = [

@@ -135,20 +135,39 @@ extern "C" {
         CAMLreturn(ret);
     }
 
-    static value createShapeTuple(unsigned int codepoint, unsigned int cluster) {
+    static value create_hb_shaped_glyph_record(
+        unsigned int glyphId,
+        unsigned int cluster,
+        hb_position_t xAdvance,
+        hb_position_t yAdvance,
+        hb_position_t xOffset,
+        hb_position_t yOffset,
+        double unitsPerEm
+    ) {
         CAMLparam0();
+        CAMLlocal1(recordBlock);
 
-        CAMLlocal1(ret);
-        ret = caml_alloc(2, 0);
-        Store_field(ret, 0, Val_int(codepoint));
-        Store_field(ret, 1, Val_int(cluster));
-        CAMLreturn(ret);
+        const int numFields = 7;
+        recordBlock = caml_alloc(numFields, 0);
+
+        // Set the fields of the OCaml record
+        // Remember fields are 0-indexed
+        Store_field(recordBlock, 0, Val_int(glyphId)); // glyphId: int
+        Store_field(recordBlock, 1, Val_int(cluster)); // cluster: int
+
+        // Convert HarfBuzz positions (hb_position_t, which is an int representing font units) to float pixels
+        Store_field(recordBlock, 2, caml_copy_double((double)xAdvance)); // xAdvance: float
+        Store_field(recordBlock, 3, caml_copy_double((double)yAdvance)); // yAdvance: float
+        Store_field(recordBlock, 4, caml_copy_double((double)xOffset));  // xOffset: float
+        Store_field(recordBlock, 5, caml_copy_double((double)yOffset));  // yOffset: float
+        Store_field(recordBlock, 6, caml_copy_double(unitsPerEm));
+        CAMLreturn(recordBlock);
     }
 
     CAMLprim value rehb_shape(value vFace, value vString, value vFeatures,
-                              value vStart, value vLen) {
+                              value vStart, value vLen, value vFontSize) {
         CAMLparam5(vFace, vString, vFeatures, vStart, vLen);
-        CAMLlocal2(ret, feat);
+        CAMLlocal3(ret, feat, shapedGlyphRecord);
 
         int start = Int_val(vStart);
         int len = Int_val(vLen);
@@ -166,6 +185,8 @@ extern "C" {
         }
 
         hb_font_t *hb_font = *((hb_font_t **)Data_custom_val(vFace));
+        hb_face_t *hb_face = hb_font_get_face(hb_font);
+        double units_per_em = (double)hb_face_get_upem(hb_face);
 
         hb_buffer_t *hb_buffer;
         hb_buffer = hb_buffer_create();
@@ -176,11 +197,21 @@ extern "C" {
 
         unsigned int glyph_count;
         hb_glyph_info_t *info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
+        hb_glyph_position_t *positions = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
 
         ret = caml_alloc(glyph_count, 0);
 
         for (int i = 0; i < glyph_count; i++) {
-            Store_field(ret, i, createShapeTuple(info[i].codepoint, info[i].cluster));
+            shapedGlyphRecord = create_hb_shaped_glyph_record(
+                                    info[i].codepoint,
+                                    info[i].cluster,
+                                    positions[i].x_advance,
+                                    positions[i].y_advance,
+                                    positions[i].x_offset,
+                                    positions[i].y_offset,
+                                    units_per_em
+                                );
+            Store_field(ret, i, shapedGlyphRecord);
         }
         free(features);
         hb_buffer_destroy(hb_buffer);
