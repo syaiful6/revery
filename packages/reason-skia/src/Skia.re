@@ -776,7 +776,14 @@ module TextBlobBuillder = {
     );
   };
 
-  let build = SkiaWrapped.TextBlob.Builder.build;
+  let build = (builder) => {
+    switch (SkiaWrapped.TextBlob.Builder.build(builder)) {
+    | Some(textblob) =>
+        Gc.finalise(SkiaWrapped.TextBlob.delete, textblob);
+        Some(textblob);
+    | None => None
+    }
+  };
 
   type shape = {
     glyphId: int,
