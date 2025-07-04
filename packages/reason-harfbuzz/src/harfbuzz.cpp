@@ -38,8 +38,6 @@ extern "C" {
 
     static void custom_finalize_hb_font(value vFontBlock) {
         hb_font_t *pFont = *((hb_font_t **)Data_custom_val(vFontBlock));
-
-        fprintf(stderr, "Finalizing hb_font_t* at %p\n", (void *)pFont);
         if (pFont) {
             hb_font_destroy(pFont);
         }

@@ -776,13 +776,13 @@ module TextBlobBuillder = {
     );
   };
 
-  let build = (builder) => {
+  let build = builder => {
     switch (SkiaWrapped.TextBlob.Builder.build(builder)) {
     | Some(textblob) =>
-        Gc.finalise(SkiaWrapped.TextBlob.delete, textblob);
-        Some(textblob);
+      Gc.finalise(SkiaWrapped.TextBlob.delete, textblob);
+      Some(textblob);
     | None => None
-    }
+    };
   };
 
   type shape = {

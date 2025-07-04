@@ -72,11 +72,9 @@ module FallbackCharacterCache =
   Lru.M.Make(UcharHashable, SkiaTypefaceWeighted);
 
 type t = {
-  hbFace: Harfbuzz.hb_face,
   skiaFace: Skia.Typeface.t,
   metricsCache: MetricsCache.t,
   shapeCache: ShapeResultCache.t,
-  fallbackCache: FallbackCache.t,
   fallbackCharacterCache: FallbackCharacterCache.t,
 };
 
@@ -87,9 +85,10 @@ module FontWeight = {
 };
 
 module FontCache = Lru.M.Make(SkiaTypefaceHashable, FontWeight);
+module HarfbuzzMap = Hashtbl.Make(Int32);
 
 module Internal = {
-  let cache = FontCache.create(64);
+  let cache = FontCache.create(8);
 };
 
 module Constants = {
@@ -104,11 +103,7 @@ let skiaFaceToHarfbuzzFace = skiaFace => {
   | Some(asset) =>
     let bytes =
       Fun.protect(
-        ~finally=
-          () => {
-            Log.debugf(m => m("destroying typeface stream asset"));
-            Skia.StreamAsset.delete(asset);
-          },
+        ~finally=() => {Skia.StreamAsset.delete(asset)},
         () => {
           let stream = Skia.StreamAsset.toStream(asset);
           let length = Skia.Stream.getLength(stream);
@@ -128,36 +123,26 @@ let load: option(Skia.Typeface.t) => result(t, string) =
       FontCache.promote(skiaTypeface, Internal.cache);
       v;
     | None =>
-      let harfbuzzFace = skiaTypeface |> Option.map(skiaFaceToHarfbuzzFace);
-      let metricsCache = MetricsCache.create(64);
-      let shapeCache = ShapeResultCache.create(128 * 1024);
-      let fallbackCache = FallbackCache.create(128 * 1024);
-      let fallbackCharacterCache = FallbackCharacterCache.create(128 * 1024);
+      let metricsCache = MetricsCache.create(8);
+      let shapeCache = ShapeResultCache.create(256);
+      let fallbackCharacterCache = FallbackCharacterCache.create(256);
 
       let ret =
-        switch (skiaTypeface, harfbuzzFace) {
-        | (Some(skiaFace), Some(Ok(hbFace))) =>
+        switch (skiaTypeface) {
+        | Some(skiaFace) =>
           Event.dispatch(onFontLoaded, ());
           Log.infof(m =>
             m("Loaded: %s", Skia.Typeface.getFamilyName(skiaFace))
           );
           Ok({
-            hbFace,
             skiaFace,
             metricsCache,
             shapeCache,
-            fallbackCache,
             fallbackCharacterCache,
           });
-        | (_, Some(Error(msg))) =>
-          Log.warn("Error loading typeface: " ++ msg);
-          Error("Error loading typeface: " ++ msg);
-        | (None, _) =>
+        | None =>
           Log.warn("Error loading typeface (skia)");
           Error("Error loading typeface.");
-        | (_, None) =>
-          Log.warn("Error loading typeface (harfbuzz)");
-          Error("Error loading typeface");
         };
 
       FontCache.add(skiaTypeface, ret, Internal.cache);
@@ -236,6 +221,8 @@ let generateShapes:
   (~fallback: Fallback.strategy, ~features: list(Feature.t), t, string) =>
   list(ShapeResult.shapeNode) =
   (~fallback, ~features, font, str) => {
+    let hbCache = HarfbuzzMap.create(32);
+
     let fallbackFor = (~byteOffset, str) => {
       Log.debugf(m =>
         m(
@@ -351,7 +338,7 @@ let generateShapes:
           ~acc,
           ~holeStart=?,
           ~index,
-          {hbFace, skiaFace, _} as font,
+          {skiaFace, _} as font,
           shapes,
         ) => {
       let resolvePossibleHole = (~stop) => {
@@ -443,11 +430,25 @@ let generateShapes:
           font,
         );
       } else {
+        let hbFace =
+          switch (
+            HarfbuzzMap.find_opt(
+              hbCache,
+              Skia.Typeface.getUniqueID(font.skiaFace),
+            )
+          ) {
+          | Some(hbFace) => hbFace
+          | None =>
+            switch (skiaFaceToHarfbuzzFace(font.skiaFace)) {
+            | Ok(hbFace) => hbFace
+            | Error(msg) => failwith(msg)
+            }
+          };
         Harfbuzz.hb_shape(
           ~features,
           ~start=`Position(start),
           ~stop=`Position(stop),
-          font.hbFace,
+          hbFace,
           str,
         )
         |> loopShapes(~attempts, ~stopCluster=stop, ~acc, ~index=0, font);

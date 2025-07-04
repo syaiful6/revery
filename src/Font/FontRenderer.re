@@ -3,19 +3,21 @@ type measureResult = {
   height: float,
 };
 
-let measure = (~features=[], font, size, text: string) => {
+let measure =
+    (~smoothing: Smoothing.t, ~features=[], font, size, text: string) => {
   let {height, _}: FontMetrics.t = FontCache.getMetrics(font, size);
-  let shapeNodes = text |> FontCache.shape(~features, font);
+
+  let paint = Skia.Paint.make();
+  let skiaFont = Skia.Font.make();
+
+  Smoothing.setPaint(~smoothing, skiaFont, paint);
+  Skia.Font.setSize(skiaFont, size);
+  Skia.Font.setTypeface(skiaFont, FontCache.getSkiaTypeface(font));
 
   let width =
-    shapeNodes
-    |> List.fold_left(
-         (acc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
-           let scaled_x_advance = xAdvance *. size /. unitsPerEm;
-           acc +. scaled_x_advance;
-         },
-         0.,
-       );
+    Skia.Font.measureText(~paint, ~encoding=Utf8, skiaFont, text, ());
+
+  // Skia.Paint.setTextSize(paint, size);
   {
     height,
     width,

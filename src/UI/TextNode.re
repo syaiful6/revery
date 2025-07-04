@@ -80,7 +80,7 @@ class textNode (text: string) = {
           let shapedNodes =
             line |> Revery_Font.shape(~features=_features, font);
 
-          if (List.length(shapedNodes) > 0) {
+          if (!List.is_empty(shapedNodes)) {
             Skia.TextBlobBuillder.withBuilder(builder => {
               let offset = ref(0.0);
 
@@ -144,9 +144,8 @@ class textNode (text: string) = {
               shapedNodes
               |> List.fold_left(
                    (acc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
-                     let scaled_x_advance =
-                       xAdvance *. _fontSize /. unitsPerEm;
-                     acc +. scaled_x_advance;
+                     let scaledXadvance = xAdvance *. _fontSize /. unitsPerEm;
+                     acc +. scaledXadvance;
                    },
                    0.,
                  );
