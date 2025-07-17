@@ -166,6 +166,9 @@ module M = (F: FOREIGN) => {
     let makeDefault =
       foreign("sk_fontmgr_create_default", void @-> returning(t));
 
+    let refDefault =
+      foreign("sk_fontmgr_ref_default", void @-> returning(t));
+
     let matchFamilyStyle =
       foreign(
         "sk_fontmgr_match_family_style",
@@ -937,6 +940,75 @@ module M = (F: FOREIGN) => {
     let height = foreign("sk_image_get_height", t @-> returning(int));
   };
 
+  module TextBlob = {
+    type t = ptr(structure(SkiaTypes.TextBlob.t));
+    let t = ptr(SkiaTypes.TextBlob.t);
+
+    let delete = foreign("sk_textblob_unref", t @-> returning(void));
+    let getUniqueID =
+      foreign("sk_textblob_get_unique_id", t @-> returning(uint32_t));
+    let getBounds =
+      foreign("sk_textblob_get_bounds", t @-> Rect.t @-> returning(void));
+    let getIntercepts =
+      foreign(
+        "sk_textblob_get_intercepts",
+        t @-> ptr(float) @-> ptr(float) @-> Paint.t @-> returning(int),
+      );
+
+    module RunBuffer = {
+      type t = ptr(structure(SkiaTypes.TextBlob.RunBuffer.t));
+      let t = ptr(SkiaTypes.TextBlob.RunBuffer.t);
+      let make = () => allocate_n(SkiaTypes.TextBlob.RunBuffer.t, ~count=1);
+      let getGlyphs = buffer =>
+        getf(!@buffer, SkiaTypes.TextBlob.RunBuffer.glyphs);
+      let getPos = buffer => getf(!@buffer, SkiaTypes.TextBlob.RunBuffer.pos);
+      let getUtf8text = buffer =>
+        getf(!@buffer, SkiaTypes.TextBlob.RunBuffer.pos);
+      let getClusters = buffer =>
+        getf(!@buffer, SkiaTypes.TextBlob.RunBuffer.clusters);
+    };
+    module Builder = {
+      type t = ptr(structure(SkiaTypes.TextBlob.Builder.t));
+      let t = ptr(SkiaTypes.TextBlob.Builder.t);
+
+      let make = foreign("sk_textblob_builder_new", void @-> returning(t));
+      let delete =
+        foreign("sk_textblob_builder_delete", t @-> returning(void));
+      let build =
+        foreign(
+          "sk_textblob_builder_make",
+          t @-> returning(ptr_opt(SkiaTypes.TextBlob.t)),
+        );
+      let allocRun =
+        foreign(
+          "sk_textblob_builder_alloc_run",
+          t
+          @-> Font.t
+          @-> int
+          @-> float
+          @-> float
+          @-> ptr_opt(SkiaTypes.Rect.t)
+          @-> RunBuffer.t
+          @-> returning(void),
+        );
+      let allocRunPos =
+        foreign(
+          "sk_textblob_builder_alloc_run_pos",
+          t
+          @-> Font.t
+          @-> int
+          @-> ptr_opt(SkiaTypes.Rect.t)
+          @-> RunBuffer.t
+          @-> returning(void),
+        );
+      let allocRunRsxform =
+        foreign(
+          "sk_textblob_builder_alloc_run_rsxform",
+          t @-> Font.t @-> int @-> RunBuffer.t @-> returning(void),
+        );
+    };
+  };
+
   type pixelGeometry = SkiaTypes.pixelGeometry;
   let pixelGeometry = SkiaTypes.pixelGeometry;
 
@@ -1085,6 +1157,12 @@ module M = (F: FOREIGN) => {
         @-> Font.t
         @-> Paint.t
         @-> returning(void),
+      );
+
+    let drawTextBlob =
+      foreign(
+        "sk_canvas_draw_text_blob",
+        t @-> TextBlob.t @-> float @-> float @-> Paint.t @-> returning(void),
       );
 
     let drawImage =

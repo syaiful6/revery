@@ -365,6 +365,13 @@ module FontManager = {
     Gc.finalise(SkiaWrapped.FontManager.delete, mgr);
     mgr;
   };
+
+  let refDefault = () => {
+    let mgr = SkiaWrapped.FontManager.refDefault();
+    Gc.finalise(SkiaWrapped.FontManager.delete, mgr);
+    mgr;
+  };
+
   let matchFamilyStyle = (mgr, family, style) => {
     let typeface =
       SkiaWrapped.FontManager.matchFamilyStyle(mgr, family, style);
@@ -754,6 +761,153 @@ module Image = {
   let height = SkiaWrapped.Image.height;
 };
 
+module TextBlob = {
+  type t = SkiaWrapped.TextBlob.t;
+};
+
+module TextBlobBuillder = {
+  type t = SkiaWrapped.TextBlob.Builder.t;
+
+  let make = () => {
+    let builder = SkiaWrapped.TextBlob.Builder.make();
+    Gc.finalise(SkiaWrapped.TextBlob.Builder.delete, builder);
+    builder;
+  };
+
+  let withBuilder = fn => {
+    let builder = SkiaWrapped.TextBlob.Builder.make();
+
+    Fun.protect(
+      ~finally=() => SkiaWrapped.TextBlob.Builder.delete(builder),
+      () => fn(builder),
+    );
+  };
+
+  let build = builder => {
+    switch (SkiaWrapped.TextBlob.Builder.build(builder)) {
+    | Some(textblob) =>
+      Gc.finalise(SkiaWrapped.TextBlob.delete, textblob);
+      Some(textblob);
+    | None => None
+    };
+  };
+
+  type shape = {
+    glyphId: int,
+    cluster: int,
+    xAdvance: float,
+    yAdvance: float,
+    xOffset: float,
+    yOffset: float,
+    unitsPerEm: float,
+  };
+
+  let allocRun =
+      (
+        ~font: Font.t,
+        ~glyphs: list(int),
+        ~bounds: option(Rect.t)=?,
+        ~x=0.0,
+        ~y=0.0,
+        builder,
+      ) => {
+    open Ctypes;
+    let count = List.length(glyphs);
+    let runBuffer = SkiaWrapped.TextBlob.RunBuffer.make(); // allocate runBuffer
+    SkiaWrapped.TextBlob.Builder.allocRun(
+      builder,
+      font,
+      count,
+      x,
+      y,
+      bounds,
+      runBuffer,
+    );
+
+    // no blits function in Ctypes, so let's just set  glypsh and pos directly here?
+    let glyphsPTr =
+      CArray.from_ptr(
+        coerce(
+          ptr(void),
+          ptr(uint16_t),
+          SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer),
+        ),
+        count,
+      );
+
+    List.iteri(
+      (i, glyph) => {
+        CArray.set(glyphsPTr, i, Unsigned.UInt16.of_int(glyph))
+      },
+      glyphs,
+    );
+  };
+
+  let allocRunPos =
+      (
+        ~font: Font.t,
+        ~fontSize: float,
+        ~shapes: list(shape),
+        ~bounds: option(Rect.t)=?,
+        ~baselineY=0.0,
+        builder,
+      ) => {
+    open Ctypes;
+    let count = List.length(shapes);
+    let runBuffer = SkiaWrapped.TextBlob.RunBuffer.make(); // allocate runBuffer
+    SkiaWrapped.TextBlob.Builder.allocRunPos(
+      builder,
+      font,
+      count,
+      bounds,
+      runBuffer,
+    );
+
+    // no blits function in Ctypes, so let's just set  glypsh and pos directly here?
+    let glyphsPTr =
+      CArray.from_ptr(
+        coerce(
+          ptr(void),
+          ptr(uint16_t),
+          SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer),
+        ),
+        count,
+      );
+
+    let posCArray =
+      CArray.from_ptr(
+        coerce(
+          ptr(void),
+          ptr(float),
+          SkiaWrapped.TextBlob.RunBuffer.getPos(runBuffer),
+        ),
+        List.length(shapes) * 2,
+      );
+
+    let currentXPos = ref(0.0);
+
+    List.iteri(
+      (i, shape) => {
+        CArray.set(glyphsPTr, i, Unsigned.UInt16.of_int(shape.glyphId));
+
+        let scaleFactor = fontSize /. shape.unitsPerEm;
+        let scaledXOffset = shape.xOffset *. scaleFactor;
+        let scaledYOffset = shape.yOffset *. scaleFactor;
+        let scalledXAdvance = shape.xAdvance *. scaleFactor;
+
+        let glyphOriginX = currentXPos^ +. scaledXOffset;
+        let glyphOriginY = baselineY +. scaledYOffset;
+
+        CArray.set(posCArray, i * 2, glyphOriginX);
+        CArray.set(posCArray, i * 2 + 1, glyphOriginY);
+
+        currentXPos := currentXPos^ +. scalledXAdvance;
+      },
+      shapes,
+    );
+  };
+};
+
 type pixelGeometry = SkiaWrapped.pixelGeometry;
 
 module Gr = {
@@ -824,6 +978,8 @@ module Canvas = {
   };
   let drawText = (canvas, text, x, y, font, paint) =>
     drawSimpleText(canvas, text, x, y, font, paint, ());
+
+  let drawTextBlob = SkiaWrapped.Canvas.drawTextBlob;
 
   let drawImage = SkiaWrapped.Canvas.drawImage;
   let drawImageRect = SkiaWrapped.Canvas.drawImageRect;

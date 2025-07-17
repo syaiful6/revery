@@ -81,6 +81,7 @@ module FontManager: {
   type t;
 
   let makeDefault: unit => t;
+  let refDefault: unit => t;
   let matchFamilyStyle: (t, string, FontStyle.t) => option(Typeface.t);
   let matchFamilyStyleCharacter:
     (t, string, FontStyle.t, list(string), Uchar.t) => option(Typeface.t);
@@ -446,6 +447,47 @@ module Image: {
   let height: t => int;
 };
 
+module TextBlob: {
+  type t;
+};
+
+module TextBlobBuillder: {
+  type t;
+
+  let make: unit => t;
+  let withBuilder: (t => 'a) => 'a;
+  let build: t => option(TextBlob.t);
+  type shape = {
+    glyphId: int,
+    cluster: int,
+    xAdvance: float,
+    yAdvance: float,
+    xOffset: float,
+    yOffset: float,
+    unitsPerEm: float,
+  };
+  let allocRun:
+    (
+      ~font: Font.t,
+      ~glyphs: list(int),
+      ~bounds: Rect.t=?,
+      ~x: float=?,
+      ~y: float=?,
+      t
+    ) =>
+    unit;
+  let allocRunPos:
+    (
+      ~font: Font.t,
+      ~fontSize: float,
+      ~shapes: list(shape),
+      ~bounds: Rect.t=?,
+      ~baselineY: float=?,
+      t
+    ) =>
+    unit;
+};
+
 type pixelGeometry = SkiaWrapped.pixelGeometry;
 
 module Gr: {
@@ -510,7 +552,7 @@ module Canvas: {
   let drawImage: (t, Image.t, float, float, option(Paint.t)) => unit;
   let drawImageRect:
     (t, Image.t, option(Rect.t), Rect.t, option(Paint.t)) => unit;
-
+  let drawTextBlob: (t, TextBlob.t, float, float, Paint.t) => unit;
   let concat: (t, Matrix.t) => unit;
   let setMatrix: (t, Matrix.t) => unit;
   let translate: (t, float, float) => unit;

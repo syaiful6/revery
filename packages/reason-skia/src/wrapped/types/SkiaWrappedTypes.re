@@ -528,6 +528,18 @@ module M = (T: TYPE) => {
     let t: typ(structure(t)) = structure("sk_textblob_t");
     let t = typedef(t, "sk_textblob_t");
 
+    module RunBuffer = {
+      type t;
+      let t: typ(structure(t)) =
+        structure("sk_textblob_builder_runbuffer_t");
+      let t = typedef(t, "sk_textblob_builder_runbuffer_t");
+      let glyphs = field(t, "glyphs", ptr(void));
+      let pos = field(t, "pos", ptr(void));
+      let utf8text = field(t, "utf8text", ptr(void));
+      let clusters = field(t, "clusters", ptr(void));
+      let () = seal(t);
+    };
+
     module Builder = {
       type t;
       let t: typ(structure(t)) = structure("sk_textblob_builder_t");

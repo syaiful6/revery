@@ -9,15 +9,12 @@ module StringFeaturesHashable = {
   let hash = Hashtbl.hash;
 };
 
-module SkiaTypefaceHashable = {
-  type t = option(Skia.Typeface.t);
-  let equal =
-    Option.equal((tf1, tf2) =>
-      Skia.Typeface.getUniqueID(tf1) == Skia.Typeface.getUniqueID(tf2)
-    );
-  let hash = maybeTypeface =>
-    switch (maybeTypeface) {
-    | Some(tf) => Skia.Typeface.getUniqueID(tf) |> Int32.to_int
+module SkiaTypefaceIDHashable = {
+  type t = option(int32);
+  let equal = Option.equal(Int32.equal);
+  let hash = maybeTypefaceID =>
+    switch (maybeTypefaceID) {
+    | Some(id) => Int32.to_int(id)
     | None => 0
     };
 };
@@ -51,7 +48,7 @@ module MetricsWeighted = {
 module ShapeResultWeighted = {
   type t = ShapeResult.t;
 
-  let weight = ShapeResult.size;
+  let weight = _ => 1;
 };
 
 module FallbackWeighted = {
@@ -59,8 +56,8 @@ module FallbackWeighted = {
   let weight = _ => 1;
 };
 
-module SkiaTypefaceWeighted = {
-  type t = option(Skia.Typeface.t);
+module FontIdWeighted = {
+  type t = option(int32);
   let weight = _ => 1;
 };
 
@@ -68,32 +65,47 @@ module MetricsCache = Lru.M.Make(FloatHashable, MetricsWeighted);
 module ShapeResultCache =
   Lru.M.Make(StringFeaturesHashable, ShapeResultWeighted);
 module FallbackCache = Lru.M.Make(StringFeaturesHashable, FallbackWeighted);
-module FallbackCharacterCache =
-  Lru.M.Make(UcharHashable, SkiaTypefaceWeighted);
+module FallbackCharacterCache = Lru.M.Make(UcharHashable, FontIdWeighted);
 
-type t = {
-  hbFace: Harfbuzz.hb_face,
-  skiaFace: Skia.Typeface.t,
+type cacheItem = {
   metricsCache: MetricsCache.t,
   shapeCache: ShapeResultCache.t,
-  fallbackCache: FallbackCache.t,
   fallbackCharacterCache: FallbackCharacterCache.t,
 };
 
+type t = {
+  skiaFace: Skia.Typeface.t,
+  metricsCache: MetricsCache.t,
+  shapeCache: ShapeResultCache.t,
+  fallbackCharacterCache: FallbackCharacterCache.t,
+};
+
+let ofCacheItem = (item: cacheItem, typeface: Skia.Typeface.t) => {
+  skiaFace: typeface,
+  metricsCache: item.metricsCache,
+  shapeCache: item.shapeCache,
+  fallbackCharacterCache: item.fallbackCharacterCache,
+};
+
 module FontWeight = {
-  type font = t;
+  type font = cacheItem;
   type t = result(font, string);
   let weight = _ => 1;
 };
 
-module FontCache = Lru.M.Make(SkiaTypefaceHashable, FontWeight);
+module FontCache = Lru.M.Make(SkiaTypefaceIDHashable, FontWeight);
+module HarfbuzzMap = Ephemeron.K1.Make(Int32);
 
 module Internal = {
-  let cache = FontCache.create(64);
+  let cache = FontCache.create(8);
+  let harfbuzzCache = HarfbuzzMap.create(32);
 };
 
 module Constants = {
   let unresolvedGlyphID = 0;
+  let defaultUnresolvedAdvance = 0.0;
+  let defaultUnresolvedOffset = 0.0;
+  let defaultUnresolvedUnitsPerEm = 1.0;
 };
 
 let skiaFaceToHarfbuzzFace = skiaFace => {
@@ -101,11 +113,7 @@ let skiaFaceToHarfbuzzFace = skiaFace => {
   | Some(asset) =>
     let bytes =
       Fun.protect(
-        ~finally=
-          () => {
-            Log.debugf(m => m("destroying typeface stream asset"));
-            Skia.StreamAsset.delete(asset);
-          },
+        ~finally=() => {Skia.StreamAsset.delete(asset)},
         () => {
           let stream = Skia.StreamAsset.toStream(asset);
           let length = Skia.Stream.getLength(stream);
@@ -120,48 +128,46 @@ let skiaFaceToHarfbuzzFace = skiaFace => {
 
 let load: option(Skia.Typeface.t) => result(t, string) =
   (skiaTypeface: option(Skia.Typeface.t)) => {
-    switch (FontCache.find(skiaTypeface, Internal.cache)) {
+    let typefaceID = Option.map(Skia.Typeface.getUniqueID, skiaTypeface);
+    switch (FontCache.find(typefaceID, Internal.cache)) {
     | Some(v) =>
-      FontCache.promote(skiaTypeface, Internal.cache);
-      v;
+      FontCache.promote(typefaceID, Internal.cache);
+      v
+      |> Result.map(cacheItem =>
+           ofCacheItem(cacheItem, Option.get(skiaTypeface))
+         );
     | None =>
-      let harfbuzzFace = skiaTypeface |> Option.map(skiaFaceToHarfbuzzFace);
-      let metricsCache = MetricsCache.create(64);
-      let shapeCache = ShapeResultCache.create(128 * 1024);
-      let fallbackCache = FallbackCache.create(128 * 1024);
-      let fallbackCharacterCache = FallbackCharacterCache.create(128 * 1024);
+      let metricsCache = MetricsCache.create(8);
+      let shapeCache = ShapeResultCache.create(256);
+      let fallbackCharacterCache = FallbackCharacterCache.create(256);
 
       let ret =
-        switch (skiaTypeface, harfbuzzFace) {
-        | (Some(skiaFace), Some(Ok(hbFace))) =>
+        switch (skiaTypeface) {
+        | Some(skiaFace) =>
           Event.dispatch(onFontLoaded, ());
           Log.infof(m =>
             m("Loaded: %s", Skia.Typeface.getFamilyName(skiaFace))
           );
           Ok({
-            hbFace,
-            skiaFace,
             metricsCache,
             shapeCache,
-            fallbackCache,
             fallbackCharacterCache,
           });
-        | (_, Some(Error(msg))) =>
-          Log.warn("Error loading typeface: " ++ msg);
-          Error("Error loading typeface: " ++ msg);
-        | (None, _) =>
+        | None =>
           Log.warn("Error loading typeface (skia)");
           Error("Error loading typeface.");
-        | (_, None) =>
-          Log.warn("Error loading typeface (harfbuzz)");
-          Error("Error loading typeface");
         };
 
-      FontCache.add(skiaTypeface, ret, Internal.cache);
+      FontCache.add(typefaceID, ret, Internal.cache);
       FontCache.trim(Internal.cache);
-      ret;
+      ret
+      |> Result.map(cacheItem =>
+           ofCacheItem(cacheItem, Option.get(skiaTypeface))
+         );
     };
   };
+
+let getSkiaTypeface: t => Skia.Typeface.t = ({skiaFace, _}) => skiaFace;
 
 let getMetrics: (t, float) => FontMetrics.t =
   ({skiaFace, metricsCache, _}, size) => {
@@ -184,8 +190,6 @@ let getMetrics: (t, float) => FontMetrics.t =
     };
   };
 
-let getSkiaTypeface: t => Skia.Typeface.t = font => font.skiaFace;
-
 /* [Fallback.strategy] encapsulates the logic for discovering a font, based on a character [Uchar.t] */
 module Fallback = {
   type strategy = Uchar.t => option(Skia.Typeface.t);
@@ -195,20 +199,35 @@ module Fallback = {
   let constant = (typeface, _uchar) => Some(typeface);
 
   let skia = ({skiaFace, fallbackCharacterCache, _}: t, uchar) => {
+    let familyName = skiaFace |> Skia.Typeface.getFamilyName;
+    let fontStyle = skiaFace |> Skia.Typeface.getFontStyle;
+
     switch (FallbackCharacterCache.find(uchar, fallbackCharacterCache)) {
-    | Some(maybeTypeface) =>
+    | Some(maybeFontId) =>
       FallbackCharacterCache.promote(uchar, fallbackCharacterCache);
-      maybeTypeface;
+      // Re-query font manager to get the actual typeface
+      // Since we cached the ID, we know this character is supported
+      switch (maybeFontId) {
+      | Some(_fontId) =>
+        Skia.FontManager.matchFamilyStyleCharacter(
+          FontManager.instance,
+          familyName,
+          fontStyle,
+          [Environment.userLocale],
+          uchar,
+        )
+      | None => None
+      };
     | None =>
-      let familyName = skiaFace |> Skia.Typeface.getFamilyName;
       let maybeTypeface =
         Skia.FontManager.matchFamilyStyleCharacter(
           FontManager.instance,
           familyName,
-          skiaFace |> Skia.Typeface.getFontStyle,
+          fontStyle,
           [Environment.userLocale],
           uchar,
         );
+
       Log.debugf(m =>
         m(
           "Unresolved glyph: character : U+%04X font: %s",
@@ -216,11 +235,10 @@ module Fallback = {
           familyName,
         )
       );
-      FallbackCharacterCache.add(
-        uchar,
-        maybeTypeface,
-        fallbackCharacterCache,
-      );
+
+      // Cache the font ID instead of the typeface
+      let maybeFontId = Option.map(Skia.Typeface.getUniqueID, maybeTypeface);
+      FallbackCharacterCache.add(uchar, maybeFontId, fallbackCharacterCache);
       FallbackCharacterCache.trim(fallbackCharacterCache);
       maybeTypeface;
     };
@@ -285,9 +303,13 @@ let generateShapes:
           resolveHole(
             ~acc=[
               ShapeResult.{
-                hbFace: font.hbFace,
                 skiaFace: font.skiaFace,
                 glyphId: Constants.unresolvedGlyphID,
+                xAdvance: Constants.defaultUnresolvedAdvance,
+                yAdvance: Constants.defaultUnresolvedAdvance,
+                xOffset: Constants.defaultUnresolvedOffset,
+                yOffset: Constants.defaultUnresolvedOffset,
+                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
                 cluster: start,
               },
               ...acc,
@@ -303,9 +325,13 @@ let generateShapes:
           resolveHole(
             ~acc=[
               ShapeResult.{
-                hbFace: font.hbFace,
                 skiaFace: font.skiaFace,
                 glyphId: Constants.unresolvedGlyphID,
+                xAdvance: Constants.defaultUnresolvedAdvance,
+                yAdvance: Constants.defaultUnresolvedAdvance,
+                xOffset: Constants.defaultUnresolvedOffset,
+                yOffset: Constants.defaultUnresolvedOffset,
+                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
                 cluster: start,
               },
               ...acc,
@@ -340,7 +366,7 @@ let generateShapes:
           ~acc,
           ~holeStart=?,
           ~index,
-          {hbFace, skiaFace, _} as font,
+          {skiaFace, _} as font,
           shapes,
         ) => {
       let resolvePossibleHole = (~stop) => {
@@ -353,7 +379,15 @@ let generateShapes:
       if (index == Array.length(shapes)) {
         resolvePossibleHole(~stop=stopCluster);
       } else {
-        let Harfbuzz.{glyphId, cluster} = shapes[index];
+        let Harfbuzz.{
+          glyphId,
+          cluster,
+          xAdvance,
+          yAdvance,
+          xOffset,
+          yOffset,
+          unitsPerEm,
+        } = shapes[index];
 
         // If we have an unknown glyph (part of a hole), extend
         // the current hole to encapsulate it. We cannot resolve unresolved
@@ -376,15 +410,18 @@ let generateShapes:
           let acc = resolvePossibleHole(~stop=cluster);
           let acc = [
             ShapeResult.{
-              hbFace,
               skiaFace,
               glyphId,
+              xAdvance,
+              yAdvance,
+              xOffset,
+              yOffset,
+              unitsPerEm,
               cluster,
             },
             ...acc,
           ];
           loopShapes(
-            // TODO: Bring back fix! Just see if we can repro
             ~attempts,
             ~stopCluster,
             ~acc,
@@ -405,9 +442,13 @@ let generateShapes:
           ~attempts=0,
           ~acc=[
             ShapeResult.{
-              hbFace: font.hbFace,
               skiaFace: font.skiaFace,
               glyphId: Constants.unresolvedGlyphID,
+              xAdvance: Constants.defaultUnresolvedAdvance,
+              yAdvance: Constants.defaultUnresolvedAdvance,
+              xOffset: Constants.defaultUnresolvedOffset,
+              yOffset: Constants.defaultUnresolvedOffset,
+              unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
               cluster: start,
             },
             ...acc,
@@ -417,17 +458,31 @@ let generateShapes:
           font,
         );
       } else {
+        let typefaceId = Skia.Typeface.getUniqueID(font.skiaFace);
+        let hbFace =
+          switch (HarfbuzzMap.find_opt(Internal.harfbuzzCache, typefaceId)) {
+          | Some(hbFace) => hbFace
+          | None =>
+            switch (skiaFaceToHarfbuzzFace(font.skiaFace)) {
+            | Ok(hbFace) =>
+              // Cache the HarfBuzz face for reuse
+              HarfbuzzMap.add(Internal.harfbuzzCache, typefaceId, hbFace);
+              hbFace;
+            | Error(msg) => failwith(msg)
+            }
+          };
         Harfbuzz.hb_shape(
           ~features,
           ~start=`Position(start),
           ~stop=`Position(stop),
-          font.hbFace,
+          hbFace,
           str,
         )
         |> loopShapes(~attempts, ~stopCluster=stop, ~acc, ~index=0, font);
       };
 
-    loop(~attempts=0, ~start=0, ~stop=String.length(str), ~acc=[], font);
+    loop(~attempts=0, ~start=0, ~stop=String.length(str), ~acc=[], font)
+    |> List.rev;
   };
 
 let shape:
@@ -447,8 +502,7 @@ let shape:
       result;
     | None =>
       let result =
-        generateShapes(~fallback=fallbackToUse, ~features, font, str)
-        |> ShapeResult.ofHarfbuzz;
+        generateShapes(~fallback=fallbackToUse, ~features, font, str);
       ShapeResultCache.add((str, features), result, shapeCache);
       ShapeResultCache.trim(shapeCache);
       result;

@@ -75,25 +75,19 @@ module Sample = {
             // Skia.Paint.setAntiAlias(textPaint, true);
             // Skia.Paint.setTextSize(textPaint, 20.);
 
-            let shapedText =
-              "Hello, World"
-              |> FontCache.shape(font)
-              |> ShapeResult.getGlyphStrings;
-
             // Skia.Font.setEncoding(textPaint, GlyphId);
-
-            shapedText
-            |> List.iter(((typeface, string)) => {
-                 Skia.Font.setTypeface(textFont, typeface);
-                 CanvasContext.drawText(
-                   ~paint=textPaint,
-                   ~font=textFont,
-                   ~x=10.0,
-                   ~y=20.0,
-                   ~text=string,
-                   canvasContext,
-                 );
-               });
+            Skia.Font.setTypeface(
+              textFont,
+              Revery_Font.getSkiaTypeface(font),
+            );
+            CanvasContext.drawText(
+              ~paint=textPaint,
+              ~font=textFont,
+              ~x=10.0,
+              ~y=20.0,
+              ~text="Hello world",
+              canvasContext,
+            );
           };
 
           let fill = Skia.Paint.make();
