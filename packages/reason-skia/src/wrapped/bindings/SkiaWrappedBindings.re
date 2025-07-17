@@ -166,6 +166,9 @@ module M = (F: FOREIGN) => {
     let makeDefault =
       foreign("sk_fontmgr_create_default", void @-> returning(t));
 
+    let refDefault =
+      foreign("sk_fontmgr_ref_default", void @-> returning(t));
+
     let matchFamilyStyle =
       foreign(
         "sk_fontmgr_match_family_style",

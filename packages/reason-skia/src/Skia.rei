@@ -81,6 +81,7 @@ module FontManager: {
   type t;
 
   let makeDefault: unit => t;
+  let refDefault: unit => t;
   let matchFamilyStyle: (t, string, FontStyle.t) => option(Typeface.t);
   let matchFamilyStyleCharacter:
     (t, string, FontStyle.t, list(string), Uchar.t) => option(Typeface.t);
