@@ -879,7 +879,7 @@ module TextBlobBuillder = {
         coerce(
           ptr(void),
           ptr(float),
-          SkiaWrapped.TextBlob.RunBuffer.getGlyphs(runBuffer),
+          SkiaWrapped.TextBlob.RunBuffer.getPos(runBuffer),
         ),
         List.length(shapes) * 2,
       );
