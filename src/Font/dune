@@ -6,6 +6,7 @@
  (preprocess
   (pps lwt_ppx))
  (libraries
+  ctypes
   harfbuzz
   lru
   lwt

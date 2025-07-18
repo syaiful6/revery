@@ -18,7 +18,18 @@
 
 extern "C" {
 
-// hb_font_t*
+    // Thread-local buffer for HarfBuzz reuse (using __thread for C++98 compatibility)
+    static __thread hb_buffer_t *reusable_buffer = nullptr;
+
+    // Cleanup function to destroy thread-local buffer
+    static void cleanup_thread_local_buffer() {
+        if (reusable_buffer != nullptr) {
+            hb_buffer_destroy(reusable_buffer);
+            reusable_buffer = nullptr;
+        }
+    }
+
+    // hb_font_t*
 
     CAMLprim value Val_success(value v) {
         CAMLparam1(v);
@@ -133,6 +144,37 @@ extern "C" {
         CAMLreturn(ret);
     }
 
+    // Zero-copy version using memory pointer directly (SkSharper-style)
+    CAMLprim value rehb_face_from_memory_ptr(value vPtr, value vLength, value vtcIndex) {
+        CAMLparam2(vPtr, vLength);
+        CAMLlocal1(ret);
+
+        void *memory_ptr = (void *)Nativeint_val(vPtr);
+        int length = Int_val(vLength);
+        int tcIndex = Int_val(vtcIndex);
+        hb_blob_t *blob = hb_blob_create((const char *)memory_ptr, length,
+                                         HB_MEMORY_MODE_READONLY, nullptr, nullptr);
+        hb_blob_make_immutable(blob);
+        hb_face_t *face = hb_face_create(blob, (unsigned)tcIndex);
+        hb_blob_destroy(blob); // face will keep a reference to blob
+
+        hb_font_t *font = hb_font_create(face);
+        hb_face_destroy(face); // font will keep a reference to face
+
+        hb_ot_font_set_funcs(font);
+
+        if (!font) {
+            ret = Val_error("Unable to load font from memory");
+        } else {
+            CAMLlocal1(custom_font_block);
+            custom_font_block =
+                caml_alloc_custom(&hb_font_custom_ops, sizeof(hb_font_t *), 0, 1);
+            *((hb_font_t **)Data_custom_val(custom_font_block)) = font;
+            ret = Val_success(custom_font_block);
+        }
+        CAMLreturn(ret);
+    }
+
     static value create_hb_shaped_glyph_record(
         unsigned int glyphId,
         unsigned int cluster,
@@ -186,8 +228,16 @@ extern "C" {
         hb_face_t *hb_face = hb_font_get_face(hb_font);
         double units_per_em = (double)hb_face_get_upem(hb_face);
 
+        // Reuse thread-local buffer for better memory efficiency
         hb_buffer_t *hb_buffer;
-        hb_buffer = hb_buffer_create();
+        if (reusable_buffer == nullptr) {
+            reusable_buffer = hb_buffer_create();
+            hb_buffer = reusable_buffer;
+        } else {
+            hb_buffer = reusable_buffer;
+            hb_buffer_clear_contents(hb_buffer);
+        }
+
         hb_buffer_add_utf8(hb_buffer, String_val(vString), -1, start, len);
         hb_buffer_guess_segment_properties(hb_buffer);
 
@@ -212,7 +262,7 @@ extern "C" {
             Store_field(ret, i, shapedGlyphRecord);
         }
         free(features);
-        hb_buffer_destroy(hb_buffer);
+        // Don't destroy the buffer - reuse it for next call
         CAMLreturn(ret);
     }
 
@@ -230,6 +280,95 @@ extern "C" {
         CAMLlocal1(ret);
 
         ret = caml_copy_string(hb_version_string());
+
+        CAMLreturn(ret);
+    }
+
+    // Cleanup function to free thread-local buffer
+    CAMLprim value rehb_cleanup_buffers() {
+        CAMLparam0();
+        cleanup_thread_local_buffer();
+        CAMLreturn(Val_unit);
+    }
+
+    // Table-based font creation for efficient emoji font handling
+    struct table_callback_data {
+        value ocaml_callback;  // OCaml function to call for table data
+        value user_data;       // User data passed to callback
+    };
+
+    // HarfBuzz table callback - called when HarfBuzz needs a font table
+    static hb_blob_t* get_table_callback(hb_face_t* face, hb_tag_t tag, void* user_data) {
+        struct table_callback_data* data = (struct table_callback_data*)user_data;
+
+        // Convert tag to OCaml value (uint32_t -> int32)
+        CAMLparam0();
+        CAMLlocal2(tag_val, result);
+
+        tag_val = caml_copy_int32(tag);
+
+        // Call OCaml callback: callback(tag, user_data) -> option(string)
+        result = caml_callback2(data->ocaml_callback, tag_val, data->user_data);
+
+        // Check if result is Some(data) or None
+        if (Is_block(result) && Tag_val(result) == 0) {
+            // Some(data) - extract the string
+            value data_val = Field(result, 0);
+            const char* table_data = String_val(data_val);
+            size_t table_size = caml_string_length(data_val);
+
+            // Create HarfBuzz blob with copy mode for safety
+            hb_blob_t* blob = hb_blob_create(table_data, table_size,
+                                             HB_MEMORY_MODE_DUPLICATE, nullptr, nullptr);
+            CAMLreturnT(hb_blob_t*, blob);
+        } else {
+            // None - table not found
+            CAMLreturnT(hb_blob_t*, nullptr);
+        }
+    }
+
+    // Cleanup callback for table data
+    static void cleanup_table_callback_data(void* user_data) {
+        struct table_callback_data* data = (struct table_callback_data*)user_data;
+        caml_remove_global_root(&data->ocaml_callback);
+        caml_remove_global_root(&data->user_data);
+        free(data);
+    }
+
+    // Create HarfBuzz face using table callback approach
+    CAMLprim value rehb_face_create_for_tables(value vCallback, value vUserData) {
+        CAMLparam2(vCallback, vUserData);
+        CAMLlocal1(ret);
+
+        // Allocate callback data structure
+        struct table_callback_data* callback_data =
+            (struct table_callback_data*)malloc(sizeof(struct table_callback_data));
+
+        // Store OCaml callback and user data as global roots
+        callback_data->ocaml_callback = vCallback;
+        callback_data->user_data = vUserData;
+        caml_register_global_root(&callback_data->ocaml_callback);
+        caml_register_global_root(&callback_data->user_data);
+
+        // Create HarfBuzz face with table callback
+        hb_face_t* face = hb_face_create_for_tables(get_table_callback, callback_data,
+                          cleanup_table_callback_data);
+
+        // Create HarfBuzz font from face
+        hb_font_t* font = hb_font_create(face);
+        hb_face_destroy(face); // font keeps reference
+
+        hb_ot_font_set_funcs(font);
+
+        if (!font) {
+            ret = Val_error("Unable to create font from tables");
+        } else {
+            CAMLlocal1(custom_font_block);
+            custom_font_block =
+                caml_alloc_custom(&hb_font_custom_ops, sizeof(hb_font_t *), 0, 1);
+            *((hb_font_t **)Data_custom_val(custom_font_block)) = font;
+            ret = Val_success(custom_font_block);
+        }
 
         CAMLreturn(ret);
     }

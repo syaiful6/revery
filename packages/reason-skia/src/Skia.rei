@@ -46,6 +46,7 @@ module Stream: {
   let makeFileStream: string => option(t);
   let makeMemoryStreamFromString: (string, int) => t;
   let makeMemoryStreamFromData: data => t;
+  let getMemoryBase: t => Ctypes.ptr(unit);
 };
 
 module StreamAsset: {
@@ -73,7 +74,10 @@ module Typeface: {
   let makeFromName: (string, FontStyle.t) => option(t);
   let makeFromFile: (string, int) => option(t);
   let toStream: t => option(StreamAsset.t);
+  let toStreamIndex: t => (option(StreamAsset.t), int);
   let getFontStyle: t => FontStyle.t;
+  let copyTableData: (t, Unsigned.uint32) => option(string);
+  let copyTableDataInt32: (t, int32) => option(string);
   let getUniqueID: t => int32;
   let equal: (t, t) => bool;
 };
@@ -483,6 +487,7 @@ module TextBlobBuillder: {
       ~fontSize: float,
       ~shapes: list(shape),
       ~bounds: Rect.t=?,
+      ~baselineX: float=?,
       ~baselineY: float=?,
       t
     ) =>

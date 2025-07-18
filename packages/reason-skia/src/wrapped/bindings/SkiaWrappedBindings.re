@@ -49,6 +49,9 @@ module M = (F: FOREIGN) => {
     let deleteFileStream =
       foreign("sk_filestream_destroy", t @-> returning(void));
 
+    let getMemoryBase =
+      foreign("sk_stream_get_memory_base", t @-> returning(ptr(void)));
+
     let makeMemoryStreamFromString =
       foreign(
         "sk_memorystream_new_with_data",
@@ -131,6 +134,9 @@ module M = (F: FOREIGN) => {
     type t = ptr(structure(SkiaTypes.Typeface.t));
     let t = ptr(SkiaTypes.Typeface.t);
 
+    type font_table_tag = SkiaTypes.Typeface.font_table_tag;
+    let font_table_tag = SkiaTypes.Typeface.font_table_tag;
+
     let getFamilyName =
       foreign("sk_typeface_get_family_name", t @-> returning(String.t));
 
@@ -155,6 +161,11 @@ module M = (F: FOREIGN) => {
       foreign(
         "sk_typeface_open_stream",
         t @-> ptr_opt(int) @-> returning(StreamAsset.maybeT),
+      );
+    let copyTableData =
+      foreign(
+        "sk_typeface_copy_table_data",
+        t @-> font_table_tag @-> returning(ptr_opt(SkiaTypes.Data.t)),
       );
     let delete = foreign("sk_typeface_unref", t @-> returning(void));
   };

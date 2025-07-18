@@ -23,6 +23,9 @@ let getMetrics: (t, float) => FontMetrics.t;
 
 let getSkiaTypeface: t => Skia.Typeface.t;
 
+let createTextRun:
+  (~text: string, ~font: t, ~features: list(Feature.t)) => ShapeResult.textRun;
+
 let shape:
   (~fallback: Fallback.strategy=?, ~features: list(Feature.t)=?, t, string) =>
   ShapeResult.t;

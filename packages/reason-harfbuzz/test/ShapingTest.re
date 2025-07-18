@@ -7,14 +7,29 @@ describe("Shaping", ({test, _}) => {
       {
         glyphId: 69,
         cluster: 0,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
       {
         glyphId: 70,
         cluster: 1,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
       {
         glyphId: 71,
         cluster: 2,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
 
@@ -28,6 +43,11 @@ describe("Shaping", ({test, _}) => {
       {
         glyphId: 70,
         cluster: 1,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
     let shapes =
@@ -41,6 +61,11 @@ describe("Shaping", ({test, _}) => {
       {
         glyphId: 1007,
         cluster: 1,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
     let shapes =

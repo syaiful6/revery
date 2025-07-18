@@ -2,11 +2,18 @@ open Revery_Core;
 
 module Log = (val Revery_Core.Log.withNamespace("Revery.FontCache"));
 
-module StringFeaturesHashable = {
-  type t = (string, list(Feature.t));
-  let equal = ((str1, features1), (str2, features2)) =>
-    String.equal(str1, str2) && features1 == features2;
-  let hash = Hashtbl.hash;
+module TextRunHashable = {
+  type t = ShapeResult.textRun;
+  let equal = (run1: t, run2: t) =>
+    String.equal(run1.text, run2.text)
+    && Skia.Typeface.equal(run1.face, run2.face)
+    && List.length(run1.features) == List.length(run2.features);
+  let hash = (run: t) =>
+    Hashtbl.hash((
+      run.text,
+      Skia.Typeface.getUniqueID(run.face),
+      List.length(run.features),
+    ));
 };
 
 module SkiaTypefaceIDHashable = {
@@ -57,14 +64,17 @@ module FallbackWeighted = {
 };
 
 module FontIdWeighted = {
-  type t = option(int32);
+  type item = {
+    familyName: string,
+    style: Skia.FontStyle.t,
+  };
+  type t = option(item);
   let weight = _ => 1;
 };
 
 module MetricsCache = Lru.M.Make(FloatHashable, MetricsWeighted);
-module ShapeResultCache =
-  Lru.M.Make(StringFeaturesHashable, ShapeResultWeighted);
-module FallbackCache = Lru.M.Make(StringFeaturesHashable, FallbackWeighted);
+module ShapeResultCache = Lru.M.Make(TextRunHashable, ShapeResultWeighted);
+module FallbackCache = Lru.M.Make(TextRunHashable, FallbackWeighted);
 module FallbackCharacterCache = Lru.M.Make(UcharHashable, FontIdWeighted);
 
 type cacheItem = {
@@ -95,7 +105,6 @@ module FontWeight = {
 
 module FontCache = Lru.M.Make(SkiaTypefaceIDHashable, FontWeight);
 module HarfbuzzMap = Ephemeron.K1.Make(Int32);
-
 module Internal = {
   let cache = FontCache.create(8);
   let harfbuzzCache = HarfbuzzMap.create(32);
@@ -108,21 +117,39 @@ module Constants = {
   let defaultUnresolvedUnitsPerEm = 1.0;
 };
 
-let skiaFaceToHarfbuzzFace = skiaFace => {
-  switch (Skia.Typeface.toStream(skiaFace)) {
-  | Some(asset) =>
-    let bytes =
-      Fun.protect(
-        ~finally=() => {Skia.StreamAsset.delete(asset)},
-        () => {
-          let stream = Skia.StreamAsset.toStream(asset);
-          let length = Skia.Stream.getLength(stream);
-          Skia.Data.makeStringFromStream(stream, length);
-        },
-      );
+let tableCallback = (tag, typeface) => {
+  Skia.Typeface.copyTableDataInt32(typeface, tag);
+};
 
-    Harfbuzz.hb_face_from_data(bytes);
-  | None => Result.Error("failed to convert skia typeface to stream")
+let skiaFaceToHarfbuzzFace = skiaFace => {
+  let familyName = Skia.Typeface.getFamilyName(skiaFace);
+  if (familyName == "Apple Color Emoji") {
+    Harfbuzz.hb_face_create_for_tables(tableCallback, skiaFace);
+  } else {
+    switch (Skia.Typeface.toStreamIndex(skiaFace)) {
+    | (Some(asset), idx) =>
+      let stream = Skia.StreamAsset.toStream(asset);
+      print_endline(Format.sprintf("get tcIndex: %d", idx));
+      let length = Skia.Stream.getLength(stream);
+      // Try zero-copy approach first using getMemoryBase
+      let memoryBase = Skia.Stream.getMemoryBase(stream);
+      let face =
+        if (Ctypes.is_null(memoryBase)) {
+          // Fallback to copying approach if memory base is not available
+          let bytes = Skia.Data.makeStringFromStream(stream, length);
+          Harfbuzz.hb_face_from_data(bytes);
+        } else {
+          // Zero-copy approach: use memory base directly
+          let memoryPtr = Ctypes.raw_address_of_ptr(memoryBase);
+          Harfbuzz.hb_face_from_memory_ptr(memoryPtr, length, idx);
+        };
+      let destroyAsset = _face => {
+        Skia.StreamAsset.delete(asset);
+      };
+      Gc.finalise(destroyAsset, face);
+      face;
+    | (None, _) => Result.Error("failed to convert skia typeface to stream")
+    };
   };
 };
 
@@ -169,6 +196,15 @@ let load: option(Skia.Typeface.t) => result(t, string) =
 
 let getSkiaTypeface: t => Skia.Typeface.t = ({skiaFace, _}) => skiaFace;
 
+let createTextRun = (~text, ~font: t, ~features) => {
+  let face = getSkiaTypeface(font);
+  ShapeResult.{
+    text,
+    face,
+    features,
+  };
+};
+
 let getMetrics: (t, float) => FontMetrics.t =
   ({skiaFace, metricsCache, _}, size) => {
     switch (MetricsCache.find(size, metricsCache)) {
@@ -203,18 +239,14 @@ module Fallback = {
     let fontStyle = skiaFace |> Skia.Typeface.getFontStyle;
 
     switch (FallbackCharacterCache.find(uchar, fallbackCharacterCache)) {
-    | Some(maybeFontId) =>
+    | Some(maybeItem) =>
       FallbackCharacterCache.promote(uchar, fallbackCharacterCache);
-      // Re-query font manager to get the actual typeface
-      // Since we cached the ID, we know this character is supported
-      switch (maybeFontId) {
-      | Some(_fontId) =>
-        Skia.FontManager.matchFamilyStyleCharacter(
+      switch (maybeItem) {
+      | Some(item) =>
+        Skia.FontManager.matchFamilyStyle(
           FontManager.instance,
-          familyName,
-          fontStyle,
-          [Environment.userLocale],
-          uchar,
+          item.familyName,
+          item.style,
         )
       | None => None
       };
@@ -237,8 +269,16 @@ module Fallback = {
       );
 
       // Cache the font ID instead of the typeface
-      let maybeFontId = Option.map(Skia.Typeface.getUniqueID, maybeTypeface);
-      FallbackCharacterCache.add(uchar, maybeFontId, fallbackCharacterCache);
+      let item =
+        maybeTypeface
+        |> Option.map(typeface =>
+             {
+               FontIdWeighted.familyName:
+                 Skia.Typeface.getFamilyName(typeface),
+               style: Skia.Typeface.getFontStyle(typeface),
+             }
+           );
+      FallbackCharacterCache.add(uchar, item, fallbackCharacterCache);
       FallbackCharacterCache.trim(fallbackCharacterCache);
       maybeTypeface;
     };
@@ -247,9 +287,9 @@ module Fallback = {
   let custom = (f: strategy) => f;
 };
 
-let generateShapes:
+let generateShapedNodes:
   (~fallback: Fallback.strategy, ~features: list(Feature.t), t, string) =>
-  list(ShapeResult.shapeNode) =
+  list((Skia.Typeface.t, ShapeResult.shapeNode)) =
   (~fallback, ~features, font, str) => {
     let fallbackFor = (~byteOffset, str) => {
       Log.debugf(m =>
@@ -302,16 +342,18 @@ let generateShapes:
             when Skia.Typeface.equal(fallbackFont.skiaFace, font.skiaFace) =>
           resolveHole(
             ~acc=[
-              ShapeResult.{
-                skiaFace: font.skiaFace,
-                glyphId: Constants.unresolvedGlyphID,
-                xAdvance: Constants.defaultUnresolvedAdvance,
-                yAdvance: Constants.defaultUnresolvedAdvance,
-                xOffset: Constants.defaultUnresolvedOffset,
-                yOffset: Constants.defaultUnresolvedOffset,
-                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
-                cluster: start,
-              },
+              (
+                font.skiaFace,
+                ShapeResult.{
+                  glyphId: Constants.unresolvedGlyphID,
+                  xAdvance: Constants.defaultUnresolvedAdvance,
+                  yAdvance: Constants.defaultUnresolvedAdvance,
+                  xOffset: Constants.defaultUnresolvedOffset,
+                  yOffset: Constants.defaultUnresolvedOffset,
+                  unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
+                  cluster: start,
+                },
+              ),
               ...acc,
             ],
             ~start=start + 1,
@@ -324,16 +366,18 @@ let generateShapes:
           // glyph and try to resolve the rest of the string.
           resolveHole(
             ~acc=[
-              ShapeResult.{
-                skiaFace: font.skiaFace,
-                glyphId: Constants.unresolvedGlyphID,
-                xAdvance: Constants.defaultUnresolvedAdvance,
-                yAdvance: Constants.defaultUnresolvedAdvance,
-                xOffset: Constants.defaultUnresolvedOffset,
-                yOffset: Constants.defaultUnresolvedOffset,
-                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
-                cluster: start,
-              },
+              (
+                font.skiaFace,
+                ShapeResult.{
+                  glyphId: Constants.unresolvedGlyphID,
+                  xAdvance: Constants.defaultUnresolvedAdvance,
+                  yAdvance: Constants.defaultUnresolvedAdvance,
+                  xOffset: Constants.defaultUnresolvedOffset,
+                  yOffset: Constants.defaultUnresolvedOffset,
+                  unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
+                  cluster: start,
+                },
+              ),
               ...acc,
             ],
             ~start=start + 1,
@@ -409,16 +453,18 @@ let generateShapes:
           // current glyph to the list.
           let acc = resolvePossibleHole(~stop=cluster);
           let acc = [
-            ShapeResult.{
+            (
               skiaFace,
-              glyphId,
-              xAdvance,
-              yAdvance,
-              xOffset,
-              yOffset,
-              unitsPerEm,
-              cluster,
-            },
+              ShapeResult.{
+                glyphId,
+                xAdvance,
+                yAdvance,
+                xOffset,
+                yOffset,
+                unitsPerEm,
+                cluster,
+              },
+            ),
             ...acc,
           ];
           loopShapes(
@@ -441,16 +487,18 @@ let generateShapes:
         loop(
           ~attempts=0,
           ~acc=[
-            ShapeResult.{
-              skiaFace: font.skiaFace,
-              glyphId: Constants.unresolvedGlyphID,
-              xAdvance: Constants.defaultUnresolvedAdvance,
-              yAdvance: Constants.defaultUnresolvedAdvance,
-              xOffset: Constants.defaultUnresolvedOffset,
-              yOffset: Constants.defaultUnresolvedOffset,
-              unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
-              cluster: start,
-            },
+            (
+              font.skiaFace,
+              ShapeResult.{
+                glyphId: Constants.unresolvedGlyphID,
+                xAdvance: Constants.defaultUnresolvedAdvance,
+                yAdvance: Constants.defaultUnresolvedAdvance,
+                xOffset: Constants.defaultUnresolvedOffset,
+                yOffset: Constants.defaultUnresolvedOffset,
+                unitsPerEm: Constants.defaultUnresolvedUnitsPerEm,
+                cluster: start,
+              },
+            ),
             ...acc,
           ],
           ~start=start + 1,
@@ -496,15 +544,62 @@ let shape:
       | Some(fallbackStrategy) => fallbackStrategy
       };
 
-    switch (ShapeResultCache.find((str, features), shapeCache)) {
-    | Some(result) =>
-      ShapeResultCache.promote((str, features), shapeCache);
-      result;
+    // Create a textRun for the primary font to check cache
+    let primaryTextRun = createTextRun(~text=str, ~font, ~features);
+
+    switch (ShapeResultCache.find(primaryTextRun, shapeCache)) {
+    | Some(cachedResult) =>
+      // Cache hit - return complete cached result including fallback fonts
+      ShapeResultCache.promote(primaryTextRun, shapeCache);
+      cachedResult;
+
     | None =>
-      let result =
-        generateShapes(~fallback=fallbackToUse, ~features, font, str);
-      ShapeResultCache.add((str, features), result, shapeCache);
+      // Cache miss - generate and cache complete result
+      let shapedNodes =
+        generateShapedNodes(~fallback=fallbackToUse, ~features, font, str);
+
+      // Group consecutive nodes by typeface
+      let rec groupConsecutiveByTypeface = (nodes, acc) => {
+        switch (nodes) {
+        | [] => List.rev(acc)
+        | [(typeface, node), ...rest] =>
+          let typefaceId = Skia.Typeface.getUniqueID(typeface);
+
+          // Collect all consecutive nodes with the same typeface
+          let rec collectSameTypeface = (currentNodes, remainingNodes) => {
+            switch (remainingNodes) {
+            | [(tf, n), ...r]
+                when Int32.equal(Skia.Typeface.getUniqueID(tf), typefaceId) =>
+              collectSameTypeface([n, ...currentNodes], r)
+            | _ => (List.rev(currentNodes), remainingNodes)
+            };
+          };
+
+          let (sameTypefaceNodes, remaining) =
+            collectSameTypeface([node], rest);
+
+          let textRun =
+            ShapeResult.{
+              text: str, // TODO: extract actual text portion for this run
+              face: typeface,
+              features,
+            };
+
+          let shapedRun =
+            ShapeResult.{
+              textRun,
+              nodes: sameTypefaceNodes,
+            };
+          groupConsecutiveByTypeface(remaining, [shapedRun, ...acc]);
+        };
+      };
+
+      let result = groupConsecutiveByTypeface(shapedNodes, []);
+
+      // Cache the complete result including fallback fonts
+      ShapeResultCache.add(primaryTextRun, result, shapeCache);
       ShapeResultCache.trim(shapeCache);
+
       result;
     };
   };
