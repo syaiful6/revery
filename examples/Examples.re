@@ -326,7 +326,12 @@ let init = app => {
   Timber.App.enable(Timber.Reporter.console());
   Timber.App.setLevel(Timber.Level.perf);
 
-  let _unsubIdle = App.onIdle(app, () => prerr_endline("Idle!"));
+  let _unsubIdle = App.onIdle(app, () => {
+    prerr_endline("Idle!");
+    print_endline(Printf.sprintf("Font cache used: %d of limit %d.", Skia.Graphics.getFontCacheUsed(), Skia.Graphics.getFontCacheLimit()));
+    print_endline(Printf.sprintf("Resource cache used: %d of limit %d.", Skia.Graphics.getResourceCacheTotalBytesUsed(), Skia.Graphics.getResourceCacheTotalByteLimit()));
+    // Skia.Graphics.purgeAllCaches();
+  });
   let _unsubBeforQuit =
     App.onBeforeQuit(
       app,

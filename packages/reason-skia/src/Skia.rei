@@ -68,6 +68,7 @@ module Data: {
 module Typeface: {
   type t;
 
+  let null: t;
   let getFamilyName: t => string;
   let makeFromName: (string, FontStyle.t) => option(t);
   let makeFromFile: (string, int) => option(t);
@@ -613,6 +614,18 @@ module Surface: {
   let getProps: t => SurfaceProps.t;
   let flush: t => unit;
   let flushAndSubmit: (t, bool) => unit;
+};
+
+module Graphics: {
+  let init: unit => unit;
+  let purgeFontCache: unit => unit;
+  let purgeResourceCache: unit => unit;
+  let purgeAllCaches: unit => unit;
+  let getFontCacheUsed: unit => int;
+  let getFontCacheLimit: unit => int;
+  let setFontCacheLimit: int => int;
+  let getResourceCacheTotalBytesUsed: unit => int;
+  let getResourceCacheTotalByteLimit: unit => int;
 };
 
 module SVG: {

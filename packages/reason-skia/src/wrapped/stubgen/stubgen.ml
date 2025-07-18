@@ -18,6 +18,7 @@ let prologue = {|
 #include "include/c/sk_stream.h"
 #include "include/c/sk_string.h"
 #include "include/c/sk_textblob.h"
+#include "include/c/sk_graphics.h"
 #include "include/c/sk_svg.h"
 #include "modules/svg/include/sk_svgdom_c.h"
 |}

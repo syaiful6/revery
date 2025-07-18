@@ -360,6 +360,13 @@ module FontStyle = {
 module FontManager = {
   type t = SkiaWrapped.FontManager.t;
 
+  let debugDelete = typeface => {
+    let skStr = SkiaWrapped.Typeface.getFamilyName(typeface);
+    print_endline(Format.sprintf("skia freed: %s", SkiaWrapped.String.toString(skStr)));
+    SkiaWrapped.Typeface.delete(typeface);
+    SkiaWrapped.String.delete(skStr);
+  }
+
   let makeDefault = () => {
     let mgr = SkiaWrapped.FontManager.makeDefault();
     Gc.finalise(SkiaWrapped.FontManager.delete, mgr);
@@ -377,7 +384,7 @@ module FontManager = {
       SkiaWrapped.FontManager.matchFamilyStyle(mgr, family, style);
     switch (typeface) {
     | Some(tf) =>
-      Gc.finalise(SkiaWrapped.Typeface.delete, tf);
+      Gc.finalise(debugDelete, tf);
       Some(tf);
     | None => None
     };
@@ -401,7 +408,7 @@ module FontManager = {
 
     switch (maybeTypeface) {
     | Some(tf) as ret =>
-      Gc.finalise(SkiaWrapped.Typeface.delete, tf);
+      Gc.finalise(debugDelete, tf);
       ret;
     | None => None
     };
@@ -696,6 +703,8 @@ module Data = {
 
 module Typeface = {
   type t = SkiaWrapped.Typeface.t;
+
+  let null: t = Ctypes.coerce(Ctypes.ptr(Ctypes.void), SkiaWrapped.Typeface.t, Ctypes.null);
 
   let getFamilyName = tf => {
     let skStr = SkiaWrapped.Typeface.getFamilyName(tf);
@@ -1099,6 +1108,29 @@ module Surface = {
   let getProps = SkiaWrapped.Surface.getProps;
   let flush = SkiaWrapped.Surface.flush;
   let flushAndSubmit = SkiaWrapped.Surface.flushAndSubmit;
+};
+
+module Graphics = {
+  let init = SkiaWrapped.Graphics.init;
+  let purgeFontCache = SkiaWrapped.Graphics.purgeFontCache;
+  let purgeResourceCache = SkiaWrapped.Graphics.purgeResourceCache;
+  let purgeAllCaches = SkiaWrapped.Graphics.purgeAllCaches;
+
+  let getFontCacheUsed = () => {
+    let used = SkiaWrapped.Graphics.getFontCacheUsed();
+    Unsigned.Size_t.to_int(used);
+  };
+
+  let getFontCacheLimit = () => {
+    let limit = SkiaWrapped.Graphics.getFontCacheLimit();
+    Unsigned.Size_t.to_int(limit);
+  };
+
+  let setFontCacheLimit = limit =>
+    SkiaWrapped.Graphics.setFontCacheLimit(Unsigned.Size_t.of_int(limit)) |> Unsigned.Size_t.to_int;
+
+  let getResourceCacheTotalBytesUsed = () => SkiaWrapped.Graphics.getResourceCacheTotalBytesUsed() |> Unsigned.Size_t.to_int;
+  let getResourceCacheTotalByteLimit = () => SkiaWrapped.Graphics.getResourceCacheTotalByteLimit() |> Unsigned.Size_t.to_int;
 };
 
 module SVG = {
