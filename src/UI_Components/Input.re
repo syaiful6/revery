@@ -85,12 +85,14 @@ let getStringParts = (index, str) => {
   switch (index) {
   | 0 => ("", str)
   | _ =>
+    let strLength = Zed_utf8.length(str);
+    let safeIndex = index > strLength ? strLength : index < 0 ? 0 : index;
     let strBeginning =
-      try(Str.string_before(str, index)) {
+      try(Zed_utf8.before(str, safeIndex)) {
       | _ => str
       };
     let strEnd =
-      try(Str.string_after(str, index)) {
+      try(Zed_utf8.after(str, safeIndex)) {
       | _ => ""
       };
     (strBeginning, strEnd);
@@ -99,7 +101,7 @@ let getStringParts = (index, str) => {
 
 let getSafeStringBounds = (str, cursorPosition, change) => {
   let nextPosition = cursorPosition + change;
-  let currentLength = String.length(str);
+  let currentLength = Zed_utf8.length(str);
   nextPosition > currentLength
     ? currentLength : nextPosition < 0 ? 0 : nextPosition;
 };
@@ -107,7 +109,7 @@ let getSafeStringBounds = (str, cursorPosition, change) => {
 let removeCharacterBefore = (word, cursorPosition) => {
   let (startStr, endStr) = getStringParts(cursorPosition, word);
   let nextPosition = getSafeStringBounds(startStr, cursorPosition, -1);
-  let newString = Str.string_before(startStr, nextPosition) ++ endStr;
+  let newString = Zed_utf8.before(startStr, nextPosition) ++ endStr;
   (newString, nextPosition);
 };
 
@@ -118,7 +120,7 @@ let removeCharacterAfter = (word, cursorPosition) => {
     ++ (
       switch (endStr) {
       | "" => ""
-      | _ => Str.last_chars(endStr, String.length(endStr) - 1)
+      | _ => Zed_utf8.after(endStr, 1)
       }
     );
   (newString, cursorPosition);
@@ -128,7 +130,7 @@ let insertString = (currentValue, insertion, index) => {
   let (startStr, endStr) = getStringParts(index, currentValue);
   (
     startStr ++ insertion ++ endStr,
-    String.length(startStr) + String.length(insertion),
+    Zed_utf8.length(startStr) + Zed_utf8.length(insertion),
   );
 };
 
@@ -242,7 +244,7 @@ let%component make =
   let showPlaceholder = value == "";
   let cursorPosition =
     Option.value(cursorPosition, ~default=state.cursorPosition)
-    |> min(String.length(value));
+    |> min(Zed_utf8.length(value));
 
   // TODO: Expose as argument
   let smoothing = Revery_Font.Smoothing.default;
@@ -274,7 +276,7 @@ let%component make =
 
   let () = {
     let cursorOffset =
-      measureTextWidth(String.sub(value, 0, cursorPosition));
+      measureTextWidth(Zed_utf8.before(value, cursorPosition));
 
     switch (Option.bind(textRef^, r => r#getParent())) {
     | Some(containerNode) =>

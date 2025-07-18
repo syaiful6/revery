@@ -75,13 +75,13 @@ let dimensions =
 };
 
 let indexNearestOffset = (~measure, text, offset) => {
-  let length = String.length(text);
+  let length = Zed_utf8.length(text);
 
   let rec loop = (~last, i) =>
     if (i > length) {
       i - 1;
     } else {
-      let width = measure(String.sub(text, 0, i));
+      let width = measure(Zed_utf8.before(text, i));
 
       if (width > offset) {
         let isCurrentNearest = width - offset < offset - last;
