@@ -84,45 +84,46 @@ class textNode (text: string) = {
             Skia.TextBlobBuillder.withBuilder(builder => {
               let offset = ref(0.0);
 
-              let rec processShapesNodes = (nodes: ShapeResult.t) => {
-                switch (nodes) {
+              let rec processShapedRuns = (runs: ShapeResult.t) => {
+                switch (runs) {
                 | [] => ()
-                | [head, ...tail] =>
-                  let currentSkiaFace = head.skiaFace;
-                  let (runNodes, remaingingNodes) =
-                    List.partition(
-                      (ShapeResult.{skiaFace}) =>
-                        Skia.Typeface.equal(currentSkiaFace, skiaFace),
-                      nodes,
-                    );
-                  if (List.length(runNodes) > 0) {
-                    Skia.Font.setTypeface(_font, currentSkiaFace);
-                    let glyphs =
-                      runNodes
-                      |> List.map((node: ShapeResult.shapeNode) =>
-                           node.glyphId
-                         );
-                    Skia.TextBlobBuillder.allocRun(
-                      ~font=_font,
-                      ~glyphs,
-                      ~x=offset^,
-                      ~y=baselineY,
-                      builder,
-                    );
+                | [shapedRun, ...remainingRuns] =>
+                  let typeface = ShapeResult.resolveFont(shapedRun.textRun);
+                  Skia.Font.setTypeface(_font, typeface);
+                  let shapes =
+                    shapedRun.nodes
+                    |> List.map((node: ShapeResult.shapeNode) => {
+                         Skia.TextBlobBuillder.{
+                           glyphId: node.glyphId,
+                           cluster: node.cluster,
+                           xAdvance: node.xAdvance,
+                           yAdvance: node.yAdvance,
+                           xOffset: node.xOffset,
+                           yOffset: node.yOffset,
+                           unitsPerEm: node.unitsPerEm,
+                         }
+                       });
+                  Skia.TextBlobBuillder.allocRunPos(
+                    ~font=_font,
+                    ~fontSize=_fontSize,
+                    ~shapes,
+                    ~baselineX=offset^,
+                    ~baselineY,
+                    builder,
+                  );
 
-                    let runTotalWidth =
-                      List.fold_left(
-                        (acc: float, node: ShapeResult.shapeNode) =>
-                          acc +. node.xAdvance *. _fontSize /. node.unitsPerEm,
-                        0.,
-                        runNodes,
-                      );
-                    offset := offset^ +. runTotalWidth;
-                    processShapesNodes(remaingingNodes);
-                  };
+                  let runTotalWidth =
+                    List.fold_left(
+                      (acc: float, node: ShapeResult.shapeNode) =>
+                        acc +. node.xAdvance *. _fontSize /. node.unitsPerEm,
+                      0.,
+                      shapedRun.nodes,
+                    );
+                  offset := offset^ +. runTotalWidth;
+                  processShapedRuns(remainingRuns);
                 };
               };
-              processShapesNodes(shapedNodes);
+              processShapedRuns(shapedNodes);
 
               switch (Skia.TextBlobBuillder.build(builder)) {
               | Some(textblob) =>
@@ -143,9 +144,16 @@ class textNode (text: string) = {
             let width =
               shapedNodes
               |> List.fold_left(
-                   (acc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
-                     let scaledXadvance = xAdvance *. _fontSize /. unitsPerEm;
-                     acc +. scaledXadvance;
+                   (acc, shapedRun: ShapeResult.shapedRun) => {
+                     shapedRun.nodes
+                     |> List.fold_left(
+                          (innerAcc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
+                            let scaledXadvance =
+                              xAdvance *. _fontSize /. unitsPerEm;
+                            innerAcc +. scaledXadvance;
+                          },
+                          acc,
+                        )
                    },
                    0.,
                  );
@@ -333,5 +341,9 @@ class textNode (text: string) = {
         (_mode, width, _widthMeasureMode, height, _heightMeasureMode) =>
       _this#measure(width, height);
     Some(measure);
+  };
+  pub cleanup = () => {
+    _super#cleanup();
+    Skia.Font.setTypeface(_font, Skia.Typeface.null);
   };
 };

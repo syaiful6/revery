@@ -128,6 +128,10 @@ module M = (T: TYPE) => {
     type t;
     let t: typ(structure(t)) = structure("sk_typeface_t");
     let t = typedef(t, "sk_typeface_t");
+
+    type font_table_tag = Unsigned.uint32;
+
+    let font_table_tag = uint32_t;
   };
 
   module FontManager = {

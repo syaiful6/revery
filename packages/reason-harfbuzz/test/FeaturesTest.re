@@ -7,10 +7,20 @@ describe("Features", ({test, _}) => {
       {
         glyphId: 74,
         cluster: 0,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
       {
         glyphId: 74,
         cluster: 1,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
     let shapes = hb_shape(font, "ff");
@@ -23,6 +33,11 @@ describe("Features", ({test, _}) => {
       {
         glyphId: 444,
         cluster: 0,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
     let shapes = hb_shape(font, "fi");
@@ -35,6 +50,11 @@ describe("Features", ({test, _}) => {
       {
         glyphId: 443,
         cluster: 0,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
     let features = [
@@ -55,10 +75,20 @@ describe("Features", ({test, _}) => {
       {
         glyphId: 74,
         cluster: 0,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
       {
         glyphId: 77,
         cluster: 1,
+        xAdvance: 0.0,
+        yAdvance: 0.0,
+        xOffset: 0.0,
+        yOffset: 0.0,
+        unitsPerEm: 1.0,
       },
     |];
     let features = [

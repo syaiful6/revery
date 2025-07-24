@@ -7,17 +7,20 @@ let measure =
     (~smoothing: Smoothing.t, ~features=[], font, size, text: string) => {
   let {height, _}: FontMetrics.t = FontCache.getMetrics(font, size);
 
-  let paint = Skia.Paint.make();
-  let skiaFont = Skia.Font.make();
-
-  Smoothing.setPaint(~smoothing, skiaFont, paint);
-  Skia.Font.setSize(skiaFont, size);
-  Skia.Font.setTypeface(skiaFont, FontCache.getSkiaTypeface(font));
+  let shapes = FontCache.shape(~features, font, text);
 
   let width =
-    Skia.Font.measureText(~paint, ~encoding=Utf8, skiaFont, text, ());
-
-  // Skia.Paint.setTextSize(paint, size);
+    List.fold_left(
+      (acc, run: ShapeResult.shapedRun) =>
+        List.fold_left(
+          (acc2: float, node: ShapeResult.shapeNode) =>
+            acc2 +. node.xAdvance *. size /. node.unitsPerEm,
+          acc,
+          run.nodes,
+        ),
+      0.,
+      shapes,
+    );
   {
     height,
     width,

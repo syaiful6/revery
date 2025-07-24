@@ -49,6 +49,9 @@ module M = (F: FOREIGN) => {
     let deleteFileStream =
       foreign("sk_filestream_destroy", t @-> returning(void));
 
+    let getMemoryBase =
+      foreign("sk_stream_get_memory_base", t @-> returning(ptr(void)));
+
     let makeMemoryStreamFromString =
       foreign(
         "sk_memorystream_new_with_data",
@@ -131,6 +134,9 @@ module M = (F: FOREIGN) => {
     type t = ptr(structure(SkiaTypes.Typeface.t));
     let t = ptr(SkiaTypes.Typeface.t);
 
+    type font_table_tag = SkiaTypes.Typeface.font_table_tag;
+    let font_table_tag = SkiaTypes.Typeface.font_table_tag;
+
     let getFamilyName =
       foreign("sk_typeface_get_family_name", t @-> returning(String.t));
 
@@ -155,6 +161,11 @@ module M = (F: FOREIGN) => {
       foreign(
         "sk_typeface_open_stream",
         t @-> ptr_opt(int) @-> returning(StreamAsset.maybeT),
+      );
+    let copyTableData =
+      foreign(
+        "sk_typeface_copy_table_data",
+        t @-> font_table_tag @-> returning(ptr_opt(SkiaTypes.Data.t)),
       );
     let delete = foreign("sk_typeface_unref", t @-> returning(void));
   };
@@ -1306,6 +1317,84 @@ module M = (F: FOREIGN) => {
     let flush = foreign("sk_surface_flush", t @-> returning(void));
     let flushAndSubmit =
       foreign("sk_surface_flush_and_submit", t @-> bool @-> returning(void));
+  };
+
+  module Graphics = {
+    let init = foreign("sk_graphics_init", void @-> returning(void));
+
+    let purgeFontCache =
+      foreign("sk_graphics_purge_font_cache", void @-> returning(void));
+    let purgeResourceCache =
+      foreign("sk_graphics_purge_resource_cache", void @-> returning(void));
+    let purgeAllCaches =
+      foreign("sk_graphics_purge_all_caches", void @-> returning(void));
+
+    // font cache
+    let getFontCacheUsed =
+      foreign("sk_graphics_get_font_cache_used", void @-> returning(size_t));
+    let getFontCacheLimit =
+      foreign(
+        "sk_graphics_get_font_cache_limit",
+        void @-> returning(size_t),
+      );
+    let setFontCacheLimit =
+      foreign(
+        "sk_graphics_set_font_cache_limit",
+        size_t @-> returning(size_t),
+      );
+    let getFontCacheCountUsed =
+      foreign(
+        "sk_graphics_get_font_cache_count_used",
+        void @-> returning(int),
+      );
+    let getFontCacheCountLimit =
+      foreign(
+        "sk_graphics_get_font_cache_count_limit",
+        void @-> returning(int),
+      );
+    let setFontCacheCountLimit =
+      foreign(
+        "sk_graphics_set_font_cache_count_limit",
+        int @-> returning(int),
+      );
+    let getFontCachePointSizeLimit =
+      foreign(
+        "sk_graphics_get_font_cache_point_size_limit",
+        void @-> returning(int),
+      );
+    let setFontCachePointSizeLimit =
+      foreign(
+        "sk_graphics_set_font_cache_point_size_limit",
+        int @-> returning(int),
+      );
+
+    // resource cache
+    let getResourceCacheTotalBytesUsed =
+      foreign(
+        "sk_graphics_get_resource_cache_total_bytes_used",
+        void @-> returning(size_t),
+      );
+
+    let getResourceCacheTotalByteLimit =
+      foreign(
+        "sk_graphics_get_resource_cache_total_byte_limit",
+        void @-> returning(size_t),
+      );
+    let setResourceCacheTotalByteLimit =
+      foreign(
+        "sk_graphics_set_resource_cache_total_byte_limit",
+        size_t @-> returning(size_t),
+      );
+    let getResourceCacheSingleAllocationByteLimit =
+      foreign(
+        "sk_graphics_get_resource_cache_single_allocation_byte_limit",
+        void @-> returning(size_t),
+      );
+    let setResourceCacheSingleAllocationByteLimit =
+      foreign(
+        "sk_graphics_set_resource_cache_single_allocation_byte_limit",
+        size_t @-> returning(size_t),
+      );
   };
 
   module SVG = {

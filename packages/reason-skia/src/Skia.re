@@ -651,6 +651,8 @@ module Stream = {
     Gc.finalise(SkiaWrapped.Stream.deleteMemoryStream, stream);
     stream;
   };
+
+  let getMemoryBase = SkiaWrapped.Stream.getMemoryBase;
 };
 
 module StreamAsset = {
@@ -697,6 +699,13 @@ module Data = {
 module Typeface = {
   type t = SkiaWrapped.Typeface.t;
 
+  let null: t =
+    Ctypes.coerce(
+      Ctypes.ptr(Ctypes.void),
+      SkiaWrapped.Typeface.t,
+      Ctypes.null,
+    );
+
   let getFamilyName = tf => {
     let skStr = SkiaWrapped.Typeface.getFamilyName(tf);
     Gc.finalise(SkiaWrapped.String.delete, skStr);
@@ -706,8 +715,18 @@ module Typeface = {
   let makeFromName = SkiaWrapped.Typeface.makeFromName;
   let makeFromFile = SkiaWrapped.Typeface.makeFromFile;
 
+  let toStreamIndex = typeface => {
+    let ptr = Ctypes.CArray.make(Ctypes.int, 1);
+    let stream =
+      SkiaWrapped.Typeface.openStream(
+        typeface,
+        Some(Ctypes.CArray.start(ptr)),
+      );
+    (stream, Ctypes.CArray.get(ptr, 0));
+  };
+
   let toStream = typeface => {
-    let stream = SkiaWrapped.Typeface.openStream(typeface, None);
+    let (stream, _) = toStreamIndex(typeface);
     stream;
   };
 
@@ -715,6 +734,22 @@ module Typeface = {
     let style = SkiaWrapped.Typeface.getFontStyle(typeface);
     Gc.finalise(SkiaWrapped.FontStyle.delete, style);
     style;
+  };
+
+  let copyTableData = (typeface, tag) => {
+    switch (SkiaWrapped.Typeface.copyTableData(typeface, tag)) {
+    | Some(data) =>
+      let result = Data.makeString(data);
+      SkiaWrapped.Data.delete(data);
+      Some(result);
+    | None => None
+    };
+  };
+
+  // Convert int32 to Unsigned.uint32 for Skia compatibility
+  let copyTableDataInt32 = (typeface, tag: int32) => {
+    let uint32_tag = Unsigned.UInt32.of_int32(tag);
+    copyTableData(typeface, uint32_tag);
   };
 
   let getUniqueID = SkiaWrapped.Typeface.getUniqueID;
@@ -849,6 +884,7 @@ module TextBlobBuillder = {
         ~fontSize: float,
         ~shapes: list(shape),
         ~bounds: option(Rect.t)=?,
+        ~baselineX=0.0,
         ~baselineY=0.0,
         builder,
       ) => {
@@ -878,13 +914,13 @@ module TextBlobBuillder = {
       CArray.from_ptr(
         coerce(
           ptr(void),
-          ptr(float),
+          SkiaWrapped.Point.t,
           SkiaWrapped.TextBlob.RunBuffer.getPos(runBuffer),
         ),
-        List.length(shapes) * 2,
+        List.length(shapes),
       );
 
-    let currentXPos = ref(0.0);
+    let currentXPos = ref(baselineX);
 
     List.iteri(
       (i, shape) => {
@@ -898,8 +934,7 @@ module TextBlobBuillder = {
         let glyphOriginX = currentXPos^ +. scaledXOffset;
         let glyphOriginY = baselineY +. scaledYOffset;
 
-        CArray.set(posCArray, i * 2, glyphOriginX);
-        CArray.set(posCArray, i * 2 + 1, glyphOriginY);
+        CArray.set(posCArray, i, !@Point.make(glyphOriginX, glyphOriginY));
 
         currentXPos := currentXPos^ +. scalledXAdvance;
       },
@@ -1099,6 +1134,34 @@ module Surface = {
   let getProps = SkiaWrapped.Surface.getProps;
   let flush = SkiaWrapped.Surface.flush;
   let flushAndSubmit = SkiaWrapped.Surface.flushAndSubmit;
+};
+
+module Graphics = {
+  let init = SkiaWrapped.Graphics.init;
+  let purgeFontCache = SkiaWrapped.Graphics.purgeFontCache;
+  let purgeResourceCache = SkiaWrapped.Graphics.purgeResourceCache;
+  let purgeAllCaches = SkiaWrapped.Graphics.purgeAllCaches;
+
+  let getFontCacheUsed = () => {
+    let used = SkiaWrapped.Graphics.getFontCacheUsed();
+    Unsigned.Size_t.to_int(used);
+  };
+
+  let getFontCacheLimit = () => {
+    let limit = SkiaWrapped.Graphics.getFontCacheLimit();
+    Unsigned.Size_t.to_int(limit);
+  };
+
+  let setFontCacheLimit = limit =>
+    SkiaWrapped.Graphics.setFontCacheLimit(Unsigned.Size_t.of_int(limit))
+    |> Unsigned.Size_t.to_int;
+
+  let getResourceCacheTotalBytesUsed = () =>
+    SkiaWrapped.Graphics.getResourceCacheTotalBytesUsed()
+    |> Unsigned.Size_t.to_int;
+  let getResourceCacheTotalByteLimit = () =>
+    SkiaWrapped.Graphics.getResourceCacheTotalByteLimit()
+    |> Unsigned.Size_t.to_int;
 };
 
 module SVG = {
