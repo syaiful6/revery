@@ -43,3 +43,4 @@ module Ticker = Ticker;
 module Tree = Tree;
 module RichTextView = RichTextView;
 module Markdown = Markdown;
+module Spacer = Spacer;

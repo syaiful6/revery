@@ -129,7 +129,6 @@ let skiaFaceToHarfbuzzFace = skiaFace => {
     switch (Skia.Typeface.toStreamIndex(skiaFace)) {
     | (Some(asset), idx) =>
       let stream = Skia.StreamAsset.toStream(asset);
-      print_endline(Format.sprintf("get tcIndex: %d", idx));
       let length = Skia.Stream.getLength(stream);
       // Try zero-copy approach first using getMemoryBase
       let memoryBase = Skia.Stream.getMemoryBase(stream);

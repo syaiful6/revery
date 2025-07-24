@@ -229,6 +229,11 @@ let examples = [
     render: _ => WavFilePlaybackExample.render(),
     source: "WavFilePlaybackExample.re",
   },
+  {
+    name: "Layouts",
+    render: _ => LayoutExample.render(),
+    source: "LayoutExample.re",
+  },
 ];
 
 let getExampleByName = name =>
@@ -285,8 +290,6 @@ module ExampleHost = {
       onMouseWheel={_evt => ()}
       style=Style.[
         position(`Absolute),
-        justifyContent(`Center),
-        alignItems(`Center),
         backgroundColor(bgColor),
         bottom(0),
         top(0),
@@ -296,23 +299,20 @@ module ExampleHost = {
       ]>
       <ScrollView
         style=Style.[
-          position(`Absolute),
-          top(0),
-          left(0),
           width(175),
-          bottom(0),
           backgroundColor(bgColor),
+          flexGrow(0),
+          flexShrink(0),
+          ...Environment.isMac ? [paddingTop(28)] : [],
         ]>
         <View> {buttons |> React.listToElement} </View>
       </ScrollView>
       <View
         style=Style.[
-          position(`Absolute),
-          top(0),
-          left(175),
-          right(0),
-          bottom(0),
           backgroundColor(activeBackgroundColor),
+          flexGrow(1),
+          flexShrink(1),
+          ...Environment.isMac ? [paddingTop(28)] : [],
         ]>
         exampleView
       </View>

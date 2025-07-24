@@ -360,15 +360,6 @@ module FontStyle = {
 module FontManager = {
   type t = SkiaWrapped.FontManager.t;
 
-  let debugDelete = typeface => {
-    let skStr = SkiaWrapped.Typeface.getFamilyName(typeface);
-    print_endline(
-      Format.sprintf("skia freed: %s", SkiaWrapped.String.toString(skStr)),
-    );
-    SkiaWrapped.Typeface.delete(typeface);
-    SkiaWrapped.String.delete(skStr);
-  };
-
   let makeDefault = () => {
     let mgr = SkiaWrapped.FontManager.makeDefault();
     Gc.finalise(SkiaWrapped.FontManager.delete, mgr);
@@ -386,7 +377,7 @@ module FontManager = {
       SkiaWrapped.FontManager.matchFamilyStyle(mgr, family, style);
     switch (typeface) {
     | Some(tf) =>
-      Gc.finalise(debugDelete, tf);
+      Gc.finalise(SkiaWrapped.Typeface.delete, tf);
       Some(tf);
     | None => None
     };
@@ -410,7 +401,7 @@ module FontManager = {
 
     switch (maybeTypeface) {
     | Some(tf) as ret =>
-      Gc.finalise(debugDelete, tf);
+      Gc.finalise(SkiaWrapped.Typeface.delete, tf);
       ret;
     | None => None
     };
