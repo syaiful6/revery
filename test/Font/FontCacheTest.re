@@ -1,23 +1,21 @@
 open Revery_Font;
 open TestFramework;
 
-let glyphId = (index, (_typeface, glyphs)) => {
-  // Each glyph is 2 bytes
-  let b0 = glyphs.[index * 2] |> Char.code;
-  let b1 = glyphs.[index * 2 + 1] |> Char.code;
-  b1 lsl 8 + b0;
+let glyphId = (index, shapedRun: ShapeResult.shapedRun) => {
+  let ShapeResult.{nodes, _} = shapedRun;
+  let node = List.nth(nodes, index);
+  node.glyphId;
 };
 
-let runCount = glyphStrings => List.length(glyphStrings);
+let runCount = (shapedRuns: ShapeResult.t) => List.length(shapedRuns);
 
-let glyphCount = ((_typeface, glyphs)) =>
-  // Each glyph is 2 bytes
-  String.length(glyphs) / 2;
+let glyphCount = (shapedRun: ShapeResult.shapedRun) =>
+  List.length(shapedRun.ShapeResult.nodes);
 
-let run = (index, runs) => List.nth(runs, index);
+let run = (index, runs: ShapeResult.t) => List.nth(runs, index);
 
-let typefaceId = ((typeface, _glyphs)) =>
-  typeface |> Skia.Typeface.getUniqueID |> Int32.to_int;
+let typefaceId = (shapedRun: ShapeResult.shapedRun) =>
+  shapedRun.ShapeResult.textRun.face |> Skia.Typeface.getUniqueID |> Int32.to_int;
 
 describe("FontCache", ({describe, test, _}) => {
   // TODO: This font is dependent on system defaults,
@@ -39,9 +37,9 @@ describe("FontCache", ({describe, test, _}) => {
   let jetBrainsMonoFont = Family.fromFile("JetBrainsMono-Regular.ttf");
 
   test("empty string has empty shapes", ({expect, _}) => {
-    let {glyphStrings}: ShapeResult.t = "" |> FontCache.shape(defaultFont);
+    let shapedRuns: ShapeResult.t = "" |> FontCache.shape(defaultFont);
 
-    expect.int(glyphStrings |> runCount).toBe(0);
+    expect.int(shapedRuns |> runCount).toBe(0);
   });
 
   test(
@@ -49,17 +47,17 @@ describe("FontCache", ({describe, test, _}) => {
     ({expect, _}) => {
     for (ascii in 0 to 255) {
       let asciiCharacter = Zed_utf8.make(1, Uchar.of_int(ascii));
-      let {glyphStrings}: ShapeResult.t =
+      let shapedRuns: ShapeResult.t =
         asciiCharacter |> FontCache.shape(defaultFont);
 
-      expect.int(glyphStrings |> runCount).toBe(1);
+      expect.int(shapedRuns |> runCount).toBe(1);
       // TODO: Investigate why we sometimes get 2 glyph strings here?
-      // expect.int(glyphStrings |> run(0) |> glyphCount).toBe(1);
+      // expect.int(shapedRuns |> run(0) |> glyphCount).toBe(1);
     }
   });
 
   test("shape simple CJK text", ({expect, _}) => {
-    let {glyphStrings}: ShapeResult.t =
+    let shapedRuns: ShapeResult.t =
       "腐" |> FontCache.shape(defaultFont);
 
     // TODO: This test fails on Ubuntu CI, because it the default
@@ -67,62 +65,62 @@ describe("FontCache", ({describe, test, _}) => {
     if (Sys.unix) {
       ();
     } else {
-      expect.int(glyphStrings |> runCount).toBe(1);
-      expect.int(glyphStrings |> run(0) |> glyphCount).toBe(1);
+      expect.int(shapedRuns |> runCount).toBe(1);
+      expect.int(shapedRuns |> run(0) |> glyphCount).toBe(1);
     };
   });
 
   test("shape simple ASCII string", ({expect, _}) => {
-    let {glyphStrings}: ShapeResult.t =
+    let shapedRuns: ShapeResult.t =
       "abc" |> FontCache.shape(defaultFont);
 
-    expect.int(glyphStrings |> runCount).toBe(1);
-    expect.int(glyphStrings |> run(0) |> glyphCount).toBe(3);
+    expect.int(shapedRuns |> runCount).toBe(1);
+    expect.int(shapedRuns |> run(0) |> glyphCount).toBe(3);
   });
 
   test("shape string w/ fallback", ({expect, _}) => {
-    let {glyphStrings}: ShapeResult.t =
+    let shapedRuns: ShapeResult.t =
       "a⌋" |> FontCache.shape(defaultFont);
 
-    expect.int(glyphStrings |> runCount).toBe(2);
-    expect.int(glyphStrings |> run(0) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(0) |> typefaceId).toBe(defaultFontId);
+    expect.int(shapedRuns |> runCount).toBe(2);
+    expect.int(shapedRuns |> run(0) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(0) |> typefaceId).toBe(defaultFontId);
 
-    expect.int(glyphStrings |> run(1) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(1) |> typefaceId).not.toBe(
+    expect.int(shapedRuns |> run(1) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(1) |> typefaceId).not.toBe(
       defaultFontId,
     );
   });
 
   test("fallback first, then shape", ({expect, _}) => {
-    let {glyphStrings}: ShapeResult.t =
+    let shapedRuns: ShapeResult.t =
       "⌋a" |> FontCache.shape(defaultFont);
 
-    expect.int(glyphStrings |> runCount).toBe(2);
-    expect.int(glyphStrings |> run(0) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(0) |> typefaceId).not.toBe(
+    expect.int(shapedRuns |> runCount).toBe(2);
+    expect.int(shapedRuns |> run(0) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(0) |> typefaceId).not.toBe(
       defaultFontId,
     );
 
-    expect.int(glyphStrings |> run(1) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(1) |> typefaceId).toBe(defaultFontId);
+    expect.int(shapedRuns |> run(1) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(1) |> typefaceId).toBe(defaultFontId);
   });
 
   test("non-fallback surrounded by holes (onivim/oni2#2178)", ({expect, _}) => {
-    let {glyphStrings}: ShapeResult.t =
+    let shapedRuns: ShapeResult.t =
       "⌋a⌋" |> FontCache.shape(defaultFont);
 
-    expect.int(glyphStrings |> runCount).toBe(3);
-    expect.int(glyphStrings |> run(0) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(0) |> typefaceId).not.toBe(
+    expect.int(shapedRuns |> runCount).toBe(3);
+    expect.int(shapedRuns |> run(0) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(0) |> typefaceId).not.toBe(
       defaultFontId,
     );
 
-    expect.int(glyphStrings |> run(1) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(1) |> typefaceId).toBe(defaultFontId);
+    expect.int(shapedRuns |> run(1) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(1) |> typefaceId).toBe(defaultFontId);
 
-    expect.int(glyphStrings |> run(2) |> glyphCount).toBe(1);
-    expect.int(glyphStrings |> run(2) |> typefaceId).not.toBe(
+    expect.int(shapedRuns |> run(2) |> glyphCount).toBe(1);
+    expect.int(shapedRuns |> run(2) |> typefaceId).not.toBe(
       defaultFontId,
     );
   });
@@ -163,50 +161,50 @@ describe("FontCache", ({describe, test, _}) => {
       "onivim/oni2#2286: fallback for tab character - handle case where fallback font also does not have a glyph for tab",
       ({expect, _}) => {
         let asciiCharacter = Zed_utf8.make(1, Uchar.of_int(9));
-        let {glyphStrings}: ShapeResult.t =
+        let shapedRuns: ShapeResult.t =
           asciiCharacter |> FontCache.shape(~fallback, font);
 
-        expect.int(glyphStrings |> runCount).toBe(1);
+        expect.int(shapedRuns |> runCount).toBe(1);
       },
     );
 
     test("κόσμε", ({expect, _}) => {
-      let {glyphStrings}: ShapeResult.t =
+      let shapedRuns: ShapeResult.t =
         "κόσμε" |> FontCache.shape(~fallback, font);
 
-      expect.int(glyphStrings |> runCount).toBe(3);
-      expect.int(glyphStrings |> run(0) |> glyphCount).toBe(3);
-      expect.int(glyphStrings |> run(0) |> glyphId(0)).toBe(724); //κ
-      expect.int(glyphStrings |> run(0) |> glyphId(1)).toBe(854); //ό
-      expect.int(glyphStrings |> run(0) |> glyphId(2)).toBe(733); //σ
-      expect.int(glyphStrings |> run(0) |> typefaceId).toBe(firaCodeFontId);
+      expect.int(shapedRuns |> runCount).toBe(3);
+      expect.int(shapedRuns |> run(0) |> glyphCount).toBe(3);
+      expect.int(shapedRuns |> run(0) |> glyphId(0)).toBe(724); //κ
+      expect.int(shapedRuns |> run(0) |> glyphId(1)).toBe(854); //ό
+      expect.int(shapedRuns |> run(0) |> glyphId(2)).toBe(733); //σ
+      expect.int(shapedRuns |> run(0) |> typefaceId).toBe(firaCodeFontId);
 
-      expect.int(glyphStrings |> run(1) |> glyphCount).toBe(1);
-      expect.int(glyphStrings |> run(1) |> glyphId(0)).toBe(526); //μ
-      expect.int(glyphStrings |> run(1) |> typefaceId).toBe(
+      expect.int(shapedRuns |> run(1) |> glyphCount).toBe(1);
+      expect.int(shapedRuns |> run(1) |> glyphId(0)).toBe(526); //μ
+      expect.int(shapedRuns |> run(1) |> typefaceId).toBe(
         jetBrainsFontId,
       );
 
-      expect.int(glyphStrings |> run(2) |> glyphCount).toBe(1);
-      expect.int(glyphStrings |> run(2) |> glyphId(0)).toBe(719); //ε
-      expect.int(glyphStrings |> run(2) |> typefaceId).toBe(firaCodeFontId);
+      expect.int(shapedRuns |> run(2) |> glyphCount).toBe(1);
+      expect.int(shapedRuns |> run(2) |> glyphId(0)).toBe(719); //ε
+      expect.int(shapedRuns |> run(2) |> typefaceId).toBe(firaCodeFontId);
     });
     test("alternate fall-back", ({expect, _}) => {
-      let {glyphStrings}: ShapeResult.t =
+      let shapedRuns: ShapeResult.t =
         "aκaκaκaκaκ" |> FontCache.shape(~fallback, font);
 
       // Validate each aκ pair - there are 5 pairs (10 characters)
-      expect.int(glyphStrings |> runCount).toBe(10);
+      expect.int(shapedRuns |> runCount).toBe(10);
       for (i in 0 to 4) {
-        expect.int(glyphStrings |> run(i * 2) |> glyphCount).toBe(1);
-        expect.int(glyphStrings |> run(i * 2) |> glyphId(0)).toBe(42); //a
-        expect.int(glyphStrings |> run(i * 2) |> typefaceId).toBe(
+        expect.int(shapedRuns |> run(i * 2) |> glyphCount).toBe(1);
+        expect.int(shapedRuns |> run(i * 2) |> glyphId(0)).toBe(42); //a
+        expect.int(shapedRuns |> run(i * 2) |> typefaceId).toBe(
           jetBrainsFontId,
         );
 
-        expect.int(glyphStrings |> run(i * 2 + 1) |> glyphCount).toBe(1);
-        expect.int(glyphStrings |> run(i * 2 + 1) |> glyphId(0)).toBe(724); //κ
-        expect.int(glyphStrings |> run(i * 2 + 1) |> typefaceId).toBe(
+        expect.int(shapedRuns |> run(i * 2 + 1) |> glyphCount).toBe(1);
+        expect.int(shapedRuns |> run(i * 2 + 1) |> glyphId(0)).toBe(724); //κ
+        expect.int(shapedRuns |> run(i * 2 + 1) |> typefaceId).toBe(
           firaCodeFontId,
         );
       };
@@ -222,10 +220,10 @@ describe("FontCache", ({describe, test, _}) => {
 
       for (ascii in 0 to 255) {
         let asciiCharacter = Zed_utf8.make(1, Uchar.of_int(ascii));
-        let {glyphStrings}: ShapeResult.t =
+        let shapedRuns: ShapeResult.t =
           asciiCharacter |> FontCache.shape(~fallback, font);
 
-        expect.int(glyphStrings |> runCount).toBe(1);
+        expect.int(shapedRuns |> runCount).toBe(1);
 
         expect.int(fallbackSensor^).toBe(0);
       };
@@ -243,11 +241,11 @@ describe("FontCache", ({describe, test, _}) => {
         ++ Zed_utf8.make(1, Uchar.of_int(0x200D))
         ++ Zed_utf8.make(1, Uchar.of_int(0x1F525));
 
-      let {glyphStrings}: ShapeResult.t =
+      let shapedRuns: ShapeResult.t =
         FontCache.shape(~fallback, font, str);
 
       // ...really just making sure we didn't hang.
-      expect.equal(true, glyphStrings |> runCount > 1);
+      expect.equal(true, shapedRuns |> runCount > 1);
     });
   });
 });
