@@ -23,7 +23,7 @@ Logs and its reporters are distributed under the ISC license.
 [cmdliner]: http://erratique.ch/software/cmdliner
 [lwt]: http://ocsigen.org/lwt/
 
-Home page: http://erratique.ch/software/logs"""
+Home page: <http://erratique.ch/software/logs>"""
 maintainer: "Daniel Bünzli <daniel.buenzl i@erratique.ch>"
 authors: "The logs programmers"
 license: "ISC"
@@ -32,7 +32,7 @@ homepage: "https://erratique.ch/software/logs"
 doc: "https://erratique.ch/software/logs/doc"
 bug-reports: "https://github.com/dbuenzli/logs/issues"
 depends: [
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.14.0"}
   "ocamlfind" {build}
   "ocamlbuild" {build}
   "topkg" {build & >= "1.0.3"}
@@ -63,8 +63,8 @@ build: [
 ]
 dev-repo: "git+https://erratique.ch/repos/logs.git"
 url {
-  src: "https://erratique.ch/software/logs/releases/logs-0.8.0.tbz"
+  src: "https://erratique.ch/software/logs/releases/logs-0.9.0.tbz"
   checksum:
-    "sha512=c34c67b00d6a989a2660204ea70db8521736d6105f15d1ee0ec6287a662798fe5c4d47075c6e7c84f5d5372adb5af5c4c404f79db70d69140af5e0ebbea3b6a5"
+    "sha512=b75fb28e83f33461b06b5c9b60972c4a9a9a1599d637b4a0c7b1e86a87f34fe5361e817cb31f42ad7e7cbb822473b28fab9f58a02870eb189ebe88dae8e045ff"
 }
 x-maintenance-intent: ["(latest)"]

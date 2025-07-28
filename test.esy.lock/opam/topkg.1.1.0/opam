@@ -43,8 +43,8 @@ depends: [
 build: ["ocaml" "pkg/pkg.ml" "build" "--pkg-name" name "--dev-pkg" "%{dev}%"]
 dev-repo: "git+https://erratique.ch/repos/topkg.git"
 url {
-  src: "https://erratique.ch/software/topkg/releases/topkg-1.0.8.tbz"
+  src: "https://erratique.ch/software/topkg/releases/topkg-1.1.0.tbz"
   checksum:
-    "sha512=4b632b60137852bb72ff9c8cdc2e16ac5ece6473569e50963fef9c1e800a0933a516bea1107b04011645afa4a1e78893c82dbce0aa8de2970d4d6c6d0dd2fe02"
+    "sha512=34d22ae5b6bd166dd4a601a7d12d89c336684b3c56d7c7f481b40837eab263616cc3a6e6f63602f3d4a7d53c911967bf261de6c1ac205341b98a9838e5ea7aeb"
 }
 x-maintenance-intent: ["(latest)"]

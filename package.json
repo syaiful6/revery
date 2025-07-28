@@ -39,7 +39,7 @@
     "@opam/ctypes": "0.23.0",
     "@opam/dune": "< 4.0.0",
     "@opam/dune-configurator": "*",
-    "@opam/reason": "^3.6.2",
+    "@opam/reason": "^3.15.0",
     "@opam/lru": "*",
     "@opam/lwt": "^5.9.1",
     "@opam/lwt_ppx": "^5.9.1",
@@ -50,7 +50,7 @@
     "@opam/uucp": "*",
     "@opam/uutf": "*",
     "@opam/charInfo_width": "*",
-    "@brisk/brisk-reconciler": "briskml/brisk-reconciler#c9d5c4c",
+    "@brisk/brisk-reconciler": "briskml/brisk-reconciler#95dcb18",
     "esy-angle-prebuilt": "1.0.0",
     "esy-freetype2": "^2.9.1008",
     "@onivim/reason-native-crash-utils": "^1.0.2",
@@ -60,7 +60,7 @@
     "reperf": "syaiful6/reperf#27f9e34747f1b1c5ff7efdfc28452315f29f26b1",
     "rench": "^1.10.0",
     "@reason-native/rely": "*",
-    "ocaml": "^5.2"
+    "ocaml": "5.2.x"
   },
   "resolutions": {
     "@opam/printbox": "0.12",

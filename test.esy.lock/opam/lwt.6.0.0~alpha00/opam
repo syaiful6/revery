@@ -25,6 +25,7 @@ depends: [
   "cppo" {build & >= "1.1.0"}
   "ocamlfind" {dev & >= "1.7.3-1"}
   "odoc" {with-doc & >= "2.3.0"}
+  "bisect_ppx" {with-test}
   "dune-configurator"
   "ocplib-endian"
 ]
@@ -54,10 +55,14 @@ build: [
     "@doc" {with-doc}
   ]
 ]
+x-maintenance-intent:[ "(latest)" ]
+available: opam-version >= "2.1.0"
+flags: avoid-version
 url {
-  src: "https://github.com/ocsigen/lwt/archive/refs/tags/5.9.1.tar.gz"
+  src:
+    "https://github.com/ocsigen/lwt/archive/refs/tags/6.0.0-alpha00.tar.gz"
   checksum: [
-    "md5=18742da8b8fe3618e3fa700b7a884fe7"
-    "sha512=1c51fdb4d0856c89e2df08a1c0095ef28ebd0f613b07b03d0f66501ca5486515562071291e6d0932e57587ed0c9362c8b92c5c9eddb4d2bb2f5e129986b484a7"
+    "md5=8a88c5d5fcb01d179bbb12e6b6888dca"
+    "sha512=bfecd3fa0a3461a3368bd7724e2fce7a751ba3899d590d5b08bc4257b058ca34ec25de1a3ead6585528afe77c6ca6db1c3e2d2421d6a773c845ef091472d2ed9"
   ]
 }
