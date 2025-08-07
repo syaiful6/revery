@@ -18,20 +18,7 @@
 
 extern "C" {
 
-    // Thread-local buffer for HarfBuzz reuse (using __thread for C++98
-    // compatibility)
-    static __thread hb_buffer_t *reusable_buffer = nullptr;
-
-    // Cleanup function to destroy thread-local buffer
-    static void cleanup_thread_local_buffer() {
-        if (reusable_buffer != nullptr) {
-            hb_buffer_destroy(reusable_buffer);
-            reusable_buffer = nullptr;
-        }
-    }
-
-    // hb_font_t*
-
+// hb_font_t*
     CAMLprim value Val_success(value v) {
         CAMLparam1(v);
         CAMLlocal1(some);
@@ -234,18 +221,11 @@ extern "C" {
 
         // Fix for Apple Color Emoji fonts that may return 0 or invalid units_per_em
         if (units_per_em <= 0.0) {
-            units_per_em = 1000.0;  // Use standard default value
+            units_per_em = 1000.0; // Use standard default value
         }
 
-        // Reuse thread-local buffer for better memory efficiency
-        hb_buffer_t *hb_buffer;
-        if (reusable_buffer == nullptr) {
-            reusable_buffer = hb_buffer_create();
-            hb_buffer = reusable_buffer;
-        } else {
-            hb_buffer = reusable_buffer;
-            hb_buffer_clear_contents(hb_buffer);
-        }
+        // Create new buffer for each call to avoid reuse issues
+        hb_buffer_t *hb_buffer = hb_buffer_create();
 
         hb_buffer_add_utf8(hb_buffer, String_val(vString), -1, start, len);
         hb_buffer_guess_segment_properties(hb_buffer);
@@ -267,7 +247,7 @@ extern "C" {
             Store_field(ret, i, shapedGlyphRecord);
         }
         free(features);
-        // Don't destroy the buffer - reuse it for next call
+        hb_buffer_destroy(hb_buffer);
         CAMLreturn(ret);
     }
 
@@ -289,20 +269,13 @@ extern "C" {
         CAMLreturn(ret);
     }
 
-// Cleanup function to free thread-local buffer
-    CAMLprim value rehb_cleanup_buffers() {
-        CAMLparam0();
-        cleanup_thread_local_buffer();
-        CAMLreturn(Val_unit);
-    }
-
-    // Table-based font creation for efficient emoji font handling
+// Table-based font creation for efficient emoji font handling
     struct table_callback_data {
         value ocaml_callback; // OCaml function to call for table data
         value user_data;      // User data passed to callback
     };
 
-    // HarfBuzz table callback - called when HarfBuzz needs a font table
+// HarfBuzz table callback - called when HarfBuzz needs a font table
     static hb_blob_t *get_table_callback(hb_face_t *face, hb_tag_t tag,
                                          void *user_data) {
         struct table_callback_data *data = (struct table_callback_data *)user_data;
@@ -333,7 +306,7 @@ extern "C" {
         }
     }
 
-    // Cleanup callback for table data
+// Cleanup callback for table data
     static void cleanup_table_callback_data(void *user_data) {
         struct table_callback_data *data = (struct table_callback_data *)user_data;
         caml_remove_global_root(&data->ocaml_callback);
@@ -341,7 +314,7 @@ extern "C" {
         free(data);
     }
 
-    // Create HarfBuzz face using table callback approach
+// Create HarfBuzz face using table callback approach
     CAMLprim value rehb_face_create_for_tables(value vCallback, value vUserData) {
         CAMLparam2(vCallback, vUserData);
         CAMLlocal1(ret);

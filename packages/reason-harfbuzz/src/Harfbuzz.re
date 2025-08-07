@@ -174,6 +174,3 @@ let hb_face_create_for_tables = (callback, userData) => {
 
 let hb_version_string_compiled = Internal.hb_version_string_compiled;
 let hb_version_string_runtime = Internal.hb_version_string_runtime;
-
-// Cleanup function to free thread-local HarfBuzz buffers
-external cleanup_buffers: unit => unit = "rehb_cleanup_buffers";
