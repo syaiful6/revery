@@ -53,7 +53,6 @@ describe("Shaping", ({test, _}) => {
     let shapes =
       hb_shape(font, "abc", ~start=`Position(1), ~stop=`Position(2));
 
-
     expect.equal(expectedResult, shapes);
   });
 
@@ -71,7 +70,6 @@ describe("Shaping", ({test, _}) => {
     |];
     let shapes =
       hb_shape(font, "aҙc", ~start=`Position(1), ~stop=`Position(3));
-
 
     expect.equal(expectedResult, shapes);
   });
