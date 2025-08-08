@@ -128,6 +128,9 @@ let skiaFaceToHarfbuzzFace = skiaFace => {
   } else {
     switch (Skia.Typeface.toStreamIndex(skiaFace)) {
     | (Some(asset), idx) =>
+      let destroyAsset = () => {
+        Skia.StreamAsset.delete(asset);
+      };
       let stream = Skia.StreamAsset.toStream(asset);
       let length = Skia.Stream.getLength(stream);
       // Try zero-copy approach first using getMemoryBase
@@ -136,16 +139,21 @@ let skiaFaceToHarfbuzzFace = skiaFace => {
         if (Ctypes.is_null(memoryBase)) {
           // Fallback to copying approach if memory base is not available
           let bytes = Skia.Data.makeStringFromStream(stream, length);
-          Harfbuzz.hb_face_from_data(bytes);
+          let result = Harfbuzz.hb_face_from_data(bytes);
+          // Asset can be deleted immediately since we copied the data
+          Skia.StreamAsset.delete(asset);
+          result;
         } else {
           // Zero-copy approach: use memory base directly
           let memoryPtr = Ctypes.raw_address_of_ptr(memoryBase);
-          Harfbuzz.hb_face_from_memory_ptr(memoryPtr, length, idx);
+          let result =
+            Harfbuzz.hb_face_from_memory_ptr(memoryPtr, length, idx);
+          switch (result) {
+          | Ok(hb_face) => Gc.finalise_last(destroyAsset, hb_face)
+          | Error(_) => Skia.StreamAsset.delete(asset)
+          };
+          result;
         };
-      let destroyAsset = _face => {
-        Skia.StreamAsset.delete(asset);
-      };
-      Gc.finalise(destroyAsset, face);
       face;
     | (None, _) => Result.Error("failed to convert skia typeface to stream")
     };
