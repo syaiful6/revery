@@ -13,10 +13,12 @@
   (flags
    (:include cxx_flags.sexp)))
  (library_flags
-  (:include flags.sexp)))
+  (:include flags.sexp))
+ (c_library_flags
+  (:include c_library_flags.sexp)))
 
 (rule
- (targets c_flags.sexp cxx_flags.sexp flags.sexp)
+ (targets c_flags.sexp cxx_flags.sexp flags.sexp c_library_flags.sexp)
  (deps
   (:discover config/discover.exe))
  (action
