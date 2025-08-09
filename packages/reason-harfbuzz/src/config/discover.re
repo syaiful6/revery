@@ -55,16 +55,29 @@ let c_flags = ["-fPIC", "-I", Sys.getenv("HARFBUZZ_INCLUDE_PATH")];
 let ccopt = s => ["-ccopt", s];
 let cclib = s => ["-cclib", s];
 
-let lib_path_flags = [] @ ccopt("-L" ++ Sys.getenv("HARFBUZZ_LIB_PATH"));
+let cLibraryFlags = os => {
+  let extraFlags =
+    switch (os) {
+    | Windows => ["-lpthread"]
+    | Linux => ["-L/usr/lib"]
+    | Mac
+    | IOS => [
+        "-framework",
+        "CoreFoundation",
+        "-framework",
+        "CoreGraphics",
+        "-framework",
+        "CoreText",
+      ]
+    | _ => []
+    };
 
-let extraFlags = os =>
-  switch (os) {
-  | Windows => cclib("-lpthread")
-  | Linux => ccopt("-L/usr/lib")
-  | _ => []
-  };
+  ["-L" ++ Sys.getenv("HARFBUZZ_LIB_PATH")] @ ["-lharfbuzz"] @ extraFlags;
+};
 
-let flags = os => [] @ cclib("-lharfbuzz") @ extraFlags(os) @ lib_path_flags;
+let flags = os => {
+  [] @ (cLibraryFlags(os) |> List.map(cclib) |> List.flatten);
+};
 
 let cxx_flags = os =>
   switch (os) {
@@ -77,4 +90,5 @@ Configurator.main(~name="reason-harfbuzz", conf => {
   Configurator.Flags.write_sexp("c_flags.sexp", c_flags);
   Configurator.Flags.write_sexp("cxx_flags.sexp", cxx_flags(os));
   Configurator.Flags.write_sexp("flags.sexp", flags(os));
+  Configurator.Flags.write_sexp("c_library_flags.sexp", cLibraryFlags(os));
 });

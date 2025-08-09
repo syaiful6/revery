@@ -1,5 +1,5 @@
 {
-  "checksum": "6c4238c0758403702e123e7a27977983",
+  "checksum": "390502fdacafac1abefe2578bd028985",
   "root": "revery@link-dev:./package.json",
   "node": {
     "revery@link-dev:./package.json": {
@@ -17,8 +17,8 @@
         "rench@1.10.0@d41d8cd9", "ocaml@5.2.0@d41d8cd9",
         "esy-sdl2@github:syaiful6/esy-sdl2#8b1fe1e08168b9532f160a23966a25806e87c200@d41d8cd9",
         "esy-mono-skia@github:syaiful6/esy-mono-skia#ed44f9368b8c9185c2d74a6edbd717a1f8dc0ef2@d41d8cd9",
-        "esy-harfbuzz@github:syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232@d41d8cd9",
-        "esy-freetype2@2.9.1008@d41d8cd9",
+        "esy-harfbuzz@github:syaiful6/esy-harfbuzz#ccc214a40f57aa71695e1b4a8eca5c6f351cb51a@d41d8cd9",
+        "esy-freetype2@github:syaiful6/esy-freetype2#5a8ba7245f14f9668c8f9436a82e8ff6e4959204@d41d8cd9",
         "esy-angle-prebuilt@1.0.0@d41d8cd9",
         "@reason-native/rely@git:https://github.com/reasonml/reason-native.git:rely.opam#20b1997b6451d9715dfdbeec86a9d274c7430ed8@d41d8cd9",
         "@opam/uutf@opam:1.0.4@ba7fbef7", "@opam/uucp@opam:16.0.0@ded5dcba",
@@ -201,19 +201,19 @@
         [ "windows", "x86_64" ]
       ]
     },
-    "esy-harfbuzz@github:syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232@d41d8cd9": {
-      "id": "esy-harfbuzz@github:syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232@d41d8cd9",
+    "esy-harfbuzz@github:syaiful6/esy-harfbuzz#ccc214a40f57aa71695e1b4a8eca5c6f351cb51a@d41d8cd9": {
+      "id": "esy-harfbuzz@github:syaiful6/esy-harfbuzz#ccc214a40f57aa71695e1b4a8eca5c6f351cb51a@d41d8cd9",
       "name": "esy-harfbuzz",
-      "version": "github:syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232",
+      "version": "github:syaiful6/esy-harfbuzz#ccc214a40f57aa71695e1b4a8eca5c6f351cb51a",
       "source": {
         "type": "install",
         "source": [
-          "github:syaiful6/esy-harfbuzz#8c653146d5abea4c6ca4045450bc8bee7e45f232"
+          "github:syaiful6/esy-harfbuzz#ccc214a40f57aa71695e1b4a8eca5c6f351cb51a"
         ]
       },
       "overrides": [],
-      "dependencies": [],
-      "devDependencies": [],
+      "dependencies": [ "esy-cmake@0.3.5@d41d8cd9" ],
+      "devDependencies": [ "esy-cmake@0.3.5@d41d8cd9" ],
       "available": [
         [ "darwin", "x86_64" ],
         [ "darwin", "arm64" ],
@@ -221,19 +221,19 @@
         [ "windows", "x86_64" ]
       ]
     },
-    "esy-freetype2@2.9.1008@d41d8cd9": {
-      "id": "esy-freetype2@2.9.1008@d41d8cd9",
+    "esy-freetype2@github:syaiful6/esy-freetype2#5a8ba7245f14f9668c8f9436a82e8ff6e4959204@d41d8cd9": {
+      "id": "esy-freetype2@github:syaiful6/esy-freetype2#5a8ba7245f14f9668c8f9436a82e8ff6e4959204@d41d8cd9",
       "name": "esy-freetype2",
-      "version": "2.9.1008",
+      "version": "github:syaiful6/esy-freetype2#5a8ba7245f14f9668c8f9436a82e8ff6e4959204",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://registry.npmjs.org/esy-freetype2/-/esy-freetype2-2.9.1008.tgz#sha1:cdc4443f6bf763fd44b3eeaf8fd0b1c1df6fdea9"
+          "github:syaiful6/esy-freetype2#5a8ba7245f14f9668c8f9436a82e8ff6e4959204"
         ]
       },
       "overrides": [],
       "dependencies": [ "esy-cmake@0.3.5@d41d8cd9" ],
-      "devDependencies": [],
+      "devDependencies": [ "esy-cmake@0.3.5@d41d8cd9" ],
       "available": [
         [ "darwin", "x86_64" ],
         [ "darwin", "arm64" ],

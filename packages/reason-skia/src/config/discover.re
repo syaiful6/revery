@@ -97,6 +97,7 @@ let flags = os =>
     @ ["-verbose"]
     @ cclib("-lfontconfig")
     @ cclib("-lfreetype")
+    @ cclib("-lbrotlidec")
     @ cclib("-lz")
     @ cclib("-lbz2")
     @ cclib("-lsvg")
@@ -198,6 +199,7 @@ let libs = os =>
       "-lsvg",
       "-lskia",
       "-lfreetype",
+      "-lbrotlidec",
       "-lz",
       "-L" ++ getenv("JPEG_LIB_PATH"),
       "-ljpeg",
@@ -241,6 +243,7 @@ let libs = os =>
       "-lsvg",
       "-lskia",
       "-lfreetype",
+      "-lbrotlidec",
       "-lfontconfig",
       "-lz",
       "-lbz2",
