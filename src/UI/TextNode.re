@@ -89,7 +89,17 @@ class textNode (text: string) = {
                 | [] => ()
                 | [shapedRun, ...remainingRuns] =>
                   let typeface = ShapeResult.resolveFont(shapedRun.textRun);
+                  let scaleFactor =
+                    FontRenderer.getScaleFactorForTypeface(
+                      ~primaryFont=font,
+                      ~typeface,
+                      ~size=_fontSize,
+                    );
+                  let effectiveFontSize = _fontSize *. scaleFactor;
+
                   Skia.Font.setTypeface(_font, typeface);
+                  Skia.Font.setSize(_font, effectiveFontSize);
+
                   let shapes =
                     shapedRun.nodes
                     |> List.map((node: ShapeResult.shapeNode) => {
@@ -105,7 +115,7 @@ class textNode (text: string) = {
                        });
                   Skia.TextBlobBuillder.allocRunPos(
                     ~font=_font,
-                    ~fontSize=_fontSize,
+                    ~fontSize=effectiveFontSize,
                     ~shapes,
                     ~baselineX=offset^,
                     ~baselineY,
@@ -115,7 +125,10 @@ class textNode (text: string) = {
                   let runTotalWidth =
                     List.fold_left(
                       (acc: float, node: ShapeResult.shapeNode) =>
-                        acc +. node.xAdvance *. _fontSize /. node.unitsPerEm,
+                        acc
+                        +. node.xAdvance
+                        *. effectiveFontSize
+                        /. node.unitsPerEm,
                       0.,
                       shapedRun.nodes,
                     );
@@ -145,15 +158,25 @@ class textNode (text: string) = {
               shapedNodes
               |> List.fold_left(
                    (acc, shapedRun: ShapeResult.shapedRun) => {
+                     let typeface =
+                       ShapeResult.resolveFont(shapedRun.textRun);
+                     let scaleFactor =
+                       FontRenderer.getScaleFactorForTypeface(
+                         ~primaryFont=font,
+                         ~typeface,
+                         ~size=_fontSize,
+                       );
+                     let effectiveFontSize = _fontSize *. scaleFactor;
+
                      shapedRun.nodes
                      |> List.fold_left(
                           (innerAcc, ShapeResult.{xAdvance, unitsPerEm, _}) => {
                             let scaledXadvance =
-                              xAdvance *. _fontSize /. unitsPerEm;
+                              xAdvance *. effectiveFontSize /. unitsPerEm;
                             innerAcc +. scaledXadvance;
                           },
                           acc,
-                        )
+                        );
                    },
                    0.,
                  );
