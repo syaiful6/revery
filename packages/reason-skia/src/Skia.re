@@ -70,6 +70,11 @@ module FontMetrics = {
   let getUnderlinePosition = SkiaWrapped.FontMetrics.getUnderlinePosition;
   let getAvgCharacterWidth = SkiaWrapped.FontMetrics.getAvgCharacterWidth;
   let getMaxCharacterWidth = SkiaWrapped.FontMetrics.getMaxCharacterWidth;
+  let getLeading = SkiaWrapped.FontMetrics.getLeading;
+  let getXMin = SkiaWrapped.FontMetrics.getXMin;
+  let getXMax = SkiaWrapped.FontMetrics.getXMax;
+  let getXHeight = SkiaWrapped.FontMetrics.getXHeight;
+  let getCapHeight = SkiaWrapped.FontMetrics.getCapHeight;
 };
 
 module FilterQuality = {
@@ -716,13 +721,9 @@ module Typeface = {
   let makeFromFile = SkiaWrapped.Typeface.makeFromFile;
 
   let toStreamIndex = typeface => {
-    let ptr = Ctypes.CArray.make(Ctypes.int, 1);
-    let stream =
-      SkiaWrapped.Typeface.openStream(
-        typeface,
-        Some(Ctypes.CArray.start(ptr)),
-      );
-    (stream, Ctypes.CArray.get(ptr, 0));
+    let intPtr = Ctypes.allocate(Ctypes.int, 0);
+    let stream = SkiaWrapped.Typeface.openStream(typeface, Some(intPtr));
+    (stream, Ctypes.(!@intPtr));
   };
 
   let toStream = typeface => {

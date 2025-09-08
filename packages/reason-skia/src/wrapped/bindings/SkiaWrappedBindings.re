@@ -215,6 +215,8 @@ module M = (F: FOREIGN) => {
       getf(!@metrics, SkiaTypes.FontMetrics.descent);
     let getTop = metrics => getf(!@metrics, SkiaTypes.FontMetrics.top);
     let getBottom = metrics => getf(!@metrics, SkiaTypes.FontMetrics.bottom);
+    let getLeading = metrics =>
+      getf(!@metrics, SkiaTypes.FontMetrics.leading);
     let getUnderlineThickness = metrics =>
       getf(!@metrics, SkiaTypes.FontMetrics.underlineThickness);
     let getUnderlinePosition = metrics =>
@@ -223,6 +225,12 @@ module M = (F: FOREIGN) => {
       getf(!@metrics, SkiaTypes.FontMetrics.maxCharacterWidth);
     let getAvgCharacterWidth = metrics =>
       getf(!@metrics, SkiaTypes.FontMetrics.avgCharacterWidth);
+    let getXMin = metrics => getf(!@metrics, SkiaTypes.FontMetrics.xMin);
+    let getXMax = metrics => getf(!@metrics, SkiaTypes.FontMetrics.xMax);
+    let getXHeight = metrics =>
+      getf(!@metrics, SkiaTypes.FontMetrics.xHeight);
+    let getCapHeight = metrics =>
+      getf(!@metrics, SkiaTypes.FontMetrics.capHeight);
   };
 
   module ImageFilter = {

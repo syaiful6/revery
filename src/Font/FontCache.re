@@ -63,6 +63,14 @@ module FallbackWeighted = {
   let weight = _ => 1;
 };
 
+module SizeAdjustedFont = {
+  type t = {
+    font: t,
+    adjustedSize: float,
+    scaleFactor: float,
+  };
+};
+
 module FontIdWeighted = {
   type item = {
     familyName: string,

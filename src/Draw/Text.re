@@ -40,7 +40,7 @@ let charWidth =
   switch (FontCache.load(maybeSkia)) {
   | Ok(font) =>
     let text = Zed_utf8.singleton(uchar);
-    FontRenderer.measure(~smoothing, font, fontSize, text).width;
+    Revery_Font.measure(~smoothing, font, fontSize, text).width;
 
   | Error(_) => 0.
   };
@@ -65,7 +65,7 @@ let dimensions =
 
   switch (FontCache.load(maybeSkia)) {
   // TODO: Properly implement
-  | Ok(font) => FontRenderer.measure(~smoothing, font, fontSize, text)
+  | Ok(font) => Revery_Font.measure(~smoothing, font, fontSize, text)
 
   | Error(_) => {
       width: 0.,
